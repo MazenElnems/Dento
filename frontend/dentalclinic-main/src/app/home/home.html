@@ -1,0 +1,71 @@
+<section class="hero">
+
+    <!-- ── LEFT ── -->
+    <div class="hero-left">
+
+        <!-- Badge -->
+        <div class="badge">
+            <div class="badge-dot">
+                <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
+                   10-4.48 10-10S17.52 2 12 2zm-1 14l-4-4
+                   1.41-1.41L11 13.17l6.59-6.59L19 8l-8 8z"/>
+        </svg>
+            </div>
+            <span class="badge-text">Aesthetic Intelligence Hub</span>
+        </div>
+
+        <!-- Title -->
+        <h1 class="hero-title">
+            Medical<br>Excellence.
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="hero-sub">
+            Integrating high-fidelity dental diagnostics with premium restorative architecture to redefine your clinical experience.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="hero-ctas">
+            <button class="cta-primary" (click)="onSynchronize()">
+        SYNCHRONIZE VISIT
+      </button>
+            <button class="cta-secondary" (click)="onPortfolio()">
+        CORE PORTFOLIO
+      </button>
+        </div>
+
+    </div>
+
+    <!-- ── RIGHT ── -->
+    <div class="hero-right">
+        <div class="clinic-img-wrap">
+
+            <!-- Clinic Image -->
+            <img [src]="clinicImageUrl" alt="Dental Clinic Interior" />
+
+            <!-- Float Card: Rating -->
+            <div class="float-card float-top-right">
+                <div class="card-content">
+                    <div class="card-number">4.9/5.0</div>
+                    <div class="card-label">SATISFACTION RATING</div>
+                </div>
+            </div>
+
+            <!-- Float Card: Procedures -->
+            <div class="float-card float-bottom-left">
+                <div class="procedures-icon">
+                    <svg viewBox="0 0 24 24" fill="white">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
+                </div>
+                <div class="card-content">
+                    <div class="card-number">Elite 15K+</div>
+                    <div class="card-label">SUCCESSFUL PROCEDURES</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>

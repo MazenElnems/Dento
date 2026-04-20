@@ -1,0 +1,241 @@
+:host {
+    display: block;
+}
+
+.footer {
+    background: #0a1628;
+    color: #ffffff;
+    font-family: 'DM Sans', sans-serif;
+    padding: 64px 60px 0;
+}
+
+
+/* ── Grid ── */
+
+.footer-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1.2fr 1.5fr;
+    gap: 48px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid #1a2a45;
+}
+
+
+/* ── Brand ── */
+
+.footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.footer-logo i {
+    color: #1e6fff;
+    font-size: 1.4rem;
+}
+
+.footer-desc {
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: #7a8aaa;
+    max-width: 270px;
+    margin-bottom: 28px;
+}
+
+
+/* Socials */
+
+.footer-socials {
+    display: flex;
+    gap: 10px;
+}
+
+.social-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #13243d;
+    border: 1px solid #1a3050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7a8aaa;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background 0.25s, color 0.25s, transform 0.2s, border-color 0.25s;
+}
+
+.social-btn:hover {
+    background: #1e6fff;
+    color: #ffffff;
+    border-color: #1e6fff;
+    transform: translateY(-4px);
+}
+
+
+/* ── Columns ── */
+
+.footer-col .col-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.footer-col .col-title i {
+    color: #1e6fff;
+    font-size: 1rem;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-col ul li a {
+    font-size: 0.88rem;
+    color: #7a8aaa;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s, gap 0.2s;
+}
+
+.footer-col ul li a i {
+    font-size: 0.75rem;
+    color: #1e6fff;
+    transition: transform 0.2s;
+}
+
+.footer-col ul li a:hover {
+    color: #ffffff;
+    gap: 10px;
+}
+
+.footer-col ul li a:hover i {
+    transform: translateX(2px);
+}
+
+
+/* ── Contact ── */
+
+.contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.contact-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: #7a8aaa;
+    line-height: 1.5;
+}
+
+.contact-list li i {
+    color: #1e6fff;
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+
+/* Book Button */
+
+.book-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1e6fff;
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    padding: 13px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.book-btn:hover {
+    background: #155de0;
+    transform: scale(1.04);
+}
+
+.book-btn i {
+    font-size: 1rem;
+}
+
+
+/* ── Bottom Bar ── */
+
+.footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    font-size: 0.8rem;
+    color: #3a4a60;
+}
+
+.bottom-links {
+    display: flex;
+    gap: 24px;
+}
+
+.bottom-links a {
+    color: #3a4a60;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.bottom-links a:hover {
+    color: #ffffff;
+}
+
+
+/* ── Responsive ── */
+
+@media (max-width: 1024px) {
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .footer {
+        padding: 40px 24px 0;
+    }
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    .footer-bottom {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+}

@@ -1,0 +1,200 @@
+/* ── Reset ─────────────────────────────────────────────── */
+.vcr-wrap * {
+  box-sizing: border-box;
+}
+
+/* ── Variables & Wrapper ───────────────────────────────── */
+.vcr-wrap {
+  --navy:   #0d1b3e;
+  --navy-2: #1a2c52;
+  --slate:  #4a5a7a;
+  --blue:   #2563eb;
+  --bg:     #f4f6fb;
+  --white:  #ffffff;
+
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg);
+  width: 100%;
+}
+
+/* ── Hero ──────────────────────────────────────────────── */
+.vcr-hero {
+  width: 100%;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 72px 24px 80px;
+  gap: 28px;
+  height: 90vh;
+}
+
+.vcr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #eef1f9;
+  border: 1px solid #d5daf0;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--blue);
+  text-transform: uppercase;
+}
+
+.vcr-badge svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--blue);
+  fill: none;
+  flex-shrink: 0;
+}
+
+.vcr-hero-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: clamp(52px, 7vw, 90px);
+  line-height: 1.05;
+  color: var(--navy);
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.vcr-hero-sub {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--slate);
+  text-align: center;
+  max-width: 560px;
+}
+
+/* ── Null Registry ─────────────────────────────────────── */
+.vcr-null-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+.vcr-null-card {
+  width: 100%;
+  max-width: 900px;
+  background: #f8f9fc;
+  border: 1.5px dashed #d0d7e8;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 64px 40px;
+}
+
+.vcr-folder-icon {
+  width: 70px;
+  height: 70px;
+}
+
+.vcr-null-title {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  color: var(--navy);
+  text-transform: uppercase;
+}
+
+.vcr-null-desc {
+  font-size: 14px;
+  color: var(--slate);
+  text-align: center;
+  max-width: 420px;
+  line-height: 1.6;
+}
+
+.vcr-btn-outline {
+  margin-top: 8px;
+  display: inline-block;
+  padding: 14px 36px;
+  border-radius: 999px;
+  border: 1.5px solid #b0bcdc;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--blue);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.vcr-btn-outline:hover {
+  background: var(--blue);
+  color: var(--white);
+  border-color: var(--blue);
+}
+
+/* ── CTA ───────────────────────────────────────────────── */
+.vcr-cta-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px 64px;
+}
+
+.vcr-cta-card {
+  width: 100%;
+  max-width: 900px;
+  background: linear-gradient(110deg, #a8c4f8 0%, #2563eb 55%, #1d4fd7 100%);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 40px;
+  gap: 16px;
+  box-shadow: 0 24px 60px rgba(37, 99, 235, 0.28);
+}
+
+.vcr-cta-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: clamp(30px, 4vw, 46px);
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.vcr-cta-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 480px;
+  line-height: 1.65;
+}
+
+.vcr-btn-solid {
+  margin-top: 12px;
+  display: inline-block;
+  padding: 18px 52px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: none;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--navy);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.vcr-btn-solid:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}

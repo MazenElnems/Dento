@@ -1,0 +1,132 @@
+# ===========================
+# Operating System
+# ===========================
+.DS_Store
+Thumbs.db
+
+# ===========================
+# Visual Studio / Rider / VS Code
+# ===========================
+.vs/
+.vscode/
+.idea/
+
+*.user
+*.rsuser
+*.suo
+*.userprefs
+*.sln.docstates
+*.sln
+
+# ===========================
+# Build Output (.NET)
+# ===========================
+bin/
+obj/
+Debug/
+Release/
+
+# ===========================
+# Build results
+# ===========================
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# ===========================
+# ASP.NET Core
+# ===========================
+publish/
+artifacts/
+
+# ===========================
+# Publish Profiles
+# ===========================
+Properties/PublishProfiles/
+*.pubxml
+*.publishproj
+
+# ===========================
+# Node / Angular
+# ===========================
+node_modules/
+dist/
+.angular/
+.pnpm-store/
+
+# ===========================
+# Logs
+# ===========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===========================
+# Cache
+# ===========================
+.history/
+.cache/
+build/
+build-analytics/
+.build-analytics/
+
+# ===========================
+# Bazel
+# ===========================
+/bazel-out/
+integration/bazel/bazel-*
+.bazelrc.user
+
+# ===========================
+# Temporary Editor Files
+# ===========================
+*.swp
+*.swo
+*~
+
+# ===========================
+# Environment / Secrets
+# ===========================
+.env
+.env.*
+!*.env.example
+
+*secret.js
+
+# ===========================
+# Dev Containers
+# ===========================
+.devcontainer/*
+!.devcontainer/README.md
+!.devcontainer/recommended-devcontainer.json
+!.devcontainer/recommended-Dockerfile
+
+# ===========================
+# Misc
+# ===========================
+.c9
+.settings/
+.notes.md
+baseline.json
+.husky/_
+
+# ===========================
+# Keep Lock Files
+# ===========================
+# Keep these for reproducible builds
+!package-lock.json
+!pnpm-lock.yaml
+!yarn.lock
+!pubspec.lock

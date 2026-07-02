@@ -139,6 +139,7 @@ public class AccountController : BaseApiController
 
 
     [HttpPost]
+    [Authorize(Roles = RoleNames.Admin)]
     public async Task<ActionResult<ApiResponse<string>>> RegisterReceptionist(RegisterDTO input)
     {
         if (User.Identity != null && User.Identity.IsAuthenticated)

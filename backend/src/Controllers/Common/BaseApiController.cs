@@ -6,7 +6,7 @@ namespace Dento.Controllers.Common;
 
 public class BaseApiController : ControllerBase
 {
-    public CurrentUser GetCurrentUser()
+    protected CurrentUser GetCurrentUser()
     {
         if (User.Identity == null || !User.Identity.IsAuthenticated)
         {

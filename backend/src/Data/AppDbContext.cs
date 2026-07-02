@@ -1,8 +1,10 @@
 ﻿using Dento.Constants;
 using Dento.Data.Entities;
+using Dento.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Dento.Data;
 
@@ -14,9 +16,23 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
 
 
+    public DbSet<Doctor> Doctors { get; set; }
+
+
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+
+        builder.Entity<Doctor>()
+        .HasKey(d => d.ApplicationUserId);
+
+        builder.Entity<Doctor>()
+            .HasOne(d => d.User)
+            .WithOne(u => u.Doctor)
+            .HasForeignKey<Doctor>(d => d.ApplicationUserId);
+
 
         builder.Entity<IdentityRole>().HasData(
         new IdentityRole

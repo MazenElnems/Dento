@@ -1,1 +1,46 @@
-<p>services works!</p>
+<section class="services-hero">
+  <span class="services-badge">
+    <i class="bi bi-heart-pulse"></i>
+    Clinical Services Grid
+  </span>
+  <h1 class="services-hero-title">Medical<br>Procedures.</h1>
+  <p class="services-hero-sub">
+    Browse our full diagnostic and restorative suite. Every procedure is executed with high-fidelity accuracy using advanced clinical technology.
+  </p>
+</section>
+
+<section class="services-list-section">
+  <div class="services-cards-grid">
+    <div *ngFor="let s of services" class="service-detail-card">
+      <div class="service-image-wrap">
+        <img [src]="s.image" [alt]="s.name" class="service-photo" />
+      </div>
+
+      <div class="service-header">
+        <div class="service-icon">
+          <i [class]="'bi ' + s.icon"></i>
+        </div>
+        <div class="service-pricing">
+          <span class="price-val">{{ s.price }}</span>
+          <span class="duration-val"><i class="bi bi-clock"></i> {{ s.duration }}</span>
+        </div>
+      </div>
+
+      <h3 class="service-card-title">{{ s.name }}</h3>
+      <p class="service-card-desc">{{ s.desc }}</p>
+
+      <ul class="service-benefits">
+        <li *ngFor="let b of s.benefits">
+          <i class="bi bi-check-circle-fill text-primary"></i>
+          <span>{{ b }}</span>
+        </li>
+      </ul>
+
+      <div class="service-action">
+        <button class="btn-book-service" routerLink="/book">
+          Book Appointment <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

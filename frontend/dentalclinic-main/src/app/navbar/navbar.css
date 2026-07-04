@@ -35,12 +35,18 @@
 /* â”€â”€ Logo â”€â”€ */
 
 .nav-logo {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: #0d1117;
-    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    height: 96px;
+    margin-top: -24px;
+    margin-bottom: -24px;
     cursor: pointer;
+}
+
+.nav-logo-img {
+    height: 100%;
+    width: auto;
+    display: block;
 }
 
 

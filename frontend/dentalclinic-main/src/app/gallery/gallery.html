@@ -17,29 +17,56 @@
     </p>
   </section>
 
-   <!-- Null Registry -->
-  <section class="vcr-null-section">
-    <div class="vcr-null-card">
-      <svg class="vcr-folder-icon" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 12C8 8.686 10.686 6 14 6H30L38 16H66C69.314 16 72 18.686 72 22V54C72 57.314 69.314 60 66 60H14C10.686 60 8 57.314 8 54V12Z" fill="#0d1b3e"/>
-        <path d="M4 22C4 18.686 6.686 16 10 16H70C73.314 16 76 18.686 76 22V54C76 57.314 73.314 60 70 60H10C6.686 60 4 57.314 4 54V22Z" fill="#1a2c52"/>
-      </svg>
-
-      <p class="vcr-null-title">NULL_REGISTRY</p>
-      <p class="vcr-null-desc">The visual matrix for this category is currently being updated with high-fidelity case data.</p>
-      <a href="#" class="vcr-btn-outline">Reset Matrix Filter</a>
+  <!-- Filters Bar -->
+  <section class="vcr-filters-section">
+    <div class="filter-buttons">
+      <button type="button" class="filter-btn" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">ALL_MATRIX</button>
+      <button type="button" class="filter-btn" [class.active]="activeFilter === 'restoration'" (click)="setFilter('restoration')">RESTORATION</button>
+      <button type="button" class="filter-btn" [class.active]="activeFilter === 'orthodontics'" (click)="setFilter('orthodontics')">ORTHODONTICS</button>
+      <button type="button" class="filter-btn" [class.active]="activeFilter === 'implants'" (click)="setFilter('implants')">IMPLANTS</button>
     </div>
   </section>
 
-   <!-- CTA -->
+  <!-- Visual Grid -->
+  <section class="vcr-grid-section">
+    <div class="vcr-grid">
+      <div *ngFor="let item of filteredCases" class="vcr-card animate-fade">
+        <!-- Comparative Photographic Visualizer (Before / After Real Photos) -->
+        <div class="comparative-graphic">
+          <div class="split-col-img">
+            <span class="split-badge">BEFORE</span>
+            <img [src]="item.beforeImg" alt="Before treatment" class="gallery-photo" />
+          </div>
+          <div class="split-divider"></div>
+          <div class="split-col-img">
+            <span class="split-badge success">AFTER</span>
+            <img [src]="item.afterImg" alt="After treatment" class="gallery-photo" />
+          </div>
+        </div>
+
+        <div class="vcr-card-body">
+          <div class="category-tag">{{ item.category | uppercase }}</div>
+          <h3 class="case-title">{{ item.title }}</h3>
+          <p class="case-desc">{{ item.description }}</p>
+          <div class="case-details">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>{{ item.details }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
   <section class="vcr-cta-section">
     <div class="vcr-cta-card">
       <h2 class="vcr-cta-title">Ready for Calibration?</h2>
       <p class="vcr-cta-desc">
         Inspired by our clinical archive? Harmonize your own aesthetic journey today with our board-certified restorative team.
       </p>
-      <a href="#" class="vcr-btn-solid">Initiate Consultation</a>
+      <a routerLink="/book" class="vcr-btn-solid">Initiate Consultation</a>
     </div>
   </section>
 
 </div>
+

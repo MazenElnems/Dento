@@ -1,0 +1,301 @@
+:host {
+  display: block;
+  background: #ffffff;
+}
+
+/* About Hero */
+.about-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 100px 60px 60px;
+  background: #ffffff;
+}
+
+.about-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #e8eaf0;
+  border-radius: 50px;
+  padding: 9px 18px;
+  width: fit-content;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0d1117;
+}
+
+.about-badge i {
+  color: #3b6bff;
+  font-size: 0.85rem;
+}
+
+.about-hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(3rem, 5.5vw, 5rem);
+  font-weight: 800;
+  color: #0d1117;
+  line-height: 1.0;
+  letter-spacing: -2px;
+}
+
+.about-hero-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #8a8fa8;
+  max-width: 480px;
+}
+
+/* Philosophy Section */
+.philosophy-section {
+  padding: 60px;
+  background: #f5f6f8;
+}
+
+.philosophy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+}
+
+.philosophy-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.philosophy-card .icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #e8eaf0;
+  color: #3b6bff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 24px;
+}
+
+.philosophy-card h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0d1117;
+  margin-bottom: 16px;
+}
+
+.philosophy-card p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem;
+  color: #8a8fa8;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Medical Team Section */
+.team-section {
+  padding: 100px 60px;
+  background: #ffffff;
+}
+
+.section-header {
+  margin-bottom: 60px;
+}
+
+.section-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #3b6bff;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #0d1117;
+  margin: 0;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 40px;
+}
+
+.doctor-card {
+  border: 1px solid #e8eaf0;
+  border-radius: 24px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  background: #ffffff;
+}
+
+.doctor-card:hover {
+  border-color: #0d1117;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.04);
+}
+
+.doc-header {
+  margin-bottom: 20px;
+}
+
+.doc-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0d1117;
+  margin-bottom: 4px;
+}
+
+.doc-role {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #3b6bff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.doc-bio {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #8a8fa8;
+  margin-bottom: 24px;
+}
+
+.doc-credentials {
+  margin-bottom: 32px;
+}
+
+.doc-credentials h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0d1117;
+  margin-bottom: 12px;
+}
+
+.doc-credentials ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.doc-credentials ul li {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  color: #5a5f78;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.doc-credentials ul li i {
+  color: #3b6bff;
+}
+
+.btn-book-doc {
+  width: 100%;
+  background: #0d1117;
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  padding: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.btn-book-doc:hover {
+  background: #252d3a;
+}
+
+/* Technologies Section */
+.tech-section {
+  padding: 100px 60px;
+  background: #f5f6f8;
+}
+
+.tech-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.tech-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #8a8fa8;
+  margin-top: 16px;
+}
+
+.tech-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tech-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.tech-card h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0d1117;
+  margin-bottom: 8px;
+}
+
+.tech-card p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #8a8fa8;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .about-hero, .philosophy-section, .team-section, .tech-section {
+    padding: 60px 24px;
+  }
+  
+  .tech-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+}

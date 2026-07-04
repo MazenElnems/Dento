@@ -69,3 +69,190 @@
     </div>
 
 </section>
+
+<!-- SERVICES PREVIEW -->
+<section class="home-services">
+    <div class="section-header">
+        <span class="section-eyebrow">Clinical Offerings</span>
+        <h2 class="section-title">High-Fidelity Procedures</h2>
+    </div>
+    <div class="services-preview-grid">
+        <!-- Whitening -->
+        <div class="service-preview-card">
+            <div class="card-icon"><i class="bi bi-brightness-high"></i></div>
+            <h3>Teeth Whitening</h3>
+            <p>Enhance your smile aesthetics with our advanced laser whitening technology. Safe, fast, and highly effective.</p>
+            <a routerLink="/services" class="card-link">Explore Procedure <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <!-- Implants -->
+        <div class="service-preview-card">
+            <div class="card-icon"><i class="bi bi-shield-check"></i></div>
+            <h3>Dental Implants</h3>
+            <p>Premium restorative titanium implants designed to fully restore bite function and natural tooth aesthetics.</p>
+            <a routerLink="/services" class="card-link">Explore Procedure <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <!-- Ortho -->
+        <div class="service-preview-card">
+            <div class="card-icon"><i class="bi bi-grid-3x3"></i></div>
+            <h3>Orthodontics</h3>
+            <p>State-of-the-art clear aligners and traditional brackets calibrated for precise orthodontic alignment.</p>
+            <a routerLink="/services" class="card-link">Explore Procedure <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- WHY CHOOSE US -->
+<section class="why-us">
+    <div class="why-us-grid">
+        <div class="why-us-left">
+            <span class="section-eyebrow">Clinic Philosophy</span>
+            <h2 class="section-title-large">Designed for Aesthetic Precision & Comfort</h2>
+            <p class="section-desc">Our practice leverages high-fidelity diagnostics and a patient-centric workflow to ensure every visit is calibrated for maximum comfort and clinical excellence.</p>
+            <ul class="features-list">
+                <li><i class="bi bi-check-circle-fill text-primary"></i> 3D Intraoral Diagnostics</li>
+                <li><i class="bi bi-check-circle-fill text-primary"></i> Fully Sterilized Modern Labs</li>
+                <li><i class="bi bi-check-circle-fill text-primary"></i> Digital Appointment Tracking</li>
+            </ul>
+        </div>
+        <div class="why-us-right">
+            <div class="features-card-grid">
+                <div class="feature-card">
+                    <h4>99.8%</h4>
+                    <p>Clinical Success Rate</p>
+                </div>
+                <div class="feature-card">
+                    <h4>12+</h4>
+                    <p>Board Certified Dentists</p>
+                </div>
+                <div class="feature-card">
+                    <h4>24/7</h4>
+                    <p>Support Channels</p>
+                </div>
+                <div class="feature-card">
+                    <h4>15K+</h4>
+                    <p>Satisfied Patients</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+    <div class="section-header text-center">
+        <span class="section-eyebrow text-center">Patient Feedback</span>
+        <h2 class="section-title text-center">Smile Transformations</h2>
+    </div>
+    <div class="testimonials-grid">
+        <div class="testimonial-card">
+            <div class="stars">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+            </div>
+            <p>"The restorative implants completely changed how I smile. The digital scan was pain-free, and Dr. Mazen was extremely professional."</p>
+            <div class="patient-author">
+                <strong>Ahmed R.</strong>
+                <span>Orthodontic Patient</span>
+            </div>
+        </div>
+        <div class="testimonial-card">
+            <div class="stars">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+            </div>
+            <p>"Outstanding clinic. Booking was simple, and the laser whitening results are incredible. Dr. Hana has done a wonderful job!"</p>
+            <div class="patient-author">
+                <strong>Mariam K.</strong>
+                <span>Cosmetic Patient</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TEAM (Architects of Oral Health) -->
+<section class="home-team">
+    <div class="section-header text-center">
+        <span class="section-eyebrow text-center">MEET OUR SPECIALISTS</span>
+        <h2 class="section-title text-center">Architects of Oral Health</h2>
+    </div>
+    <div class="team-grid">
+        <div *ngFor="let doc of doctors" class="team-card">
+            <div class="doctor-photo-wrap">
+                <img [src]="doc.image" [alt]="doc.name" class="doctor-photo" />
+            </div>
+            <div class="team-card-info">
+                <h3 class="doctor-name">{{ doc.name }}</h3>
+                <span class="doctor-role">{{ doc.role }}</span>
+                <p class="doctor-desc">{{ doc.desc }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQS (Common Inquiries) -->
+<section class="home-faqs">
+    <div class="section-header text-center">
+        <span class="section-eyebrow text-center">ANY QUESTIONS</span>
+        <h2 class="section-title text-center">Common Inquiries</h2>
+    </div>
+    <div class="faq-accordion-list">
+        <div *ngFor="let faq of faqs; let i = index" class="faq-item" [class.active]="activeFaqIndex === i">
+            <div class="faq-question" (click)="toggleFaq(i)">
+                <span>{{ faq.question }}</span>
+                <i class="bi" [class.bi-chevron-down]="activeFaqIndex !== i" [class.bi-chevron-up]="activeFaqIndex === i"></i>
+            </div>
+            <div class="faq-answer" *ngIf="activeFaqIndex === i">
+                <p>{{ faq.answer }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BLOG (The Clinical Journal) -->
+<section class="home-journal">
+    <div class="journal-section-header">
+        <div>
+            <span class="section-eyebrow">INSIGHTS</span>
+            <h2 class="section-title">The Clinical Journal</h2>
+        </div>
+        <a routerLink="/about" class="btn-read-journal">READ THE JOURNAL</a>
+    </div>
+    <div class="journal-grid">
+        <div *ngFor="let article of articles" class="journal-card">
+            <div class="journal-image-wrap">
+                <img [src]="article.image" [alt]="article.title" class="journal-image" />
+            </div>
+            <div class="journal-card-body">
+                <span class="journal-meta">{{ article.tag }} • {{ article.date }}</span>
+                <h3 class="journal-card-title">{{ article.title }}</h3>
+                <p class="journal-card-desc">{{ article.desc }}</p>
+                <a routerLink="/book" class="journal-read-more">Read More <i class="bi bi-chevron-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PREMIUM CALL TO ACTION -->
+<section class="premium-cta">
+    <div class="premium-cta-content text-center">
+        <span class="premium-eyebrow">DECIDE YOUR JOURNEY</span>
+        <h2 class="premium-title">Redefine Your Clinical<br>Experience.</h2>
+        <p class="premium-desc">
+            Join the thousands of patients who have transformed their lives through Dento's precision-engineered aesthetic restoration system.
+        </p>
+        <div class="premium-cta-buttons">
+            <button class="btn-premium-book" routerLink="/book">BOOK APPOINTMENT NOW</button>
+            <button class="btn-premium-tour" routerLink="/about">VIRTUAL TOUR</button>
+        </div>
+        <span class="premium-disclaimer">
+            Limited availability for next month's slots. Priority given to full case registries.
+        </span>
+    </div>
+</section>
+

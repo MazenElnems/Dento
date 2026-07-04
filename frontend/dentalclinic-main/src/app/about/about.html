@@ -1,1 +1,91 @@
-<p>about works!</p>
+<section class="about-hero">
+  <span class="about-badge">
+    <i class="bi bi-info-circle"></i>
+    About Clinic
+  </span>
+  <h1 class="about-hero-title">Medical Crew &<br>Clinical Ethos.</h1>
+  <p class="about-hero-sub">
+    We integrate aesthetic intelligence and state-of-the-art diagnostic scans to provide high-fidelity orthodontic and restorative treatments.
+  </p>
+</section>
+
+<!-- Mission & Vision Section -->
+<section class="philosophy-section">
+  <div class="philosophy-grid">
+    <div class="philosophy-card">
+      <div class="icon-wrap"><i class="bi bi-bullseye"></i></div>
+      <h3>Clinic Mission</h3>
+      <p>
+        To deliver exceptional, painless dental restorations and orthodontic precision utilizing cutting-edge scans and a patient-centric workflow.
+      </p>
+    </div>
+    <div class="philosophy-card">
+      <div class="icon-wrap"><i class="bi bi-eye"></i></div>
+      <h3>Clinic Vision</h3>
+      <p>
+        To become the regional benchmark in digital dental medicine, merging state-of-the-art diagnostics with restorative art.
+      </p>
+    </div>
+    <div class="philosophy-card">
+      <div class="icon-wrap"><i class="bi bi-heart"></i></div>
+      <h3>Core Values</h3>
+      <p>
+        Integrity, clinical fidelity, patient comfort, and continuous diagnostic innovation represent our founding tenets.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Medical Team Section -->
+<section class="team-section">
+  <div class="section-header">
+    <span class="section-eyebrow">Medical Staff</span>
+    <h2 class="section-title">Board-Certified Specialists</h2>
+  </div>
+
+  <div class="team-grid">
+    <div *ngFor="let member of team" class="doctor-card">
+      <div class="doc-header">
+        <h3 class="doc-name">{{ member.name }}</h3>
+        <span class="doc-role">{{ member.role }}</span>
+      </div>
+      <p class="doc-bio">{{ member.bio }}</p>
+      
+      <div class="doc-credentials">
+        <h4>Credentials:</h4>
+        <ul>
+          <li *ngFor="let q of member.qualifications">
+            <i class="bi bi-award"></i> {{ q }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="doc-action">
+        <button class="btn-book-doc" routerLink="/book">
+          Schedule with Doctor <i class="bi bi-calendar-check"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Technologies Section -->
+<section class="tech-section">
+  <div class="tech-container">
+    <div class="tech-left">
+      <span class="section-eyebrow">Digital Grid</span>
+      <h2 class="section-title">Clinical Infrastructure</h2>
+      <p class="tech-desc">
+        We utilize state-of-the-art diagnostic machinery to automate analysis and reduce patient exposure, ensuring absolute safety and clinical accuracy.
+      </p>
+    </div>
+    <div class="tech-right">
+      <div class="tech-list">
+        <div *ngFor="let tech of technologies" class="tech-card">
+          <h4>{{ tech.name }}</h4>
+          <p>{{ tech.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

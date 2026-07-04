@@ -1,0 +1,166 @@
+<div class="auth-page-container">
+  <!-- LEFT SIDE: BRAND SPLIT GRADIENT WITH FEATURES -->
+  <div class="auth-graphic-side signup-bg">
+    <div class="brand-logo-area">
+      <div class="signup-brand-header">
+        <img src="assets/images/logo-highquality-removebg-preview.png" alt="Dento Logo" class="brand-logo-img-signup" />
+        <span class="brand-portal-label">DentalPro Portal</span>
+      </div>
+    </div>
+    
+    <div class="auth-graphic-content">
+      <h1 class="graphic-headline">Elevating Modern<br>Dental Care.</h1>
+      <p class="graphic-tagline">
+        Join thousands of patients who manage their oral health with our streamlined clinical operating system.
+      </p>
+
+      <!-- Clinical Features Grids -->
+      <div class="clinical-features-grid">
+        <div class="clinical-feature-item">
+          <div class="clinical-feature-icon">
+            <i class="bi bi-calendar3"></i>
+          </div>
+          <div class="clinical-feature-desc">
+            <strong>24/7 Booking</strong>
+            <p>Schedule or reschedule appointments anytime, anywhere.</p>
+          </div>
+        </div>
+
+        <div class="clinical-feature-item">
+          <div class="clinical-feature-icon">
+            <i class="bi bi-folder2-open"></i>
+          </div>
+          <div class="clinical-feature-desc">
+            <strong>Medical Records</strong>
+            <p>Secure access to your history, x-rays, and treatment plans.</p>
+          </div>
+        </div>
+
+        <div class="clinical-feature-item">
+          <div class="clinical-feature-icon">
+            <i class="bi bi-shield-lock"></i>
+          </div>
+          <div class="clinical-feature-desc">
+            <strong>Secure Payments</strong>
+            <p>Fast, encrypted billing and insurance processing at your fingertips.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-graphic-footer">
+      <p class="signup-quote">
+        "The easiest way to stay on top of my dental hygiene I've ever used." — Sarah J., Patient
+      </p>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE: REGISTRATION FORM -->
+  <div class="auth-form-side">
+    <div class="form-container-card">
+      <div class="form-title-wrap">
+        <h2 class="form-title">Create Your Account</h2>
+        <p class="form-subtitle">Enter your details to get started with Dento Clinical OS.</p>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="login-form-element">
+        <div class="input-group-custom">
+          <label class="input-label-custom">Full Name</label>
+          <div class="input-field-wrap">
+            <i class="bi bi-person field-icon-custom"></i>
+            <input 
+              type="text" 
+              name="fullName"
+              [(ngModel)]="fullName"
+              placeholder="John Doe" 
+              class="input-custom-field" 
+              required
+            />
+          </div>
+        </div>
+
+        <div class="input-group-custom">
+          <label class="input-label-custom">Email Address</label>
+          <div class="input-field-wrap">
+            <i class="bi bi-envelope field-icon-custom"></i>
+            <input 
+              type="email" 
+              name="emailAddress"
+              [(ngModel)]="emailAddress"
+              placeholder="john@example.com" 
+              class="input-custom-field" 
+              required
+            />
+          </div>
+        </div>
+
+        <div class="input-group-custom">
+          <label class="input-label-custom">Phone Number</label>
+          <div class="input-field-wrap">
+            <i class="bi bi-telephone field-icon-custom"></i>
+            <input 
+              type="tel" 
+              name="phoneNumber"
+              [(ngModel)]="phoneNumber"
+              placeholder="+20 100 000 0000" 
+              class="input-custom-field" 
+              required
+            />
+          </div>
+        </div>
+
+        <div class="input-group-custom">
+          <label class="input-label-custom">Password</label>
+          <div class="input-field-wrap">
+            <i class="bi bi-lock field-icon-custom"></i>
+            <input 
+              [type]="showPasswordState ? 'text' : 'password'" 
+              name="passwordField"
+              [(ngModel)]="passwordField"
+              placeholder="••••••••" 
+              class="input-custom-field" 
+              required
+            />
+            <i 
+              class="bi eye-icon-custom" 
+              [class.bi-eye]="!showPasswordState"
+              [class.bi-eye-slash]="showPasswordState"
+              (click)="toggleShowPassword()"
+            ></i>
+          </div>
+          <span class="password-hint">Must be at least 8 characters with one special symbol.</span>
+        </div>
+
+        <div class="form-extra-row">
+          <label class="checkbox-label-custom terms-label">
+            <input type="checkbox" name="agreeTerms" [(ngModel)]="agreeTerms" required />
+            <span>I agree to the <a routerLink="/signup" class="terms-link-highlight">Terms of Service</a> and <a routerLink="/signup" class="terms-link-highlight">Privacy Policy</a>.</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-submit-auth">
+          Create Account
+        </button>
+      </form>
+
+      <div class="divider-text-custom">
+        <span>OR SIGN UP WITH</span>
+      </div>
+
+      <div class="social-login-row">
+        <button class="btn-social-custom" type="button">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" class="social-icon-img" />
+          <span>Google</span>
+        </button>
+        <button class="btn-social-custom" type="button">
+          <i class="bi bi-apple social-icon-apple"></i>
+          <span>Apple</span>
+        </button>
+      </div>
+
+      <div class="auth-bottom-switch">
+        <span>Already have an account? <a routerLink="/login" class="switch-link">Log in</a></span>
+      </div>
+    </div>
+  </div>
+</div>

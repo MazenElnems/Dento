@@ -1,0 +1,365 @@
+.auth-page-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* Graphic Side styling */
+.auth-graphic-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-bg {
+  background: linear-gradient(135deg, #0d2c6c 0%, #06193e 100%);
+  background-image: radial-gradient(circle at 20% 30%, rgba(59, 107, 255, 0.15) 0%, transparent 60%),
+                    url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Background overlay to make it dark and transparent */
+.login-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(13, 44, 108, 0.95), rgba(6, 25, 62, 0.98));
+  z-index: 1;
+}
+
+.brand-logo-area {
+  position: relative;
+  z-index: 2;
+}
+
+.brand-logo-img-login {
+  height: 48px;
+  width: auto;
+  filter: brightness(0) invert(1); /* Turns logo white for high contrast on dark bg */
+}
+
+.auth-graphic-content {
+  position: relative;
+  z-index: 2;
+  margin: auto 0;
+}
+
+.graphic-headline {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #ffffff;
+  margin-bottom: 24px;
+}
+
+.graphic-tagline {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  max-width: 480px;
+  margin-bottom: 36px;
+}
+
+/* Avatar stack */
+.patients-overlap-badge {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar-stack {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #06193e;
+  object-fit: cover;
+  margin-left: -12px;
+}
+
+.avatar-img:first-child {
+  margin-left: 0;
+}
+
+.overlap-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.auth-graphic-footer {
+  position: relative;
+  z-index: 2;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Form Side styling */
+.auth-form-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  background: #fafbfe;
+}
+
+.form-container-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border: 1px solid #e8eaf0;
+  border-radius: 24px;
+  padding: 48px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+}
+
+.form-title-wrap {
+  margin-bottom: 32px;
+}
+
+.form-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0d1117;
+  margin-bottom: 8px;
+}
+
+.form-subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: #8a8fa8;
+}
+
+.login-form-element {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-label-custom {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4e5d78;
+}
+
+.input-field-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-icon-custom {
+  position: absolute;
+  left: 16px;
+  font-size: 1.1rem;
+  color: #8a8fa8;
+}
+
+.input-custom-field {
+  width: 100%;
+  padding: 14px 16px 14px 48px;
+  border: 1.5px solid #e8eaf0;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem;
+  color: #0d1117;
+  transition: all 0.2s;
+  background: #ffffff;
+}
+
+.input-custom-field:focus {
+  outline: none;
+  border-color: #005ac6;
+  box-shadow: 0 0 0 3px rgba(0, 90, 198, 0.1);
+}
+
+.eye-icon-custom {
+  position: absolute;
+  right: 16px;
+  font-size: 1.1rem;
+  color: #8a8fa8;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.eye-icon-custom:hover {
+  color: #005ac6;
+}
+
+.form-extra-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+}
+
+.checkbox-label-custom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4e5d78;
+  cursor: pointer;
+}
+
+.checkbox-label-custom input {
+  accent-color: #005ac6;
+}
+
+.forgot-pass-link {
+  color: #005ac6;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.forgot-pass-link:hover {
+  text-decoration: underline;
+}
+
+.btn-submit-auth {
+  background: #005ac6;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.btn-submit-auth:hover {
+  background: #004ba5;
+  transform: translateY(-1px);
+}
+
+.divider-text-custom {
+  position: relative;
+  text-align: center;
+  margin: 28px 0;
+}
+
+.divider-text-custom::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e8eaf0;
+  z-index: 1;
+}
+
+.divider-text-custom span {
+  position: relative;
+  z-index: 2;
+  background: #ffffff;
+  padding: 0 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #8a8fa8;
+  letter-spacing: 0.05em;
+}
+
+.social-login-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.btn-social-custom {
+  background: #ffffff;
+  border: 1.5px solid #e8eaf0;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #4e5d78;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-social-custom:hover {
+  background: #fafbfe;
+  border-color: #ccd2e0;
+}
+
+.social-icon-img {
+  width: 18px;
+  height: 18px;
+}
+
+.social-icon-apple {
+  font-size: 1.1rem;
+  color: #0d1117;
+}
+
+.auth-bottom-switch {
+  text-align: center;
+  margin-top: 32px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  color: #8a8fa8;
+}
+
+.switch-link {
+  color: #005ac6;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.switch-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+  .auth-page-container {
+    grid-template-columns: 1fr;
+  }
+  .auth-graphic-side {
+    display: none;
+  }
+  .auth-form-side {
+    padding: 24px;
+    min-height: 100vh;
+  }
+  .form-container-card {
+    padding: 32px 24px;
+    border: none;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,108 @@
+<div class="auth-page-container">
+  <!-- LEFT SIDE: BRAND SPLIT GRAPHIC -->
+  <div class="auth-graphic-side login-bg">
+    <div class="brand-logo-area">
+      <img src="assets/images/logo-highquality-removebg-preview.png" alt="Dento Logo" class="brand-logo-img-login" />
+    </div>
+    
+    <div class="auth-graphic-content">
+      <h1 class="graphic-headline">Your Smile,<br>Our Priority.</h1>
+      <p class="graphic-tagline">
+        Manage your appointments, access dental records, and communicate with your care team in one secure place.
+      </p>
+
+      <!-- Active Patients Overlap Badges -->
+      <div class="patients-overlap-badge">
+        <div class="avatar-stack">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80" alt="patient 1" class="avatar-img" />
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=80" alt="patient 2" class="avatar-img" />
+          <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80" alt="patient 3" class="avatar-img" />
+        </div>
+        <span class="overlap-text">Join 10k+ active patients</span>
+      </div>
+    </div>
+
+    <div class="auth-graphic-footer">
+      <span>© 2026 Dento Clinical OS. Certified Medical Data Security.</span>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE: FORM CARD -->
+  <div class="auth-form-side">
+    <div class="form-container-card">
+      <div class="form-title-wrap">
+        <h2 class="form-title">Welcome Back</h2>
+        <p class="form-subtitle">Sign in to manage your clinical profile.</p>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="login-form-element">
+        <div class="input-group-custom">
+          <label class="input-label-custom">Email or Patient ID</label>
+          <div class="input-field-wrap">
+            <i class="bi bi-person field-icon-custom"></i>
+            <input 
+              type="text" 
+              name="emailOrId"
+              [(ngModel)]="emailOrId"
+              placeholder="Enter your email or ID" 
+              class="input-custom-field" 
+              required
+            />
+          </div>
+        </div>
+
+        <div class="input-group-custom">
+          <label class="input-label-custom">Password</label>
+          <div class="input-field-wrap">
+            <i class="bi bi-lock field-icon-custom"></i>
+            <input 
+              [type]="showPasswordState ? 'text' : 'password'" 
+              name="passwordField"
+              [(ngModel)]="passwordField"
+              placeholder="••••••••" 
+              class="input-custom-field" 
+              required
+            />
+            <i 
+              class="bi eye-icon-custom" 
+              [class.bi-eye]="!showPasswordState"
+              [class.bi-eye-slash]="showPasswordState"
+              (click)="toggleShowPassword()"
+            ></i>
+          </div>
+        </div>
+
+        <div class="form-extra-row">
+          <label class="checkbox-label-custom">
+            <input type="checkbox" name="rememberMe" [(ngModel)]="rememberMe" />
+            <span>Remember me</span>
+          </label>
+          <a routerLink="/login" class="forgot-pass-link">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="btn-submit-auth">
+          Sign In <i class="bi bi-arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="divider-text-custom">
+        <span>OR CONTINUE WITH</span>
+      </div>
+
+      <div class="social-login-row">
+        <button class="btn-social-custom" type="button">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" class="social-icon-img" />
+          <span>Google</span>
+        </button>
+        <button class="btn-social-custom" type="button">
+          <i class="bi bi-apple social-icon-apple"></i>
+          <span>Apple ID</span>
+        </button>
+      </div>
+
+      <div class="auth-bottom-switch">
+        <span>New patient? <a routerLink="/signup" class="switch-link">Create an account</a></span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -5,6 +5,8 @@ import { Gallery } from './gallery/gallery';
 import { Home } from './home/home';
 import { Services } from './services/services';
 import { Booking } from './booking/booking';
+import { Login } from './auth/login/login';
+import { Signup } from './auth/signup/signup';
 
 export const routes: Routes = [
   { path: '' , redirectTo:"home" , pathMatch:'full' , title:"Home"},
@@ -15,6 +17,8 @@ export const routes: Routes = [
   { path: 'contact', component: Contact , title: 'Contact', children:[
     { path: "home" , redirectTo:"home" , pathMatch:'full' , title:"Home"},
   ]},
-  { path: 'book', component: Booking, title: 'Book Appointment' }
+  { path: 'book', component: Booking, title: 'Book Appointment' },
+  { path: 'login', component: Login, title: 'Login' },
+  { path: 'signup', component: Signup, title: 'Sign Up' }
 ];
 

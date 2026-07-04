@@ -147,7 +147,52 @@
 }
 
 
-/* â”€â”€ Responsive â”€â”€ */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.nav-signin-link {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #0d1117;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.nav-signin-link:hover {
+    color: #3b6bff;
+}
+
+.nav-signup-btn {
+    background: #005ac6;
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.nav-signup-btn:hover {
+    background: #004ba5;
+    transform: scale(1.02);
+}
+
+.nav-auth-divider {
+    width: 1px;
+    height: 18px;
+    background: #edeef2;
+    margin: 0 4px;
+}
+
+/* ── Responsive ── */
 
 @media (max-width: 900px) {
     .navbar {

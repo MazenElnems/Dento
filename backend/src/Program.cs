@@ -1,18 +1,28 @@
 using Dento.Data;
-using Dento.Data.Entities;
 using Dento.Middlewares;
+using Dento.Models;
+using Dento.Options;
+using Dento.Services.Implementation;
+using Dento.Services.Interfaces;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<ITokenService, JwtTokenService>();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
 builder.Services.AddDbContext<AppDbContext>(o => 
     o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -27,7 +37,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 6;
 }) .AddEntityFrameworkStores<AppDbContext>();
-
 
 builder.Services.AddAuthentication(op =>
 {
@@ -45,12 +54,23 @@ builder.Services.AddAuthentication(op =>
         ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SigningKey"]!)),
+        ValidIssuer = builder.Configuration["JWTSettings:Issuer"],
+        ValidAudience = builder.Configuration["JWTSettings:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:SecretKey"]!)),
         ClockSkew = TimeSpan.Zero
     };
 });
+
+// Hangfire
+builder.Services.AddHangfire(config =>
+{
+    config
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"));
+
+}).AddHangfireServer();
 
 builder.Services.AddCors(op =>
 {
@@ -62,7 +82,16 @@ builder.Services.AddCors(op =>
     });
 });
 
+// Configure strongly typed settings objects
+builder.Services.Configure<JwtTokenSettings>(builder.Configuration.GetSection("JWTSettings"));
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+
 var app = builder.Build();
+
+// Initialize the database (Check for pending migrations and apply them and seeding the default roles)
+using var scope = app.Services.CreateScope();
+var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+await dbInitializer.InitializeAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

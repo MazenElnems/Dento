@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Dento.Data;
 using Dento.Middlewares;
 using Dento.Models;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,21 +19,48 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+// DbContext
+builder.Services.AddDbContext<AppDbContext>(o =>
+    o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    .EnableSensitiveDataLogging()
+);
+
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.EnableAnnotations();
+    options.SwaggerDoc("v1", new OpenApiInfo()
+    {
+        Title = "Dento Api",
+        Version = "1.0"
+    });
+
+    options.SwaggerDoc("v2", new OpenApiInfo()
+    {
+        Title = "Dento Api",
+        Version = "2.0"
+    });
+});
+
+// API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
 });
 
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
-builder.Services.AddDbContext<AppDbContext>(o => 
-    o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-    .EnableSensitiveDataLogging()   
-);
-
+// Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -42,6 +71,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 }) .AddEntityFrameworkStores<AppDbContext>()
    .AddDefaultTokenProviders();
 
+// JWT Authentication
 builder.Services.AddAuthentication(op =>
 {
     op.DefaultAuthenticateScheme =
@@ -102,7 +132,11 @@ await dbInitializer.InitializeAsync();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "1.0");
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "2.0");
+    });
 }
 
 app.UseCors("MyPolicy");

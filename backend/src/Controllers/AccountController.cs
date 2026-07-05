@@ -1,4 +1,5 @@
-﻿using Dento.Constants;
+﻿using Azure;
+using Dento.Constants;
 using Dento.Controllers.Common;
 using Dento.Data;
 using Dento.DTOs;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Dento.Controllers;
 
@@ -39,7 +41,25 @@ public class AccountController : BaseApiController
         _clientSettings = clientSettings.Value;
     }
 
+    /// <summary>
+    /// Registers a new patient account.
+    /// </summary>
+    /// <remarks>
+    /// Creates a new patient account and sends a verification code to the user's email.
+    /// The email address must be unique.
+    /// The caller must not already be authenticated.
+    /// </remarks>
+    /// <param name="request">Patient registration information.</param>
+    /// <returns>The created user's identifier and email address.</returns>
+    /// <response code="200">Registration completed successfully. Verification code has been sent.</response>
+    /// <response code="400">Invalid request, email already exists, or user is already authenticated.</response>
+    /// <response code="500">An unexpected error occurred while creating the account.</response>
+    /// 
     [HttpPost("register")]
+    [SwaggerOperation( Summary = "Register a new patient", Description = "Creates a patient account and sends an email verification code.")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse>> Register(RegisterPatientRequestDto request)
     {
         var currentUser = GetCurrentUser();
@@ -105,7 +125,22 @@ public class AccountController : BaseApiController
         return Ok(ApiResponse.SuccessResponse(patientDto));
     }
 
+
+    /// <summary>
+    /// Verifies a user's email address.
+    /// </summary>
+    /// <remarks>
+    /// Confirms the user's email using the verification code previously sent.
+    /// The verification code must be active and not expired.
+    /// </remarks>
+    /// <param name="request">Verification request.</param>
+    /// <returns>A success message.</returns>
+    /// <response code="200">Email verified successfully.</response>
+    /// <response code="400">Invalid or expired verification code.</response>
     [HttpPost("verify-email")]
+    [SwaggerOperation(Summary = "Verify email", Description = "Verifies a user's email using the verification code.")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse>> VerifyEmail(VerifyEmailRequestDto request)
     {
         var verificationCode = await _context
@@ -126,7 +161,21 @@ public class AccountController : BaseApiController
         return ApiResponse.SuccessResponse("Email verified successfully.", StatusCodes.Status200OK);
     }
 
+
+    /// <summary>
+    /// Sends a new email verification code.
+    /// </summary>
+    /// <remarks>
+    /// Invalidates any previously active verification codes before generating a new one.
+    /// </remarks>
+    /// <param name="request">User email.</param>
+    /// <returns>A success message.</returns>
+    /// <response code="200">Verification code sent successfully.</response>
+    /// <response code="404">No account exists with the specified email.</response>
     [HttpPost("send-verification-code")]
+    [SwaggerOperation(Summary = "Resend verification code", Description = "Generates and emails a new verification code.")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> SendVerificationCode(SendVerificationCodeRequestDto request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
@@ -156,7 +205,21 @@ public class AccountController : BaseApiController
         return ApiResponse.SuccessResponse("Verification code sent successfully.", StatusCodes.Status200OK);
     }
 
+
+    /// <summary>
+    /// Sends a password reset email.
+    /// </summary>
+    /// <remarks>
+    /// Generates a password reset token and sends a password reset link to the user's email.
+    /// </remarks>
+    /// <param name="request">User email.</param>
+    /// <returns>A success message.</returns>
+    /// <response code="200">Password reset email sent.</response>
+    /// <response code="404">No account exists with the specified email.</response>
     [HttpPost("forget-password")]
+    [SwaggerOperation(Summary = "Request password reset", Description = "Generates a password reset link and emails it to the user.")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> ForgetPassword(ForgetPasswordRequestDto request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
@@ -173,7 +236,23 @@ public class AccountController : BaseApiController
         return ApiResponse.SuccessResponse("Password reset email sent successfully.", StatusCodes.Status200OK);
     }
 
+
+    /// <summary>
+    /// Resets a user's password.
+    /// </summary>
+    /// <remarks>
+    /// Resets the user's password using a valid password reset token.
+    /// </remarks>
+    /// <param name="request">Password reset information.</param>
+    /// <returns>A success message.</returns>
+    /// <response code="200">Password reset successfully.</response>
+    /// <response code="400">Invalid or expired reset token.</response>
+    /// <response code="404">User not found.</response>
     [HttpPost("reset-password")]
+    [SwaggerOperation(Summary = "Reset password", Description = "Resets the user's password using the reset token.")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> ResetPassword(ResetPasswordRequestDto request)
     {
         var user = await _userManager.FindByIdAsync(request.UserId);
@@ -189,8 +268,25 @@ public class AccountController : BaseApiController
         return ApiResponse.SuccessResponse("Password reset successfully.", StatusCodes.Status200OK);
     }
 
+
+    /// <summary>
+    /// Creates a dentist account.
+    /// </summary>
+    /// <remarks>
+    /// Creates a new dentist user and assigns the Dentist role.
+    /// Only administrators can access this endpoint.
+    /// </remarks>
+    /// <param name="input">Dentist registration information.</param>
+    /// <returns>The created dentist.</returns>
+    /// <response code="201">Dentist created successfully.</response>
+    /// <response code="400">Invalid request or email already exists.</response>
+    /// <response code="401">Authentication required.</response>
+    /// <response code="403">Only administrators can perform this operation.</response>
     [HttpPost("register-dentist")]
     [Authorize(Roles = RoleNames.Admin)]
+    [SwaggerOperation(Summary = "Register dentist", Description = "Creates a new dentist account.")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse>> RegisterDoctor(RegisterDoctorDto input)
     {
         var existingUser = await _userManager.FindByEmailAsync(input.Email);
@@ -236,8 +332,26 @@ public class AccountController : BaseApiController
                 StatusCodes.Status201Created));
     }
 
+
+    /// <summary>
+    /// Creates a receptionist account.
+    /// </summary>
+    /// <remarks>
+    /// Creates a receptionist user and assigns the Receptionist role.
+    /// Only administrators can access this endpoint.
+    /// </remarks>
+    /// <param name="input">Receptionist registration information.</param>
+    /// <returns>A success message.</returns>
+    /// <response code="200">Receptionist created successfully.</response>
+    /// <response code="400">Invalid request or email already exists.</response>
+    /// <response code="401">Authentication required.</response>
+    /// <response code="403">Only administrators can perform this operation.</response>
     [Authorize(Roles = RoleNames.Admin)]
     [HttpPost("register-receptionist")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(Summary = "Register receptionist", Description = "Creates a new receptionist account.")]
     public async Task<ActionResult<ApiResponse>> RegisterReceptionist(RegisterPatientRequestDto input)
     {
         if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -281,7 +395,27 @@ public class AccountController : BaseApiController
         }
     }
 
+
+    /// <summary>
+    /// Authenticates a user.
+    /// </summary>
+    /// <remarks>
+    /// Validates the supplied credentials and returns an access token.
+    /// If the user's email is not verified, the response indicates that email verification is required instead of returning a token.
+    /// The caller must not already be authenticated.
+    /// </remarks>
+    /// <param name="request">User credentials.</param>
+    /// <returns>Authentication token and user information.</returns>
+    /// <response code="200">Authentication completed successfully.</response>
+    /// <response code="400">User is already authenticated.</response>
+    /// <response code="401">Invalid email or password.</response>
+    /// <response code="500">The user account is improperly configured.</response>
     [HttpPost("login")]
+    [SwaggerOperation(Summary = "Authenticate user", Description = "Authenticates a user and returns a JWT access token.")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse>> Login(LoginRequestDto request)
     {
         var currentUser = GetCurrentUser();

@@ -20,7 +20,22 @@ public class SmtpEmailService : IEmailService
         _logger = logger;
     }
 
-    public async Task SendVerificationEmailAsync(string userName, string email, string verificationCode, int expirationMinutes)
+    public async Task SendResetPasswordEmailAsync(string userName, string email, string resetPasswordUrl, int expirationMinutes = 30)
+    {
+        var templatePath = Path.Combine(_env.WebRootPath, "EmailTemplates", "ResetPasswordEmail.html");
+
+        var template = await File.ReadAllTextAsync(templatePath);
+
+        var body = template
+            .Replace("{{UserName}}", userName)
+            .Replace("{{Email}}", email)
+            .Replace("{{ResetPasswordUrl}}", resetPasswordUrl)
+            .Replace("{{ExpirationMinutes}}", expirationMinutes.ToString());
+
+        await SendAsync(email, userName, "Reset Password", body);
+    }
+
+    public async Task SendVerificationEmailAsync(string userName, string email, string verificationCode, int expirationMinutes = 30)
     {
         var templatePath = Path.Combine(_env.WebRootPath, "EmailTemplates", "VerificationEmail.html");
 

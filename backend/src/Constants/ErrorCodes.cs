@@ -12,6 +12,7 @@ public static class ErrorCodes
     public const string UserAlreadyLoggedIn = "AUTH_USER_ALREADY_LOGGED_IN";
     public const string InvalidVerificationCode = "AUTH_INVALID_VERIFICATION_CODE";
     public const string EmailNotFound = "AUTH_EMAIL_NOT_FOUND";
+    public const string UserNotFound = "AUTH_USER_NOT_FOUND";
 
 
 }

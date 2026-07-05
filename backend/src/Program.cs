@@ -36,7 +36,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 6;
-}) .AddEntityFrameworkStores<AppDbContext>();
+}) .AddEntityFrameworkStores<AppDbContext>()
+   .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(op =>
 {
@@ -85,6 +86,7 @@ builder.Services.AddCors(op =>
 // Configure strongly typed settings objects
 builder.Services.Configure<JwtTokenSettings>(builder.Configuration.GetSection("JWTSettings"));
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.Configure<ClientSettings>(builder.Configuration.GetSection("ClientSettings"));
 
 var app = builder.Build();
 

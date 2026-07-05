@@ -4,12 +4,14 @@ using Dento.Data;
 using Dento.DTOs;
 using Dento.Exceptions;
 using Dento.Models;
+using Dento.Options;
 using Dento.Services.Interfaces;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Dento.Controllers;
 
@@ -21,17 +23,20 @@ public class AccountController : BaseApiController
     private readonly ITokenService _tokenService;
     private readonly AppDbContext _context;
     private readonly IEmailService _emailService;
+    private readonly ClientSettings _clientSettings;
 
     public AccountController(
         UserManager<ApplicationUser> userManager,
         AppDbContext context,
         ITokenService authService,
-        IEmailService emailService)
+        IEmailService emailService,
+        IOptions<ClientSettings> clientSettings)
     {
         _userManager = userManager;
         _context = context;
         _tokenService = authService;
         _emailService = emailService;
+        _clientSettings = clientSettings.Value;
     }
 
     [HttpPost("register")]
@@ -149,6 +154,39 @@ public class AccountController : BaseApiController
 
         BackgroundJob.Enqueue(() => _emailService.SendVerificationEmailAsync(user.FirstName, user.Email!, code, 30));
         return ApiResponse.SuccessResponse("Verification code sent successfully.", StatusCodes.Status200OK);
+    }
+
+    [HttpPost("forget-password")]
+    public async Task<ActionResult<ApiResponse>> ForgetPassword(ForgetPasswordRequestDto request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+
+        if (user == null) 
+            return NotFound(ApiResponse.ErrorResponse(ErrorCodes.EmailNotFound, StatusCodes.Status404NotFound));
+    
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        var resetPasswordUrl = $"{_clientSettings.Host}/reset-password?userId={user.Id}&token={token}";
+
+        BackgroundJob.Enqueue(() => _emailService.SendResetPasswordEmailAsync(user.FirstName, user.Email!, resetPasswordUrl, 30));
+
+        return ApiResponse.SuccessResponse("Password reset email sent successfully.", StatusCodes.Status200OK);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult<ApiResponse>> ResetPassword(ResetPasswordRequestDto request)
+    {
+        var user = await _userManager.FindByIdAsync(request.UserId);
+
+        if(user == null)
+            return NotFound(ApiResponse.ErrorResponse(ErrorCodes.UserNotFound, StatusCodes.Status404NotFound));
+
+        var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+
+        if (!result.Succeeded)
+            return BadRequest(ApiResponse.ErrorResponse(result.Errors.First().Code, StatusCodes.Status400BadRequest));
+
+        return ApiResponse.SuccessResponse("Password reset successfully.", StatusCodes.Status200OK);
     }
 
     [HttpPost("register-dentist")]

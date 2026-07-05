@@ -4,6 +4,7 @@ using System.Security.Claims;
 
 namespace Dento.Controllers.Common;
 
+[ApiController]
 public class BaseApiController : ControllerBase
 {
     protected CurrentUser GetCurrentUser()

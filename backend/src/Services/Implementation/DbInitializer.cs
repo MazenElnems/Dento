@@ -1,14 +1,17 @@
 ﻿using Dento.Constants;
 using Dento.Data;
+using Dento.Models;
 using Dento.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dento.Services.Implementation;
 
-public class DbInitializer(AppDbContext context) : IDbInitializer
+public class DbInitializer(AppDbContext context, IConfiguration configuration, UserManager<ApplicationUser> userManager) : IDbInitializer
 {
     private readonly AppDbContext _context = context;
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly IConfiguration _configuration = configuration;
 
     public async Task InitializeAsync()
     {
@@ -27,6 +30,27 @@ public class DbInitializer(AppDbContext context) : IDbInitializer
         {
             await _context.Roles.AddRangeAsync(GetDefaultRoles());
             await _context.SaveChangesAsync();
+        }
+
+        var adminUserEmail = _configuration["AdminUser:Email"];
+        var adminUserPassword = _configuration["AdminUser:Password"];
+
+        if (adminUserEmail != null && adminUserPassword != null)
+        {
+            if (!_context.Admins.Any())
+            {
+                var admin = new Admin
+                {
+                    Email = adminUserEmail,
+                    UserName = adminUserEmail,
+                    FirstName = "Admin",
+                    MiddleName = "Admin",
+                    LastName = "Admin",
+                    EmailConfirmed = true
+                };
+                await _userManager.CreateAsync(admin, adminUserPassword);
+                await _userManager.AddToRoleAsync(admin, RoleNames.Admin);
+            }
         }
     }
 

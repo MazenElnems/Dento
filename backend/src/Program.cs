@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +42,31 @@ builder.Services.AddSwaggerGen(options =>
         Title = "Dento Api",
         Version = "2.0"
     });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' followed by your token. Example: Bearer eyJhbGciOiJIUzI1..."
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
 });
 
 // API Versioning
@@ -72,25 +98,22 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
    .AddDefaultTokenProviders();
 
 // JWT Authentication
-builder.Services.AddAuthentication(op =>
+builder.Services.AddAuthentication(options =>
 {
-    op.DefaultAuthenticateScheme =
-    op.DefaultChallengeScheme =
-    op.DefaultForbidScheme =
-    op.DefaultSignInScheme =
-    op.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(op =>
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(o =>
 {
-    op.SaveToken = true;
-    op.TokenValidationParameters = new TokenValidationParameters
+    o.RequireHttpsMetadata = true;
+    o.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
         ValidIssuer = builder.Configuration["JWTSettings:Issuer"],
         ValidAudience = builder.Configuration["JWTSettings:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:SecretKey"]!)),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:SecretKey"]!)),
         ClockSkew = TimeSpan.Zero
     };
 });
@@ -128,6 +151,8 @@ using var scope = app.Services.CreateScope();
 var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
 await dbInitializer.InitializeAsync();
 
+app.UseMiddleware<ExceptionMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -145,7 +170,6 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 

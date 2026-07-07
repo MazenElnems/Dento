@@ -11,6 +11,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Admin> Admins { get; set; }
     public DbSet<EmailVerificationCode> EmailVerificationCodes { get; set; }
     public DbSet<Receptionist> Receptionists { get; set; }
+    public DbSet<DentistAvailability> DentistAvailability { get; set; }
+    public DbSet<Slot> Slots { get; set; }  
 
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)

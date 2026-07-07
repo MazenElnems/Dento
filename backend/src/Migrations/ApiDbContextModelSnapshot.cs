@@ -104,6 +104,68 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.UseTptMappingStrategy();
                 });
 
+            modelBuilder.Entity("Dento.Models.DentistAvailability", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DentistId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("FRI")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("FromHour")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("MON")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SAT")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SUN")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeOnly?>("SecondFromHour")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly?>("SecondToHour")
+                        .HasColumnType("time");
+
+                    b.Property<int>("SlotLengthInMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("THU")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("TUE")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("ToHour")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("WED")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DentistId")
+                        .IsUnique();
+
+                    b.ToTable("DentistAvailability");
+                });
+
             modelBuilder.Entity("Dento.Models.EmailVerificationCode", b =>
                 {
                     b.Property<int>("Id")
@@ -131,6 +193,35 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("EmailVerificationCodes");
+                });
+
+            modelBuilder.Entity("Dento.Models.Slot", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<string>("DentistAvailabilityId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<TimeOnly>("From")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeOnly>("To")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DentistAvailabilityId");
+
+                    b.ToTable("Slots");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -307,6 +398,17 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.ToTable("Receptionists", (string)null);
                 });
 
+            modelBuilder.Entity("Dento.Models.DentistAvailability", b =>
+                {
+                    b.HasOne("Dento.Models.Dentist", "Dentist")
+                        .WithOne("DentistAvailability")
+                        .HasForeignKey("Dento.Models.DentistAvailability", "DentistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dentist");
+                });
+
             modelBuilder.Entity("Dento.Models.EmailVerificationCode", b =>
                 {
                     b.HasOne("Dento.Models.Patient", "User")
@@ -316,6 +418,17 @@ namespace AngDepiApi_DentalClinic.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Dento.Models.Slot", b =>
+                {
+                    b.HasOne("Dento.Models.DentistAvailability", "DentistAvailability")
+                        .WithMany("Slots")
+                        .HasForeignKey("DentistAvailabilityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DentistAvailability");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -402,6 +515,17 @@ namespace AngDepiApi_DentalClinic.Migrations
                         .WithOne()
                         .HasForeignKey("Dento.Models.Receptionist", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Dento.Models.DentistAvailability", b =>
+                {
+                    b.Navigation("Slots");
+                });
+
+            modelBuilder.Entity("Dento.Models.Dentist", b =>
+                {
+                    b.Navigation("DentistAvailability")
                         .IsRequired();
                 });
 

@@ -64,9 +64,7 @@ public class AccountController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse>> Register(RegisterPatientRequestDto request)
     {
-        var currentUser = GetCurrentUser();
-        
-        if(currentUser.IsAuthenticated)
+        if(CurrentUser.IsAuthenticated)
             return BadRequest(ApiResponse.ErrorResponse(ErrorCodes.UserAlreadyLoggedIn, StatusCodes.Status400BadRequest));
         
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
@@ -289,7 +287,7 @@ public class AccountController : BaseApiController
     [SwaggerOperation(Summary = "Register dentist", Description = "Creates a new dentist account.")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ApiResponse>> RegisterDoctor(RegisterDoctorDto input)
+    public async Task<ActionResult<ApiResponse>> RegisterDentist(RegisterDentistDto input)
     {
         var existingUser = await _userManager.FindByEmailAsync(input.Email);
 
@@ -300,13 +298,20 @@ public class AccountController : BaseApiController
                 "Email already exists.");
         }
 
-        var user = new ApplicationUser
+        var dentist = new Dentist
         {
             UserName = input.Email,
             Email = input.Email,
+            FirstName = input.FirstName,
+            MiddleName = input.MiddleName,
+            LastName = input.LastName,
+            Specialty = input.Specialty,
+            EmailConfirmed = true
         };
 
-        var result = await _userManager.CreateAsync(user, input.Password!);
+        dentist.BuildDefaultSchedule(); // intilize the dentist availability
+
+        var result = await _userManager.CreateAsync(dentist, input.Password!);
 
         if (!result.Succeeded)
         {
@@ -315,14 +320,7 @@ public class AccountController : BaseApiController
                 string.Join(", ", result.Errors.Select(e => e.Description)));
         }
 
-        await _userManager.AddToRoleAsync(user, RoleNames.Dentist);
-
-        var doctor = new Dentist
-        {
-            Specialty = input.Specialty,
-        };
-
-        _context.Dentists.Add(doctor);
+        await _userManager.AddToRoleAsync(dentist, RoleNames.Dentist);
 
         await _context.SaveChangesAsync();
 
@@ -373,7 +371,8 @@ public class AccountController : BaseApiController
             var user = new ApplicationUser
             {
                 UserName = input.Email,
-                Email = input.Email
+                Email = input.Email,
+                EmailConfirmed = true
             };
             var result = await _userManager.CreateAsync(user, input.Password!);
             if (result.Succeeded)
@@ -420,10 +419,8 @@ public class AccountController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse>> Login(LoginRequestDto request)
     {
-        var currentUser = GetCurrentUser();
-
-        if(currentUser.IsAuthenticated)
-            return ApiResponse.ErrorResponse(ErrorCodes.UserAlreadyLoggedIn, StatusCodes.Status400BadRequest);
+        if(CurrentUser.IsAuthenticated)
+            return BadRequest(ApiResponse.ErrorResponse(ErrorCodes.UserAlreadyLoggedIn, StatusCodes.Status400BadRequest));
 
         var user = await _userManager.FindByNameAsync(request.Email!);
 
@@ -435,8 +432,11 @@ public class AccountController : BaseApiController
 
         var userRoles = await _userManager.GetRolesAsync(user);
 
-        if(!userRoles.Any())
-            return ApiResponse.ErrorResponse(ErrorCodes.UnhandledException, StatusCodes.Status500InternalServerError);
+        if (!userRoles.Any())
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                ApiResponse.ErrorResponse(ErrorCodes.UnhandledException, StatusCodes.Status500InternalServerError)
+            );
 
         if (!user.EmailConfirmed)
             return ApiResponse.SuccessResponse(new { UserId = user.Id, user.Email, RequireEmailVerification = true }, "Email not confirmed.");
@@ -453,6 +453,6 @@ public class AccountController : BaseApiController
             Expiration = accessToken.ExpirationDate
         };
 
-        return Ok(ApiResponse.SuccessResponse(loginResponse, "Login successful."));
+        return ApiResponse.SuccessResponse(loginResponse, "Login successful.");
     }
 }

@@ -13,6 +13,8 @@ public static class ErrorCodes
     public const string InvalidVerificationCode = "AUTH_INVALID_VERIFICATION_CODE";
     public const string EmailNotFound = "AUTH_EMAIL_NOT_FOUND";
     public const string UserNotFound = "AUTH_USER_NOT_FOUND";
+    public const string NotOwned = "AUTH_NOT_OWNED";
 
-
+    // Dentist Schedule
+    public const string ScheduleNotFound = "SCHE_SCHEDULE_NOT_FOUND";
 }

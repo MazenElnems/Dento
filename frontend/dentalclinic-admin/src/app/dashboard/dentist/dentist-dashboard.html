@@ -1,0 +1,344 @@
+<div class="dentist-portal-container">
+  
+  <!-- Tabs Navigation -->
+  <div class="portal-nav-tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'schedule'" (click)="activeTab = 'schedule'">
+      <i class="bi bi-calendar-range"></i> Today's Schedule
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'patients'" (click)="activeTab = 'patients'">
+      <i class="bi bi-people"></i> Patients Records
+    </button>
+  </div>
+
+  <!-- Tab 1: Schedule View -->
+  @if (activeTab === 'schedule') {
+    <div class="tab-content animate-fade-in">
+      <div class="page-title">
+        <h3><i class="bi bi-clock-history"></i> My Dental Clinic Schedule</h3>
+        <p>Overview of your assigned patient appointments for the current period.</p>
+      </div>
+
+      @if (appointments.length === 0) {
+        <div class="empty-portal-state">
+          <i class="bi bi-calendar-check"></i>
+          <p>You have no appointments scheduled for today.</p>
+        </div>
+      } @else {
+        <div class="schedule-table-wrap">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Time Slot</th>
+                <th>Patient Name</th>
+                <th>Contact</th>
+                <th>Service Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (app of appointments; track app.id) {
+                <tr>
+                  <td class="time-col"><strong>{{ app.time }}</strong></td>
+                  <td class="patient-name">{{ app.patientName }}</td>
+                  <td>{{ app.patientPhone }}</td>
+                  <td>{{ app.serviceName }}</td>
+                  <td>
+                    <span class="status-badge" [class]="app.status">{{ app.status.toUpperCase() }}</span>
+                  </td>
+                  <td>
+                    @if (app.status === 'upcoming') {
+                      <button class="btn-action btn-primary-sm" (click)="selectPatient({id: app.patientId, name: app.patientName, email: '', role: 'patient', phone: app.patientPhone})">
+                        Open File <i class="bi bi-folder-symlink"></i>
+                      </button>
+                    } @else {
+                      <span class="text-muted">No Actions</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Tab 2: Patient Lookup & Detail Card -->
+  @if (activeTab === 'patients') {
+    <div class="tab-content animate-fade-in">
+      
+      @if (!selectedPatient) {
+        <div class="patient-lookup-screen">
+          <div class="page-title">
+            <h3><i class="bi bi-people-fill"></i> Patient Directory</h3>
+            <p>Select a patient to access their medical file and add clinical records.</p>
+          </div>
+
+          <div class="patients-grid">
+            @for (pat of patients; track pat.id) {
+              <div class="patient-grid-card" (click)="selectPatient(pat)">
+                <div class="patient-avatar-large">
+                  <i class="bi bi-person-fill"></i>
+                </div>
+                <h4>{{ pat.name }}</h4>
+                <p>{{ pat.phone || 'No phone number' }}</p>
+                <button class="btn-view-profile">Open Patient File</button>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <!-- Patient File Workspace -->
+        <div class="patient-workspace">
+          <div class="workspace-header">
+            <button class="btn-back" (click)="closePatientDetails()">
+              <i class="bi bi-arrow-left"></i> Back to Directory
+            </button>
+            <div class="patient-main-info">
+              <h2>{{ selectedPatient.name }}</h2>
+              <p>Email: {{ selectedPatient.email }} | Mobile: {{ selectedPatient.phone }}</p>
+            </div>
+          </div>
+
+          <!-- Actions Row -->
+          <div class="workspace-actions">
+            <button class="btn-action-primary" (click)="openRecordModal()">
+              <i class="bi bi-clipboard-pulse"></i> Add Dental Record
+            </button>
+            <button class="btn-action-primary" (click)="openPrescriptionModal()">
+              <i class="bi bi-capsule"></i> Issue Prescription
+            </button>
+            <button class="btn-action-secondary" (click)="openFollowUpModal()">
+              <i class="bi bi-calendar2-plus"></i> Schedule Follow-Up
+            </button>
+          </div>
+
+          <div class="workspace-grid">
+            
+            <!-- Left Column: Medical History details -->
+            <div class="workspace-left">
+              <div class="detail-card">
+                <h3><i class="bi bi-heart-pulse-fill"></i> Medical History Summary</h3>
+                @if (!selectedPatientHistory) {
+                  <p class="no-history-alert"><i class="bi bi-exclamation-circle"></i> Patient has not completed their medical history questionnaire yet.</p>
+                } @else {
+                  <ul class="history-details-list">
+                    <li><strong>Blood Pressure:</strong> {{ selectedPatientHistory.bloodPressure }}</li>
+                    <li><strong>Diabetes:</strong> {{ selectedPatientHistory.diabetes ? 'Yes' : 'No' }}</li>
+                    <li><strong>Heart Disease:</strong> {{ selectedPatientHistory.heartDisease ? 'Yes' : 'No' }}</li>
+                    <li><strong>Known Allergies:</strong> {{ selectedPatientHistory.allergies || 'None' }}</li>
+                    <li><strong>Daily Medications:</strong> {{ selectedPatientHistory.currentMedications || 'None' }}</li>
+                    <li><strong>Previous Surgeries:</strong> {{ selectedPatientHistory.previousSurgeries || 'None' }}</li>
+                    <li><strong>Smoking Status:</strong> {{ selectedPatientHistory.smokingStatus }}</li>
+                    @if (selectedPatientHistory.additionalNotes) {
+                      <li class="full-width"><strong>Comments:</strong> {{ selectedPatientHistory.additionalNotes }}</li>
+                    }
+                  </ul>
+                  <span class="update-stamp">Updated: {{ selectedPatientHistory.updatedAt }}</span>
+                }
+              </div>
+
+              <!-- Dental Records List -->
+              <div class="detail-card">
+                <h3><i class="bi bi-file-earmark-medical"></i> Clinic Records History</h3>
+                @if (selectedPatientRecords.length === 0) {
+                  <p class="text-muted">No clinical records registered for this patient.</p>
+                } @else {
+                  <div class="records-timeline">
+                    @for (rec of selectedPatientRecords; track rec.id) {
+                      <div class="timeline-item">
+                        <div class="item-meta">
+                          <span class="item-date">{{ rec.date }}</span>
+                          <span class="item-id">#{{ rec.id }}</span>
+                        </div>
+                        <div class="item-body">
+                          <p><strong>Diagnosis:</strong> {{ rec.diagnosis }}</p>
+                          <p><strong>Procedure:</strong> {{ rec.procedurePerformed }}</p>
+                          @if (rec.clinicalNotes) {
+                            <p class="timeline-notes"><strong>Notes:</strong> {{ rec.clinicalNotes }}</p>
+                          }
+                          @if (rec.treatmentPlan) {
+                            <p><strong>Plan:</strong> {{ rec.treatmentPlan }}</p>
+                          }
+                          @if (rec.files && rec.files.length > 0) {
+                            <div class="timeline-attachments">
+                              @for (file of rec.files; track file) {
+                                <a [href]="file" target="_blank" class="attachment-link">
+                                  <i class="bi bi-file-image"></i> View Attachment Image
+                                </a>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Right Column: Prescriptions list -->
+            <div class="workspace-right">
+              <div class="detail-card">
+                <h3><i class="bi bi-capsule-pill"></i> Issued Prescriptions</h3>
+                @if (selectedPatientPrescriptions.length === 0) {
+                  <p class="text-muted">No active prescriptions issued.</p>
+                } @else {
+                  <div class="prescriptions-column">
+                    @for (rx of selectedPatientPrescriptions; track rx.id) {
+                      <div class="rx-item">
+                        <div class="rx-meta">
+                          <strong>{{ rx.medicationName }}</strong>
+                          <span class="rx-id">#{{ rx.id }}</span>
+                        </div>
+                        <div class="rx-body">
+                          <p>Dosage: {{ rx.dosage }} | {{ rx.frequency }}</p>
+                          <p>Duration: {{ rx.duration }}</p>
+                          @if (rx.notes) {
+                            <p class="rx-comment">* {{ rx.notes }}</p>
+                          }
+                        </div>
+                        <span class="rx-date">Issued: {{ rx.date }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+          </div>
+        </div>
+      }
+
+    </div>
+  }
+
+  <!-- Modal 1: Add Dental Record -->
+  @if (showRecordModal) {
+    <div class="modal-backdrop animate-fade-in">
+      <div class="modal-card animate-zoom-in">
+        <div class="modal-header">
+          <h3>Add Clinic Record - {{ selectedPatient?.name }}</h3>
+          <button class="close-btn" (click)="closeRecordModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="diagnosis">Diagnosis</label>
+            <input type="text" id="diagnosis" [(ngModel)]="diagnosis" placeholder="e.g. Tooth decay, Gingivitis" class="styled-input">
+          </div>
+          <div class="form-group">
+            <label for="procedure">Procedure Performed</label>
+            <input type="text" id="procedure" [(ngModel)]="procedurePerformed" placeholder="e.g. Cavity filling, scaling" class="styled-input">
+          </div>
+          <div class="form-group">
+            <label for="clinicalNotes">Clinical Notes</label>
+            <textarea id="clinicalNotes" [(ngModel)]="clinicalNotes" rows="2" placeholder="Tooth status, patient response..." class="styled-textarea"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="treatmentPlan">Treatment Plan</label>
+            <input type="text" id="treatmentPlan" [(ngModel)]="treatmentPlan" placeholder="e.g. Schedule whitening in 2 weeks" class="styled-input">
+          </div>
+          <div class="form-group">
+            <label>Attach X-ray / Clinical File</label>
+            <div class="file-uploader-box">
+              <input type="file" (change)="handleFileUpload($event)" accept="image/*" class="file-input-raw">
+              <div class="uploader-overlay">
+                <i class="bi bi-cloud-upload"></i>
+                <span>{{ uploadedFile ? 'File Attached Successfully!' : 'Click to Upload X-Ray Image' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary-sm" (click)="closeRecordModal()">Cancel</button>
+          <button class="btn-primary-sm" (click)="submitRecord()">Save Record</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal 2: Issue Prescription -->
+  @if (showPrescriptionModal) {
+    <div class="modal-backdrop animate-fade-in">
+      <div class="modal-card animate-zoom-in">
+        <div class="modal-header">
+          <h3>Issue Prescription - {{ selectedPatient?.name }}</h3>
+          <button class="close-btn" (click)="closePrescriptionModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="medName">Medication Name</label>
+            <input type="text" id="medName" [(ngModel)]="medicationName" placeholder="e.g. Amoxicillin, Ibuprofen" class="styled-input">
+          </div>
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label for="dosage">Dosage</label>
+              <input type="text" id="dosage" [(ngModel)]="dosage" placeholder="e.g. 500mg, 1 tablet" class="styled-input">
+            </div>
+            <div class="form-group">
+              <label for="duration">Duration</label>
+              <input type="text" id="duration" [(ngModel)]="duration" placeholder="e.g. 7 days" class="styled-input">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="freq">Frequency</label>
+            <div class="select-wrapper">
+              <select id="freq" [(ngModel)]="frequency">
+                <option value="Once daily">Once daily</option>
+                <option value="Twice daily">Twice daily</option>
+                <option value="Three times daily">Three times daily</option>
+                <option value="Four times daily">Four times daily</option>
+                <option value="Every 8 hours">Every 8 hours</option>
+                <option value="As needed (PRN)">As needed (PRN)</option>
+              </select>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rxNotes">Instructions / Notes</label>
+            <input type="text" id="rxNotes" [(ngModel)]="rxNotes" placeholder="Take after meals" class="styled-input">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary-sm" (click)="closePrescriptionModal()">Cancel</button>
+          <button class="btn-primary-sm" (click)="submitPrescription()">Issue Rx</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal 3: Schedule Follow-Up -->
+  @if (showFollowUpModal) {
+    <div class="modal-backdrop animate-fade-in">
+      <div class="modal-card animate-zoom-in">
+        <div class="modal-header">
+          <h3>Schedule Follow-up - {{ selectedPatient?.name }}</h3>
+          <button class="close-btn" (click)="closeFollowUpModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="followDate">Date</label>
+            <input type="date" id="followDate" [(ngModel)]="followUpDate" class="styled-input">
+          </div>
+          <div class="form-group">
+            <label for="followTime">Time Slot</label>
+            <div class="select-wrapper">
+              <select id="followTime" [(ngModel)]="followUpTime">
+                @for (time of availableTimes; track time) {
+                  <option [value]="time">{{ time }}</option>
+                }
+              </select>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary-sm" (click)="closeFollowUpModal()">Cancel</button>
+          <button class="btn-primary-sm" (click)="submitFollowUp()">Schedule Slot</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

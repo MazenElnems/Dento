@@ -1,0 +1,225 @@
+@import '../dentist/dentist-dashboard.css';
+@import '../receptionist/receptionist-dashboard.css';
+
+.admin-portal-container {
+    width: 100%;
+}
+
+/* Analytics Stats Grid */
+.analytics-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.01);
+}
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.stat-data {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
+}
+
+.stat-data h3 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+/* Color Themes for Stats Card */
+.stat-card.blue .stat-icon {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+.stat-card.green .stat-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+.stat-card.red .stat-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+.stat-card.purple .stat-icon {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+/* Revenue Estimates Grid */
+.analytics-stats-subgrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.sub-stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.01);
+}
+
+.sub-stat-card span {
+    color: #64748b;
+    font-weight: 600;
+}
+
+.sub-stat-card strong {
+    color: #0f172a;
+    font-size: 0.95rem;
+}
+
+/* Chart Panel and CSS Chart */
+.chart-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.01);
+}
+
+.chart-panel h4 {
+    margin: 0 0 25px 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chart-panel h4 i {
+    color: #2563eb;
+}
+
+.css-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    height: 220px;
+    align-items: flex-end;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.chart-bar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.bar-fill {
+    width: 50%;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 8px;
+    box-sizing: border-box;
+    transition: height 0.6s ease;
+    position: relative;
+    cursor: pointer;
+}
+
+.blue-bar {
+    background: linear-gradient(to top, #2563eb, #3b82f6);
+}
+
+.blue-bar:hover {
+    background: #1d4ed8;
+}
+
+.bar-value {
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.bar-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 12px;
+    font-weight: 700;
+}
+
+/* User Role Badges */
+.role-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.role-badge.admin {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.role-badge.dentist {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.role-badge.receptionist {
+    background: #f3e8ff;
+    color: #7e22ce;
+}
+
+/* Checkbox Row Grid for Schedule */
+.checkbox-row-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.check-box-item {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Reuse standard table, forms and modals from dentist */

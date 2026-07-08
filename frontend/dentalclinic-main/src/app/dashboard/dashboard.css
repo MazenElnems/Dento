@@ -1,0 +1,4 @@
+.dashboard-wrapper {
+  min-height: calc(100vh - 96px);
+  background: #f8fafc;
+}

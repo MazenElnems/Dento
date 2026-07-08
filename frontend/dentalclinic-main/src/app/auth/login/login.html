@@ -35,6 +35,13 @@
         <p class="form-subtitle">Sign in to manage your clinical profile.</p>
       </div>
 
+      @if (errorMessage) {
+        <div class="error-banner animate-fade-in">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
       <form (ngSubmit)="onSubmit()" class="login-form-element">
         <div class="input-group-custom">
           <label class="input-label-custom">Email or Patient ID</label>

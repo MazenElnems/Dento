@@ -1,0 +1,307 @@
+<div class="admin-portal-container">
+  
+  <!-- Tabs Navigation -->
+  <div class="portal-nav-tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'analytics'" (click)="activeTab = 'analytics'">
+      <i class="bi bi-graph-up-arrow"></i> Revenue & Analytics
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">
+      <i class="bi bi-people"></i> Staff Accounts
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'schedules'" (click)="activeTab = 'schedules'">
+      <i class="bi bi-calendar3"></i> Dentist Schedules
+    </button>
+  </div>
+
+  <!-- Tab 1: Analytics & Reports -->
+  @if (activeTab === 'analytics') {
+    <div class="tab-content animate-fade-in">
+      <div class="page-title">
+        <h3><i class="bi bi-speedometer2"></i> Administrative Performance Reports</h3>
+        <p>Real-time updates on clinic revenues, appointment counts, and staff resource utilization.</p>
+      </div>
+
+      <!-- Stats Grid Cards -->
+      <div class="analytics-stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+          <div class="stat-data">
+            <span class="stat-label">Total Completed Revenue</span>
+            <h3>${{ totalRevenue }}</h3>
+          </div>
+        </div>
+
+        <div class="analytics-stats-subgrid">
+          <div class="sub-stat-card">
+            <span>Daily Estimates</span>
+            <strong>${{ dailyRevenue }}</strong>
+          </div>
+          <div class="sub-stat-card">
+            <span>Weekly Estimates</span>
+            <strong>${{ weeklyRevenue }}</strong>
+          </div>
+          <div class="sub-stat-card">
+            <span>Monthly Estimates</span>
+            <strong>${{ monthlyRevenue }}</strong>
+          </div>
+        </div>
+
+        <div class="stat-card green">
+          <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+          <div class="stat-data">
+            <span class="stat-label">Completed Appointments</span>
+            <h3>{{ completedAppCount }}</h3>
+          </div>
+        </div>
+
+        <div class="stat-card red">
+          <div class="stat-icon"><i class="bi bi-x-circle-fill"></i></div>
+          <div class="stat-data">
+            <span class="stat-label">Cancelled Visits</span>
+            <h3>{{ cancelledAppCount }}</h3>
+          </div>
+        </div>
+
+        <div class="stat-card purple">
+          <div class="stat-icon"><i class="bi bi-percent"></i></div>
+          <div class="stat-data">
+            <span class="stat-label">Dentist Utilization Rate</span>
+            <h3>{{ utilizationRate }}%</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual CSS-Animated Revenue Chart -->
+      <div class="chart-panel">
+        <h4><i class="bi bi-bar-chart-line"></i> Revenue Trends (Simulated Monthly Distribution)</h4>
+        <div class="css-chart-grid">
+          <div class="chart-bar-col">
+            <div class="bar-fill blue-bar" style="height: 45%;">
+              <span class="bar-value">$450</span>
+            </div>
+            <span class="bar-label">Week 1</span>
+          </div>
+          <div class="chart-bar-col">
+            <div class="bar-fill blue-bar" style="height: 60%;">
+              <span class="bar-value">$600</span>
+            </div>
+            <span class="bar-label">Week 2</span>
+          </div>
+          <div class="chart-bar-col">
+            <div class="bar-fill blue-bar" style="height: 85%;">
+              <span class="bar-value">$850</span>
+            </div>
+            <span class="bar-label">Week 3</span>
+          </div>
+          <div class="chart-bar-col">
+            <div class="bar-fill blue-bar" style="height: 70%;">
+              <span class="bar-value">$700</span>
+            </div>
+            <span class="bar-label">Week 4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Tab 2: User CRUD Accounts -->
+  @if (activeTab === 'users') {
+    <div class="tab-content animate-fade-in">
+      <div class="desk-header">
+        <div class="header-left">
+          <h3><i class="bi bi-people-fill"></i> Employee Accounts Directory</h3>
+          <p>Register new dentists or receptionists, review active staff listing, and toggle credentials status.</p>
+        </div>
+        <div class="header-right">
+          <button class="btn-action-primary" (click)="openStaffModal('dentist')">
+            <i class="bi bi-plus-circle"></i> Add Dentist
+          </button>
+          <button class="btn-action-secondary" (click)="openStaffModal('receptionist')">
+            <i class="bi bi-plus-circle"></i> Add Receptionist
+          </button>
+        </div>
+      </div>
+
+      <!-- Staff Accounts Table -->
+      <div class="schedule-table-wrap">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Role Type</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (usr of users; track usr.id) {
+              @if (usr.role !== 'patient') {
+                <tr>
+                  <td><code>{{ usr.id }}</code></td>
+                  <td class="patient-name">{{ usr.name }}</td>
+                  <td>{{ usr.email }}</td>
+                  <td><span class="role-badge" [class]="usr.role">{{ usr.role.toUpperCase() }}</span></td>
+                  <td>
+                    <span class="status-badge" [class]="usr.status || 'active'">{{ usr.status || 'ACTIVE' }}</span>
+                  </td>
+                  <td>
+                    <button class="btn-table-action" [class.btn-success-sm]="usr.status === 'inactive'" [class.btn-danger-sm]="usr.status !== 'inactive'" (click)="toggleUserStatus(usr)">
+                      {{ usr.status === 'inactive' ? 'Activate' : 'Deactivate' }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Tab 3: Dentist Schedules -->
+  @if (activeTab === 'schedules') {
+    <div class="tab-content animate-fade-in">
+      <div class="page-title">
+        <h3><i class="bi bi-calendar3"></i> Dentist Working Schedules</h3>
+        <p>Configure working hours, days, and slot configurations for medical personnel.</p>
+      </div>
+
+      <div class="patients-grid">
+        @for (den of dentists; track den.id) {
+          <div class="patient-grid-card">
+            <div class="patient-avatar-large">
+              <i class="bi bi-calendar2-week"></i>
+            </div>
+            <h4>{{ den.name }}</h4>
+            <p>{{ den.email }}</p>
+            <button class="btn-action-primary" (click)="openScheduleModal(den)">
+              <i class="bi bi-sliders"></i> Configure Schedule
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Modal 1: Add Staff Member -->
+  @if (showStaffModal) {
+    <div class="modal-backdrop animate-fade-in">
+      <div class="modal-card animate-zoom-in">
+        <div class="modal-header">
+          <h3>Register New Staff ({{ staffType === 'dentist' ? 'Dentist' : 'Receptionist' }})</h3>
+          <button class="close-btn" (click)="closeStaffModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" [(ngModel)]="staffFirstName" placeholder="First" class="styled-input">
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" [(ngModel)]="staffLastName" placeholder="Last" class="styled-input">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Employee Email</label>
+            <input type="email" [(ngModel)]="staffEmail" placeholder="employee@clinic.com" class="styled-input">
+          </div>
+          <div class="form-group">
+            <label>Workspace Password</label>
+            <input type="password" [(ngModel)]="staffPassword" placeholder="••••••••" class="styled-input">
+          </div>
+
+          @if (staffType === 'dentist') {
+            <div class="form-group">
+              <label>Clinical Specialty</label>
+              <input type="text" [(ngModel)]="staffSpecialty" placeholder="e.g. Orthodontist, Implantology" class="styled-input">
+            </div>
+          } @else {
+            <div class="form-group">
+              <label>Contact Phone</label>
+              <input type="tel" [(ngModel)]="staffPhone" placeholder="01000000000" class="styled-input">
+            </div>
+            <div class="grid-2-modal">
+              <div class="form-group">
+                <label>Gender</label>
+                <div class="select-wrapper">
+                  <select [(ngModel)]="staffGender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                  <i class="bi bi-chevron-down"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Birth Date</label>
+                <input type="date" [(ngModel)]="staffBirthDate" class="styled-input">
+              </div>
+            </div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary-sm" (click)="closeStaffModal()">Cancel</button>
+          <button class="btn-primary-sm" (click)="submitStaff()">Add Employee</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal 2: Config Schedule -->
+  @if (showScheduleModal) {
+    <div class="modal-backdrop animate-fade-in">
+      <div class="modal-card animate-zoom-in">
+        <div class="modal-header">
+          <h3>Schedule Config - {{ selectedDentistForSchedule?.name }}</h3>
+          <button class="close-btn" (click)="closeScheduleModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Working Days</label>
+            <div class="checkbox-row-grid">
+              <label class="check-box-item"><input type="checkbox" [(ngModel)]="sat"> Sat</label>
+              <label class="check-box-item"><input type="checkbox" [(ngModel)]="sun"> Sun</label>
+              <label class="check-box-item"><input type="checkbox" [(ngModel)]="mon"> Mon</label>
+              <label class="check-box-item"><input type="checkbox" [(ngModel)]="tue"> Tue</label>
+              <label class="check-box-item"><input type="checkbox" [(ngModel)]="wed"> Wed</label>
+              <label class="check-box-item"><input type="checkbox" [(ngModel)]="thu"> Thu</label>
+              <label class="check-box-item"><input type="checkbox" [(ngModel)]="fri"> Fri</label>
+            </div>
+          </div>
+
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label for="fHour">From Hour</label>
+              <input type="time" id="fHour" [(ngModel)]="fromHour" class="styled-input">
+            </div>
+            <div class="form-group">
+              <label for="tHour">To Hour</label>
+              <input type="time" id="tHour" [(ngModel)]="toHour" class="styled-input">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="sLength">Slot Duration (Minutes)</label>
+            <div class="select-wrapper">
+              <select id="sLength" [(ngModel)]="slotLength">
+                <option [value]="15">15 mins</option>
+                <option [value]="30">30 mins</option>
+                <option [value]="45">45 mins</option>
+                <option [value]="60">60 mins</option>
+              </select>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary-sm" (click)="closeScheduleModal()">Cancel</button>
+          <button class="btn-primary-sm" (click)="submitSchedule()">Save Schedule</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

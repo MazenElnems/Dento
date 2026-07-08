@@ -363,3 +363,24 @@
     box-shadow: none;
   }
 }
+
+/* ── Error Banner Styling ── */
+.error-banner {
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #991b1b;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+}
+
+.error-banner i {
+  color: #ef4444;
+  font-size: 1rem;
+}
+

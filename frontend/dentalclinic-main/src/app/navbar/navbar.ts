@@ -1,6 +1,7 @@
 import { NgFor } from '@angular/common';
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -10,6 +11,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './navbar.css',
 })
 export class Navbar {
+  authService = inject(AuthService);
+  private router = inject(Router);
+
   links = [
     { label: 'Home', path: '/' },
     { label: 'Services', path: '/services' },
@@ -17,4 +21,9 @@ export class Navbar {
     { label: 'Gallery', path: '/gallery' },
     { label: 'Contact', path: '/contact' },
   ];
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/']);
+  }
 }

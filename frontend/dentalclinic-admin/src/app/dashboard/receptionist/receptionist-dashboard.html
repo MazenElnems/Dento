@@ -1,0 +1,182 @@
+<div class="receptionist-portal">
+  
+  <!-- Desk Header Actions -->
+  <div class="desk-header">
+    <div class="header-left">
+      <h3><i class="bi bi-calendar-check-fill"></i> Receptionist Scheduling Desk</h3>
+      <p>Manage daily clinic schedules, book manual walk-ins/phone calls, and manage emergency slots.</p>
+    </div>
+    <div class="header-right">
+      <button class="btn-action-primary" (click)="openBookingModal(false)">
+        <i class="bi bi-telephone-inbound"></i> Book Appointment
+      </button>
+      <button class="btn-action-danger" (click)="openBookingModal(true)">
+        <i class="bi bi-exclamation-triangle"></i> Emergency Slot
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Ribbon -->
+  <div class="filters-ribbon">
+    <div class="filter-group">
+      <label>Filter by Dentist</label>
+      <div class="select-wrapper-sm">
+        <select [(ngModel)]="selectedDentistFilter">
+          <option value="all">All Dentists</option>
+          @for (den of dentists; track den.id) {
+            <option [value]="den.id">{{ den.name }}</option>
+          }
+        </select>
+        <i class="bi bi-chevron-down"></i>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label>Filter by Status</label>
+      <div class="select-wrapper-sm">
+        <select [(ngModel)]="selectedStatusFilter">
+          <option value="all">All Statuses</option>
+          <option value="upcoming">Upcoming</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <i class="bi bi-chevron-down"></i>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label>Filter by Date</label>
+      <input type="date" [(ngModel)]="selectedDateFilter" class="styled-date-input">
+    </div>
+  </div>
+
+  <!-- Appointments Desk Table -->
+  <div class="schedule-table-wrap">
+    @if (getFilteredAppointments().length === 0) {
+      <div class="empty-portal-state">
+        <i class="bi bi-search"></i>
+        <p>No appointments match the selected filters.</p>
+      </div>
+    } @else {
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Date / Time</th>
+            <th>Patient Name</th>
+            <th>Contact Phone</th>
+            <th>Service Type</th>
+            <th>Dentist Assigned</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (app of getFilteredAppointments(); track app.id) {
+            <tr [class.emergency-row]="app.isEmergency">
+              <td class="time-col">
+                <strong>{{ app.dateStr }} - {{ app.time }}</strong>
+                @if (app.isEmergency) {
+                  <span class="emergency-badge">Emergency</span>
+                }
+              </td>
+              <td class="patient-name">{{ app.patientName }}</td>
+              <td>{{ app.patientPhone }}</td>
+              <td>{{ app.serviceName }}</td>
+              <td>{{ app.dentistName }}</td>
+              <td>
+                <span class="status-badge" [class]="app.status">{{ app.status.toUpperCase() }}</span>
+              </td>
+              <td>
+                @if (app.status === 'upcoming') {
+                  <div class="action-buttons-cell">
+                    <button class="btn-table-action btn-success-sm" (click)="completeAppointment(app.id)">
+                      Complete
+                    </button>
+                    <button class="btn-table-action btn-danger-sm" (click)="cancelAppointment(app.id)">
+                      Cancel
+                    </button>
+                  </div>
+                } @else {
+                  <span class="text-muted">Archived</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <!-- Manual Booking Modal (Dual purpose) -->
+  @if (showBookingModal) {
+    <div class="modal-backdrop animate-fade-in">
+      <div class="modal-card animate-zoom-in">
+        <div class="modal-header" [class.emergency-modal-header]="isEmergencyBooking">
+          <h3>
+            <i class="bi" [class.bi-exclamation-triangle]="isEmergencyBooking" [class.bi-calendar-plus]="!isEmergencyBooking"></i>
+            {{ isEmergencyBooking ? 'Emergency Appointment Allocation' : 'Manual Appointment Booking' }}
+          </h3>
+          <button class="close-btn" (click)="closeBookingModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="pName">Patient Name</label>
+            <input type="text" id="pName" [(ngModel)]="patientName" placeholder="Enter patient name" class="styled-input">
+          </div>
+          <div class="form-group">
+            <label for="pPhone">Patient Phone Number</label>
+            <input type="tel" id="pPhone" [(ngModel)]="patientPhone" placeholder="e.g. 01000000000" class="styled-input">
+          </div>
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label for="service">Select Service</label>
+              <div class="select-wrapper">
+                <select id="service" [(ngModel)]="bookingService">
+                  @for (s of services; track s.id) {
+                    <option [value]="s.id">{{ s.name }} (${{ s.price }})</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="bDentist">Assign Dentist</label>
+              <div class="select-wrapper">
+                <select id="bDentist" [(ngModel)]="bookingDentistId">
+                  @for (d of dentists; track d.id) {
+                    <option [value]="d.id">{{ d.name }}</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label for="bDate">Appointment Date</label>
+              <input type="date" id="bDate" [(ngModel)]="bookingDate" class="styled-input">
+            </div>
+            <div class="form-group">
+              <label for="bTime">Time Slot</label>
+              <div class="select-wrapper">
+                <select id="bTime" [(ngModel)]="bookingTime">
+                  @for (t of availableTimes; track t) {
+                    <option [value]="t">{{ t }}</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary-sm" (click)="closeBookingModal()">Cancel</button>
+          <button [class]="isEmergencyBooking ? 'btn-danger-sm' : 'btn-primary-sm'" (click)="submitBooking()">
+            {{ isEmergencyBooking ? 'Confirm Emergency Slot' : 'Confirm Appointment' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

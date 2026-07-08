@@ -63,19 +63,83 @@
         <p class="form-subtitle">Enter your details to get started with Dento Clinical OS.</p>
       </div>
 
+      @if (errorMessage) {
+        <div class="error-banner animate-fade-in">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
       <form (ngSubmit)="onSubmit()" class="login-form-element">
-        <div class="input-group-custom">
-          <label class="input-label-custom">Full Name</label>
-          <div class="input-field-wrap">
-            <i class="bi bi-person field-icon-custom"></i>
-            <input 
-              type="text" 
-              name="fullName"
-              [(ngModel)]="fullName"
-              placeholder="John Doe" 
-              class="input-custom-field" 
-              required
-            />
+        <!-- First, Middle, Last Name Rows -->
+        <div class="name-fields-row">
+          <div class="input-group-custom name-col">
+            <label class="input-label-custom">First Name</label>
+            <div class="input-field-wrap">
+              <i class="bi bi-person field-icon-custom"></i>
+              <input 
+                type="text" 
+                name="firstName"
+                [(ngModel)]="firstName"
+                placeholder="First" 
+                class="input-custom-field" 
+                required
+              />
+            </div>
+          </div>
+          <div class="input-group-custom name-col">
+            <label class="input-label-custom">Middle</label>
+            <div class="input-field-wrap">
+              <input 
+                type="text" 
+                name="middleName"
+                [(ngModel)]="middleName"
+                placeholder="Middle" 
+                class="input-custom-field" 
+                required
+              />
+            </div>
+          </div>
+          <div class="input-group-custom name-col">
+            <label class="input-label-custom">Last Name</label>
+            <div class="input-field-wrap">
+              <input 
+                type="text" 
+                name="lastName"
+                [(ngModel)]="lastName"
+                placeholder="Last" 
+                class="input-custom-field" 
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Gender and Birth Date -->
+        <div class="grid-2-fields">
+          <div class="input-group-custom">
+            <label class="input-label-custom">Gender</label>
+            <div class="input-field-wrap">
+              <i class="bi bi-gender-ambiguous field-icon-custom"></i>
+              <select name="gender" [(ngModel)]="gender" class="input-custom-field select-field" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="input-group-custom">
+            <label class="input-label-custom">Birth Date</label>
+            <div class="input-field-wrap">
+              <i class="bi bi-calendar-event field-icon-custom"></i>
+              <input 
+                type="date" 
+                name="birthDate"
+                [(ngModel)]="birthDate"
+                class="input-custom-field" 
+                required
+              />
+            </div>
           </div>
         </div>
 
@@ -102,7 +166,7 @@
               type="tel" 
               name="phoneNumber"
               [(ngModel)]="phoneNumber"
-              placeholder="+20 100 000 0000" 
+              placeholder="01000000000" 
               class="input-custom-field" 
               required
             />

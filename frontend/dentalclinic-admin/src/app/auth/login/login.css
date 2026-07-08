@@ -1,0 +1,362 @@
+/* CSS variables and global layout reset */
+.auth-page-container {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  min-height: 100vh;
+  background: #ffffff;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Left Graphic Side */
+.auth-graphic-side {
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #ffffff;
+}
+
+.staff-bg {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.staff-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%);
+  z-index: 1;
+}
+
+.brand-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.brand-logo-img {
+  height: 38px;
+  width: auto;
+  filter: brightness(0) invert(1);
+}
+
+.portal-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.auth-graphic-content {
+  position: relative;
+  z-index: 2;
+  margin: 40px 0;
+}
+
+.graphic-headline {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 20px;
+}
+
+.graphic-tagline {
+  font-size: 1rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin-bottom: 40px;
+  max-width: 500px;
+}
+
+/* Role features list */
+.role-features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.role-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.role-feature-item i {
+  font-size: 1.5rem;
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.role-feature-item strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #f8fafc;
+  margin-bottom: 4px;
+}
+
+.role-feature-item span {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.auth-graphic-footer {
+  position: relative;
+  z-index: 2;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+/* Right Form Side */
+.auth-form-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  background: #f8fafc;
+}
+
+.form-container-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 48px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+}
+
+.form-title-wrap {
+  margin-bottom: 32px;
+}
+
+.form-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.form-subtitle {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.login-form-element {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-label-custom {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.input-field-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-icon-custom {
+  position: absolute;
+  left: 16px;
+  font-size: 1.1rem;
+  color: #94a3b8;
+}
+
+.input-custom-field {
+  width: 100%;
+  padding: 12px 18px;
+  padding-left: 48px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 0.93rem;
+  color: #0f172a;
+  background: #ffffff;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.input-custom-field:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.eye-icon-custom {
+  position: absolute;
+  right: 16px;
+  font-size: 1.1rem;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.eye-icon-custom:hover {
+  color: #3b82f6;
+}
+
+.btn-submit-auth {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 0.93rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-submit-auth:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: scale(1.01);
+}
+
+.btn-submit-auth:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Error Banner styling */
+.error-banner {
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #991b1b;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+
+.error-banner i {
+  color: #ef4444;
+  font-size: 1rem;
+}
+
+/* Spinner styling */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+  .auth-page-container {
+    grid-template-columns: 1fr;
+  }
+  .auth-graphic-side {
+    display: none;
+  }
+  .auth-form-side {
+    padding: 24px;
+    min-height: 100vh;
+  }
+  .form-container-card {
+    padding: 32px 24px;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+/* Custom Divider and Bypass Button */
+.divider-text-custom {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.divider-text-custom::before,
+.divider-text-custom::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.divider-text-custom::before {
+  margin-right: 10px;
+}
+
+.divider-text-custom::after {
+  margin-left: 10px;
+}
+
+.btn-bypass-auth {
+  width: 100%;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #475569;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.btn-bypass-auth:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+

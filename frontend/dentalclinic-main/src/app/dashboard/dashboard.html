@@ -1,0 +1,18 @@
+<div class="dashboard-wrapper">
+  @if (authService.currentUser()) {
+    @switch (authService.currentUser()?.role) {
+      @case ('patient') {
+        <app-patient-dashboard></app-patient-dashboard>
+      }
+      @case ('dentist') {
+        <app-dentist-dashboard></app-dentist-dashboard>
+      }
+      @case ('receptionist') {
+        <app-receptionist-dashboard></app-receptionist-dashboard>
+      }
+      @case ('admin') {
+        <app-admin-dashboard></app-admin-dashboard>
+      }
+    }
+  }
+</div>

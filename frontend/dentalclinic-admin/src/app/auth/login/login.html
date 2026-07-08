@@ -1,0 +1,119 @@
+<div class="auth-page-container animate-fade-in">
+  <!-- LEFT SIDE: GRAPHIC PORTAL OVERVIEW -->
+  <div class="auth-graphic-side staff-bg">
+    <div class="brand-logo-area">
+      <div class="brand-header">
+        <img src="assets/images/logo-highquality-removebg-preview.png" alt="Dento Logo" class="brand-logo-img" />
+        <span class="portal-badge">Admin OS</span>
+      </div>
+    </div>
+
+    <div class="auth-graphic-content">
+      <h1 class="graphic-headline">Clinic Management &<br>Operating System.</h1>
+      <p class="graphic-tagline">
+        Secure access to patient history databases, real-time schedule grids, clinical prescriptions, and performance charts.
+      </p>
+
+      <div class="role-features-list">
+        <div class="role-feature-item">
+          <i class="bi bi-shield-lock-fill"></i>
+          <div>
+            <strong>Administrator</strong>
+            <span>CRUD user profiles, edit dentist schedules, track revenues.</span>
+          </div>
+        </div>
+        <div class="role-feature-item">
+          <i class="bi bi-heart-pulse-fill"></i>
+          <div>
+            <strong>Dentist Portal</strong>
+            <span>Create diagnoses, procedures, attach x-rays, write prescriptions.</span>
+          </div>
+        </div>
+        <div class="role-feature-item">
+          <i class="bi bi-calendar-check-fill"></i>
+          <div>
+            <strong>Receptionist Desk</strong>
+            <span>Book walk-in/phone appointments, manage dentist calendars, emergency slots.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-graphic-footer">
+      <span>Dento Clinical Administrative System v1.0. Encrypted Connection.</span>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE: LOGIN FORM -->
+  <div class="auth-form-side">
+    <div class="form-container-card">
+      <div class="form-title-wrap">
+        <h2 class="form-title">Staff Sign In</h2>
+        <p class="form-subtitle">Enter your employee credentials to access your workspace.</p>
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-banner animate-fade-in">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <form (ngSubmit)="onSubmit()" class="login-form-element">
+        <div class="input-group-custom">
+          <label class="input-label-custom">Employee Email</label>
+          <div class="input-field-wrap">
+            <i class="bi bi-envelope field-icon-custom"></i>
+            <input 
+              type="email" 
+              name="email"
+              [(ngModel)]="email"
+              placeholder="name@clinic.com" 
+              class="input-custom-field" 
+              required
+              [disabled]="isSubmitting"
+            />
+          </div>
+        </div>
+
+        <div class="input-group-custom">
+          <label class="input-label-custom">Password</label>
+          <div class="input-field-wrap">
+            <i class="bi bi-lock field-icon-custom"></i>
+            <input 
+              [type]="showPasswordState ? 'text' : 'password'" 
+              name="password"
+              [(ngModel)]="password"
+              placeholder="••••••••" 
+              class="input-custom-field" 
+              required
+              [disabled]="isSubmitting"
+            />
+            <i 
+              class="bi eye-icon-custom" 
+              [class.bi-eye]="!showPasswordState"
+              [class.bi-eye-slash]="showPasswordState"
+              (click)="toggleShowPassword()"
+            ></i>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit-auth" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+            <span class="spinner"></span> Logging in...
+          } @else {
+            Sign In to Dashboard <i class="bi bi-arrow-right-short"></i>
+          }
+        </button>
+      </form>
+
+      <div class="divider-text-custom">
+        <span>OR OFFLINE SIMULATION</span>
+      </div>
+
+      <button type="button" class="btn-bypass-auth" (click)="onDemoBypass()" [disabled]="isSubmitting">
+        Bypass Server Connection <i class="bi bi-shield-slash"></i>
+      </button>
+    </div>
+  </div>
+</div>

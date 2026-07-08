@@ -1,0 +1,88 @@
+<div class="auth-page-container">
+  <!-- LEFT SIDE: BRAND SPLIT GRADIENT WITH FEATURES -->
+  <div class="auth-graphic-side signup-bg">
+    <div class="brand-logo-area">
+      <div class="signup-brand-header">
+        <img src="assets/images/logo-highquality-removebg-preview.png" alt="Dento Logo" class="brand-logo-img-signup" />
+        <span class="brand-portal-label">DentalPro Portal</span>
+      </div>
+    </div>
+    
+    <div class="auth-graphic-content">
+      <h1 class="graphic-headline">Verify Your<br>Email Address.</h1>
+      <p class="graphic-tagline">
+        We've sent a unique verification code to your registered email to secure your account credentials.
+      </p>
+    </div>
+
+    <div class="auth-graphic-footer">
+      <p class="signup-quote">
+        "Dento guarantees safe patient credential management with full authentication security."
+      </p>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE: VERIFICATION FORM -->
+  <div class="auth-form-side">
+    <div class="form-container-card">
+      <div class="form-title-wrap">
+        <h2 class="form-title">Enter Verification Code</h2>
+        <p class="form-subtitle">
+          Please check your email <strong>{{ email }}</strong> and enter the 6-digit code below.
+        </p>
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-banner animate-fade-in">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      @if (successMessage) {
+        <div class="success-banner animate-fade-in">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>{{ successMessage }}</span>
+        </div>
+      }
+
+      <form (ngSubmit)="onSubmit()" class="login-form-element">
+        <div class="input-group-custom">
+          <label class="input-label-custom">Verification Code</label>
+          <div class="input-field-wrap">
+            <i class="bi bi-shield-lock field-icon-custom"></i>
+            <input 
+              type="text" 
+              name="code"
+              [(ngModel)]="code"
+              placeholder="Enter 6-digit code" 
+              class="input-custom-field code-input" 
+              required
+              [disabled]="isSubmitting"
+            />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit-auth" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+            <span class="spinner"></span> Verifying...
+          } @else {
+            Verify Account
+          }
+        </button>
+      </form>
+
+      <div class="auth-bottom-switch">
+        <span>Didn't receive the code? 
+          <button class="btn-link" (click)="resendCode()" [disabled]="isResending">
+            {{ isResending ? 'Resending...' : 'Resend Code' }}
+          </button>
+        </span>
+      </div>
+
+      <div class="auth-bottom-switch border-top-none">
+        <span>Back to <a routerLink="/login" class="switch-link">Login</a></span>
+      </div>
+    </div>
+  </div>
+</div>

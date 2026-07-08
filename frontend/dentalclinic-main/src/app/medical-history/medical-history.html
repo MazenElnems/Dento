@@ -1,0 +1,148 @@
+<div class="medical-history-container">
+  <div class="glass-card">
+    <div class="header-section">
+      <div class="badge">Module 2: Medical Record</div>
+      <h1>{{ isEditMode ? 'Update Medical History' : 'Complete Your Medical History' }}</h1>
+      <p class="subtitle">
+        {{ isEditMode ? 'Keep your health metrics updated for your doctor' : 'Please complete your health profile below before booking your first appointment.' }}
+      </p>
+    </div>
+
+    @if (successMessage) {
+      <div class="alert success-alert animate-fade-in">
+        <i class="bi bi-check-circle-fill"></i>
+        <span>{{ successMessage }}</span>
+      </div>
+    }
+
+    <form (ngSubmit)="onSubmit()" #historyForm="ngForm">
+      
+      <!-- Cardiovascular Metrics -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="bi bi-heart-pulse"></i> Cardiovascular Health</h3>
+        
+        <div class="form-group">
+          <label for="bloodPressure">Blood Pressure Level</label>
+          <div class="select-wrapper">
+            <select id="bloodPressure" [(ngModel)]="bloodPressure" name="bloodPressure" required>
+              <option value="Normal">Normal (Less than 120/80 mmHg)</option>
+              <option value="Elevated">Elevated (120-129/less than 80 mmHg)</option>
+              <option value="High Stage 1">High Blood Pressure - Stage 1 (130-139/80-89 mmHg)</option>
+              <option value="High Stage 2">High Blood Pressure - Stage 2 (140 or higher/90 or higher mmHg)</option>
+              <option value="Crisis">Hypertensive Crisis (Higher than 180/120 mmHg)</option>
+            </select>
+            <i class="bi bi-chevron-down"></i>
+          </div>
+        </div>
+
+        <div class="checkbox-group">
+          <label class="checkbox-container">
+            <input type="checkbox" [(ngModel)]="heartDisease" name="heartDisease">
+            <span class="checkmark"></span>
+            <span class="label-text">
+              <strong>Heart Disease</strong>
+              <small>Check if you have any history of coronary artery disease, heart attacks, or arrhythmia.</small>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- General Conditions -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="bi bi-shield-plus"></i> Chronic & Systemic Conditions</h3>
+        
+        <div class="checkbox-group">
+          <label class="checkbox-container">
+            <input type="checkbox" [(ngModel)]="diabetes" name="diabetes">
+            <span class="checkmark"></span>
+            <span class="label-text">
+              <strong>Diabetes</strong>
+              <small>Check if you have Type 1 or Type 2 Diabetes.</small>
+            </span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="allergies">Known Allergies (Penicillin, Latex, Anesthesia, etc.)</label>
+          <input 
+            type="text" 
+            id="allergies" 
+            [(ngModel)]="allergies" 
+            name="allergies" 
+            placeholder="e.g. Penicillin, Latex, Sulfa drugs, or 'None'"
+            class="styled-input">
+        </div>
+      </div>
+
+      <!-- Lifestyle & Medications -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="bi bi-clipboard-pulse"></i> Lifestyle & Daily Medications</h3>
+        
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="smokingStatus">Smoking Status</label>
+            <div class="select-wrapper">
+              <select id="smokingStatus" [(ngModel)]="smokingStatus" name="smokingStatus">
+                <option value="Non-smoker">Non-smoker</option>
+                <option value="Light smoker">Light smoker (less than 10 cigarettes/day)</option>
+                <option value="Heavy smoker">Heavy smoker (more than 10 cigarettes/day)</option>
+                <option value="Former smoker">Former smoker (quit smoking)</option>
+              </select>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="currentMedications">Current Medications</label>
+            <input 
+              type="text" 
+              id="currentMedications" 
+              [(ngModel)]="currentMedications" 
+              name="currentMedications" 
+              placeholder="e.g. Aspirin, Beta-blockers, or 'None'"
+              class="styled-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="previousSurgeries">Previous Surgeries / Hospitalizations (Past 5 years)</label>
+          <input 
+            type="text" 
+            id="previousSurgeries" 
+            [(ngModel)]="previousSurgeries" 
+            name="previousSurgeries" 
+            placeholder="e.g. Wisdom teeth removal, knee surgery, or 'None'"
+            class="styled-input">
+        </div>
+      </div>
+
+      <!-- Additional Notes -->
+      <div class="form-section border-none">
+        <h3 class="section-title"><i class="bi bi-chat-text"></i> Additional Health Comments</h3>
+        <div class="form-group">
+          <label for="additionalNotes">Notes for the Dentist</label>
+          <textarea 
+            id="additionalNotes" 
+            [(ngModel)]="additionalNotes" 
+            name="additionalNotes" 
+            rows="3" 
+            placeholder="Please mention any other medical conditions or concerns you want the dentist to be aware of..."
+            class="styled-textarea"></textarea>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="actions">
+        <button type="button" class="btn-secondary" routerLink="/dashboard">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+            <span class="spinner"></span> Saving...
+          } @else {
+            <i class="bi bi-shield-check"></i> {{ isEditMode ? 'Update Profile' : 'Save & Continue' }}
+          }
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

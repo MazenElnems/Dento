@@ -15,8 +15,14 @@
     <!-- Right Side -->
     <div class="nav-right">
         <!-- Auth Links -->
-        <a class="nav-signin-link" routerLink="/login">Sign In</a>
-        <button class="nav-signup-btn" routerLink="/signup">Create Account</button>
+        @if (authService.currentUser()) {
+            <span class="nav-user-welcome">مرحباً، {{ authService.currentUser()?.name }}</span>
+            <button class="nav-dashboard-btn" routerLink="/dashboard">Dashboard</button>
+            <button class="nav-logout-btn" (click)="logout()">Sign Out</button>
+        } @else {
+            <a class="nav-signin-link" routerLink="/login">Sign In</a>
+            <button class="nav-signup-btn" routerLink="/signup">Create Account</button>
+        }
         
         <div class="nav-auth-divider"></div>
 

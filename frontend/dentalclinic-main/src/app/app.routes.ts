@@ -7,6 +7,9 @@ import { Services } from './services/services';
 import { Booking } from './booking/booking';
 import { Login } from './auth/login/login';
 import { Signup } from './auth/signup/signup';
+import { Dashboard } from './dashboard/dashboard';
+import { MedicalHistory } from './medical-history/medical-history';
+import { VerifyEmail } from './auth/verify-email/verify-email';
 
 export const routes: Routes = [
   { path: '' , redirectTo:"home" , pathMatch:'full' , title:"Home"},
@@ -19,6 +22,9 @@ export const routes: Routes = [
   ]},
   { path: 'book', component: Booking, title: 'Book Appointment' },
   { path: 'login', component: Login, title: 'Login' },
-  { path: 'signup', component: Signup, title: 'Sign Up' }
+  { path: 'signup', component: Signup, title: 'Sign Up' },
+  { path: 'dashboard', component: Dashboard, title: 'Dashboard' },
+  { path: 'medical-history', component: MedicalHistory, title: 'Medical History' },
+  { path: 'verify-email', component: VerifyEmail, title: 'Verify Email' }
 ];
 

@@ -47,13 +47,13 @@ export class Home {
       image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400'
     },
     {
-      name: 'Dr. Mazen Elnems',
+      name: 'Dr. Mazen mohamed',
       role: 'IMPLANTOLOGY SPECIALIST',
       desc: 'Pioneer in 3D cone-beam analysis and computer-guided implant placement.',
       image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400'
     },
     {
-      name: 'Dr. Tareq El-Masry',
+      name: 'Dr. ahmed El-Masry',
       role: 'MICRO-ENDODONTICS LEAD',
       desc: 'Expert in microscopic canal therapies and regenerative dental medicine.',
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400'

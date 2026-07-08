@@ -1,4 +1,5 @@
-﻿using Dento.Controllers.Common;
+﻿using Dento.Constants;
+using Dento.Controllers.Common;
 using Dento.Exceptions;
 
 namespace Dento.Middlewares
@@ -21,8 +22,8 @@ namespace Dento.Middlewares
                 context.Response.StatusCode = baseException.StatusCode;
                 context.Response.ContentType = "application/json";
 
-                var response = ApiResponse<object>.ErrorResponse(
-                    error: baseException.ErrorMessage ?? "An unexpected error occurred.",
+                var response = ApiResponse.ErrorResponse(
+                    errorCode: ErrorCodes.UnhandledException,
                     statusCode: baseException.StatusCode,
                     message: "Request failed");
 

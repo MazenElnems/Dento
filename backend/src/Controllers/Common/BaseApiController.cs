@@ -4,11 +4,19 @@ using System.Security.Claims;
 
 namespace Dento.Controllers.Common;
 
+[ApiController]
 public class BaseApiController : ControllerBase
 {
+    public CurrentUser CurrentUser { get => GetCurrentUser(); }
+    
+    public BaseApiController()
+    {
+
+    }
+
     protected CurrentUser GetCurrentUser()
     {
-        if (User.Identity == null || !User.Identity.IsAuthenticated)
+        if (User == null || User.Identity == null || !User.Identity.IsAuthenticated)
         {
             return CurrentUser.Unauthenticated;
         }

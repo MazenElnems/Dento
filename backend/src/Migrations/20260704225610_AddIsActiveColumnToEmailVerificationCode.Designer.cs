@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AngDepiApi_DentalClinic.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260427120558_AddingReceptionistRole")]
-    partial class AddingReceptionistRole
+    [Migration("20260704225610_AddIsActiveColumnToEmailVerificationCode")]
+    partial class AddIsActiveColumnToEmailVerificationCode
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace AngDepiApi_DentalClinic.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AngDepiApi_DentalClinic.Models.AppUser", b =>
+            modelBuilder.Entity("Dento.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -44,11 +44,26 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("MiddleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -88,6 +103,37 @@ namespace AngDepiApi_DentalClinic.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("Dento.Models.EmailVerificationCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmailVerificationCodes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -115,32 +161,6 @@ namespace AngDepiApi_DentalClinic.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "1",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "2",
-                            Name = "Doctor",
-                            NormalizedName = "DOCTOR"
-                        },
-                        new
-                        {
-                            Id = "3",
-                            Name = "Patient",
-                            NormalizedName = "PATIENT"
-                        },
-                        new
-                        {
-                            Id = "4",
-                            Name = "Receptionist",
-                            NormalizedName = "RECEPTIONIST"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -249,6 +269,58 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Dento.Models.Admin", b =>
+                {
+                    b.HasBaseType("Dento.Models.ApplicationUser");
+
+                    b.ToTable("Admins", (string)null);
+                });
+
+            modelBuilder.Entity("Dento.Models.Dentist", b =>
+                {
+                    b.HasBaseType("Dento.Models.ApplicationUser");
+
+                    b.Property<string>("Specialty")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("YearsOfExperience")
+                        .HasColumnType("int");
+
+                    b.ToTable("Dentists", (string)null);
+                });
+
+            modelBuilder.Entity("Dento.Models.Patient", b =>
+                {
+                    b.HasBaseType("Dento.Models.ApplicationUser");
+
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
+
+                    b.ToTable("Patients", (string)null);
+                });
+
+            modelBuilder.Entity("Dento.Models.Receptionist", b =>
+                {
+                    b.HasBaseType("Dento.Models.ApplicationUser");
+
+                    b.ToTable("Receptionists", (string)null);
+                });
+
+            modelBuilder.Entity("Dento.Models.EmailVerificationCode", b =>
+                {
+                    b.HasOne("Dento.Models.Patient", "User")
+                        .WithMany("EmailVerificationCodes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -260,7 +332,7 @@ namespace AngDepiApi_DentalClinic.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("AngDepiApi_DentalClinic.Models.AppUser", null)
+                    b.HasOne("Dento.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -269,7 +341,7 @@ namespace AngDepiApi_DentalClinic.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("AngDepiApi_DentalClinic.Models.AppUser", null)
+                    b.HasOne("Dento.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -284,7 +356,7 @@ namespace AngDepiApi_DentalClinic.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AngDepiApi_DentalClinic.Models.AppUser", null)
+                    b.HasOne("Dento.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -293,11 +365,52 @@ namespace AngDepiApi_DentalClinic.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("AngDepiApi_DentalClinic.Models.AppUser", null)
+                    b.HasOne("Dento.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Dento.Models.Admin", b =>
+                {
+                    b.HasOne("Dento.Models.ApplicationUser", null)
+                        .WithOne()
+                        .HasForeignKey("Dento.Models.Admin", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Dento.Models.Dentist", b =>
+                {
+                    b.HasOne("Dento.Models.ApplicationUser", null)
+                        .WithOne()
+                        .HasForeignKey("Dento.Models.Dentist", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Dento.Models.Patient", b =>
+                {
+                    b.HasOne("Dento.Models.ApplicationUser", null)
+                        .WithOne()
+                        .HasForeignKey("Dento.Models.Patient", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Dento.Models.Receptionist", b =>
+                {
+                    b.HasOne("Dento.Models.ApplicationUser", null)
+                        .WithOne()
+                        .HasForeignKey("Dento.Models.Receptionist", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Dento.Models.Patient", b =>
+                {
+                    b.Navigation("EmailVerificationCodes");
                 });
 #pragma warning restore 612, 618
         }

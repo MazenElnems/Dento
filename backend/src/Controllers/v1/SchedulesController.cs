@@ -23,17 +23,27 @@ public class SchedulesController : BaseApiController
         _context = context;
     }
 
-    // GET: api/v1/schedules
     [HttpGet("{scheduleId}")]
     [Authorize(Roles = RoleNames.Patient)]
     public async Task<ActionResult<ApiResponse>> Get([FromRoute] string scheduleId)
     {
-        var today = DateOnly.FromDateTime(DateTime.Today);
+        var tz = TimeZoneInfo.FindSystemTimeZoneById("Africa/Cairo");
+
+        var now = TimeZoneInfo.ConvertTimeFromUtc(
+            DateTime.UtcNow,
+            tz
+        );    
+
+        var currentDate = DateOnly.FromDateTime(now);
+        var currentTime = TimeOnly.FromDateTime(now);
 
         var availableSlots = await _context.Slots
             .Where(x => x.DentistAvailabilityId == scheduleId &&
                    x.Status == SlotStatus.Available           &&
-                   x.Date >= today
+                   (
+                        x.Date > currentDate ||
+                        (x.Date == currentDate && x.From > currentTime)
+                   )
             )
             .GroupBy(x => x.Date)
             .Select(x => new ScheduleDayDto
@@ -48,10 +58,15 @@ public class SchedulesController : BaseApiController
             })
             .OrderBy(x => x.Date).ToListAsync();
 
-        return ApiResponse.SuccessResponse(availableSlots);
+        var schedule = new DentistScheduleResponseDto
+        {
+            TimeZone = tz,
+            Schedule = availableSlots
+        };
+
+        return ApiResponse.SuccessResponse(schedule);
     }
 
-    // PUT: api/v1/schedules
     [HttpPut("{scheduleId}")]
     [Authorize(Roles = RoleNames.Dentist)]
     public async Task<ActionResult<ApiResponse>> Update([FromRoute] string scheduleId,[FromBody] UpdateScheduleRequestDto request)

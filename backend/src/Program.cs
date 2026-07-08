@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Dento.Data;
+using Dento.Jobs;
 using Dento.Middlewares;
 using Dento.Models;
 using Dento.Options;
@@ -85,6 +86,7 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+builder.Services.AddScoped<IReleaseLockedSlotJob, ReleaseLockedSlotJob>();
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

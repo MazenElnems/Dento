@@ -17,4 +17,10 @@ public static class ErrorCodes
 
     // Dentist Schedule
     public const string ScheduleNotFound = "SCHE_SCHEDULE_NOT_FOUND";
+
+
+    // Slot Appointment
+    public const string SlotIsNotFound = "SLOT_IS_NOT_FOUND";
+    public const string SlotIsNotAvailable = "SLOT_IS_NOT_AVAILABLE";
+    public const string SlotAppointmentConflict = "SLOT_APPOINTMENT_CONFLICT";
 }

@@ -104,6 +104,43 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.UseTptMappingStrategy();
                 });
 
+            modelBuilder.Entity("Dento.Models.Appointment", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CancelationReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CanceledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ConfirmedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PatientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SlotId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PatientId");
+
+                    b.HasIndex("SlotId");
+
+                    b.ToTable("Appointments");
+                });
+
             modelBuilder.Entity("Dento.Models.DentistAvailability", b =>
                 {
                     b.Property<string>("Id")
@@ -204,11 +241,19 @@ namespace AngDepiApi_DentalClinic.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("DentistAvailabilityId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<TimeOnly>("From")
                         .HasColumnType("time");
+
+                    b.Property<DateTime?>("LockedUntil")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -398,6 +443,25 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.ToTable("Receptionists", (string)null);
                 });
 
+            modelBuilder.Entity("Dento.Models.Appointment", b =>
+                {
+                    b.HasOne("Dento.Models.Patient", "Patient")
+                        .WithMany("Appointments")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dento.Models.Slot", "Slot")
+                        .WithMany()
+                        .HasForeignKey("SlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+
+                    b.Navigation("Slot");
+                });
+
             modelBuilder.Entity("Dento.Models.DentistAvailability", b =>
                 {
                     b.HasOne("Dento.Models.Dentist", "Dentist")
@@ -425,8 +489,7 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.HasOne("Dento.Models.DentistAvailability", "DentistAvailability")
                         .WithMany("Slots")
                         .HasForeignKey("DentistAvailabilityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("DentistAvailability");
                 });
@@ -531,6 +594,8 @@ namespace AngDepiApi_DentalClinic.Migrations
 
             modelBuilder.Entity("Dento.Models.Patient", b =>
                 {
+                    b.Navigation("Appointments");
+
                     b.Navigation("EmailVerificationCodes");
                 });
 #pragma warning restore 612, 618

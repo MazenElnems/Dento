@@ -11,5 +11,11 @@ public class SlotEntityTypeConfiguration : IEntityTypeConfiguration<Slot>
         builder
             .Property(x => x.Status)
             .HasConversion<string>();
+
+        builder
+            .HasOne(s => s.DentistAvailability)
+            .WithMany(a => a.Slots)
+            .HasForeignKey(x => x.DentistAvailabilityId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

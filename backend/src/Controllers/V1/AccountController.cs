@@ -287,50 +287,35 @@ public class AccountController : BaseApiController
     [SwaggerOperation(Summary = "Register dentist", Description = "Creates a new dentist account.")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ApiResponse>> RegisterDentist(RegisterDentistDto input)
+    public async Task<ActionResult<ApiResponse>> RegisterDentist(RegisterDentistDto request)
     {
-        var existingUser = await _userManager.FindByEmailAsync(input.Email);
+        var user = await _userManager.FindByEmailAsync(request.Email);
 
-        if (existingUser != null)
-        {
-            throw new BaseException(
-                StatusCodes.Status400BadRequest,
-                "Email already exists.");
-        }
+        if (user != null)
+            return BadRequest(ApiResponse.ErrorResponse(ErrorCodes.EmailAlreadyExists, StatusCodes.Status400BadRequest));
 
         var dentist = new Dentist
         {
-            UserName = input.Email,
-            Email = input.Email,
-            FirstName = input.FirstName,
-            MiddleName = input.MiddleName,
-            LastName = input.LastName,
-            Specialty = input.Specialty,
-            ConsultationFee = input.ConsultationFee,
+            UserName = request.Email,
+            Email = request.Email,
+            FirstName = request.FirstName,
+            MiddleName = request.MiddleName,
+            LastName = request.LastName,
+            Specialty = request.Specialty,
+            ConsultationFee = request.ConsultationFee,
             EmailConfirmed = true
         };
 
         dentist.BuildDefaultSchedule(); // intilize the dentist availability
 
-        var result = await _userManager.CreateAsync(dentist, input.Password!);
+        var result = await _userManager.CreateAsync(dentist, request.Password);
 
         if (!result.Succeeded)
-        {
-            throw new BaseException(
-                StatusCodes.Status400BadRequest,
-                string.Join(", ", result.Errors.Select(e => e.Description)));
-        }
+            return BadRequest(ApiResponse.ErrorResponse(result.Errors.First().Code, StatusCodes.Status400BadRequest));
 
         await _userManager.AddToRoleAsync(dentist, RoleNames.Dentist);
 
-        await _context.SaveChangesAsync();
-
-        return Created(
-            string.Empty,
-            ApiResponse.SuccessResponse(
-                "Doctor account created successfully.",
-                "Doctor created",
-                StatusCodes.Status201Created));
+        return ApiResponse.SuccessResponse("Doctor account created successfully.");
     }
 
 

@@ -1,4 +1,4 @@
-﻿using Dento.Models;
+using Dento.Models;
 using Dento.Options;
 using Dento.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -13,10 +13,12 @@ namespace Dento.Services.Implementation;
 public class JwtTokenService : ITokenService
 {
     private readonly JwtTokenSettings _jwtTokenSettings;
+    private readonly ILogger<JwtTokenService> _logger;
 
-    public JwtTokenService(UserManager<ApplicationUser> userManager, IOptions<JwtTokenSettings> jwtTokenSettings)
+    public JwtTokenService(UserManager<ApplicationUser> userManager, IOptions<JwtTokenSettings> jwtTokenSettings, ILogger<JwtTokenService> logger)
     {
         _jwtTokenSettings = jwtTokenSettings.Value;
+        _logger = logger;
     }
 
     public async Task<AccessToken> GetAccessToken(ApplicationUser user, string role)
@@ -49,6 +51,10 @@ public class JwtTokenService : ITokenService
             Token = new JwtSecurityTokenHandler().WriteToken(token),
             ExpirationDate = tokenDescriptor.Expires ?? DateTime.UtcNow.AddMinutes(_jwtTokenSettings.ExpiresInMinutes)
         };
+
+        _logger.LogInformation(
+            "JWT token generated for user {UserId} | Role: {Role} | ExpiresAt: {ExpiresAt}",
+            user.Id, role, accessToken.ExpirationDate);
 
         return accessToken;
     }

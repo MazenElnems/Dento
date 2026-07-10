@@ -1,4 +1,4 @@
-﻿using Dento.Options;
+using Dento.Options;
 using Dento.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
@@ -9,14 +9,18 @@ namespace Dento.Services.Implementation;
 public class PaymobHmacVarifier : IPaymobHmacVarifier
 {
     private readonly PaymobSettings _paymob;
+    private readonly ILogger<PaymobHmacVarifier> _logger;
 
-    public PaymobHmacVarifier(IOptions<PaymobSettings> paymob)
+    public PaymobHmacVarifier(IOptions<PaymobSettings> paymob, ILogger<PaymobHmacVarifier> logger)
     {
         _paymob = paymob.Value;
+        _logger = logger;
     }
 
     public bool Verify(string combinedQueryParameters, string receivedHmac)
     {
+        _logger.LogInformation("HMAC verification started for webhook payload");
+
         // Calculate the HMAC using your secret
         using var hmacSha512 = new HMACSHA512(Encoding.UTF8.GetBytes(_paymob.HMAC));
 
@@ -28,6 +32,8 @@ public class PaymobHmacVarifier : IPaymobHmacVarifier
             Encoding.UTF8.GetBytes(calculatedHmac),
             Encoding.UTF8.GetBytes(receivedHmac)
         );
+
+        _logger.LogInformation("HMAC verification completed | IsValid: {IsValid}", isValid);
 
         return isValid;
     }

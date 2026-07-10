@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Azure;
 using Dento.Constants;
 using Dento.Controllers.Common;
@@ -28,19 +28,22 @@ public class AccountController : BaseApiController
     private readonly AppDbContext _context;
     private readonly IEmailService _emailService;
     private readonly ClientSettings _clientSettings;
+    private readonly ILogger<AccountController> _logger;
 
     public AccountController(
         UserManager<ApplicationUser> userManager,
         AppDbContext context,
         ITokenService authService,
         IEmailService emailService,
-        IOptions<ClientSettings> clientSettings)
+        IOptions<ClientSettings> clientSettings,
+        ILogger<AccountController> logger)
     {
         _userManager = userManager;
         _context = context;
         _tokenService = authService;
         _emailService = emailService;
         _clientSettings = clientSettings.Value;
+        _logger = logger;
     }
 
     /// <summary>
@@ -64,13 +67,21 @@ public class AccountController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse>> Register(RegisterPatientRequestDto request)
     {
+        _logger.LogInformation("Patient registration attempt | Email: {Email}", request.Email);
+
         if(CurrentUser.IsAuthenticated)
+        {
+            _logger.LogWarning("Registration rejected — user is already authenticated | Email: {Email}", request.Email);
             return BadRequest(ApiResponse.ErrorResponse(ErrorCodes.UserAlreadyLoggedIn, StatusCodes.Status400BadRequest));
+        }
         
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
 
         if (existingUser != null)
+        {
+            _logger.LogWarning("Registration failed — email already exists | Email: {Email}", request.Email);
             return BadRequest(ApiResponse.ErrorResponse(ErrorCodes.EmailAlreadyExists, StatusCodes.Status400BadRequest));
+        }
 
         var patient = new Patient
         {
@@ -86,13 +97,16 @@ public class AccountController : BaseApiController
         var result = await _userManager.CreateAsync(patient, request.Password);
 
         if(!result.Succeeded)
+        {
+            _logger.LogWarning("Registration failed — identity error | Email: {Email} | Error: {Error}", request.Email, result.Errors.First().Code);
             return BadRequest(ApiResponse.ErrorResponse(result.Errors.First().Code, StatusCodes.Status400BadRequest));
+        }
 
         var roleResult = await _userManager.AddToRoleAsync(patient, RoleNames.Patient);
 
         if (!roleResult.Succeeded)
         {
-            // log warning: user created but role assignment failed
+            _logger.LogWarning("Role assignment failed, rolling back user creation | UserId: {UserId} | Email: {Email}", patient.Id, request.Email);
             await _userManager.DeleteAsync(patient); // rollback user creation
             
             return StatusCode(
@@ -115,6 +129,8 @@ public class AccountController : BaseApiController
         await _context.SaveChangesAsync();
 
         BackgroundJob.Enqueue(() => _emailService.SendVerificationEmailAsync(patient.FirstName, patient.Email, code, 30));
+
+        _logger.LogInformation("Patient registration succeeded | UserId: {UserId} | Email: {Email}", patient.Id, patient.Email);
 
         var patientDto = new RegisterResponseDto
         {
@@ -143,13 +159,18 @@ public class AccountController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse>> VerifyEmail(VerifyEmailRequestDto request)
     {
+        _logger.LogInformation("Email verification attempt | UserId: {UserId}", request.UserId);
+
         var verificationCode = await _context
             .EmailVerificationCodes
             .Include(c => c.User)
             .FirstOrDefaultAsync(vc => vc.UserId == request.UserId && vc.Code == request.Code && vc.IsActive);
 
         if(verificationCode == null || verificationCode.ExpiresAt < DateTime.UtcNow)
+        {
+            _logger.LogWarning("Email verification failed — invalid or expired code | UserId: {UserId}", request.UserId);
             return BadRequest(ApiResponse.ErrorResponse(ErrorCodes.InvalidVerificationCode, StatusCodes.Status400BadRequest));
+        }
 
         var user = verificationCode.User;
 
@@ -157,6 +178,8 @@ public class AccountController : BaseApiController
         verificationCode.IsActive = false;
 
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Email verified successfully | UserId: {UserId} | Email: {Email}", user.Id, user.Email);
 
         return ApiResponse.SuccessResponse("Email verified successfully.", StatusCodes.Status200OK);
     }
@@ -178,10 +201,15 @@ public class AccountController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> SendVerificationCode(SendVerificationCodeRequestDto request)
     {
+        _logger.LogInformation("Verification code resend requested | Email: {Email}", request.Email);
+
         var user = await _userManager.FindByEmailAsync(request.Email);
 
         if(user == null)
+        {
+            _logger.LogWarning("Verification code resend failed — email not found | Email: {Email}", request.Email);
             return NotFound(ApiResponse.ErrorResponse(ErrorCodes.EmailNotFound, StatusCodes.Status404NotFound));
+        }
 
         var code = Random.Shared.Next(100000, 999999).ToString(); // Generate a 6-digit code
 
@@ -202,6 +230,9 @@ public class AccountController : BaseApiController
         await _context.SaveChangesAsync();
 
         BackgroundJob.Enqueue(() => _emailService.SendVerificationEmailAsync(user.FirstName, user.Email!, code, 30));
+
+        _logger.LogInformation("Verification code sent successfully | UserId: {UserId} | Email: {Email}", user.Id, user.Email);
+
         return ApiResponse.SuccessResponse("Verification code sent successfully.", StatusCodes.Status200OK);
     }
 
@@ -222,16 +253,23 @@ public class AccountController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> ForgetPassword(ForgetPasswordRequestDto request)
     {
+        _logger.LogInformation("Password reset requested | Email: {Email}", request.Email);
+
         var user = await _userManager.FindByEmailAsync(request.Email);
 
-        if (user == null) 
+        if (user == null)
+        {
+            _logger.LogWarning("Password reset failed — email not found | Email: {Email}", request.Email);
             return NotFound(ApiResponse.ErrorResponse(ErrorCodes.EmailNotFound, StatusCodes.Status404NotFound));
+        }
     
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
         var resetPasswordUrl = $"{_clientSettings.Host}/reset-password?userId={user.Id}&token={token}";
 
         BackgroundJob.Enqueue(() => _emailService.SendResetPasswordEmailAsync(user.FirstName, user.Email!, resetPasswordUrl, 30));
+
+        _logger.LogInformation("Password reset email sent | UserId: {UserId} | Email: {Email}", user.Id, user.Email);
 
         return ApiResponse.SuccessResponse("Password reset email sent successfully.", StatusCodes.Status200OK);
     }
@@ -255,15 +293,25 @@ public class AccountController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> ResetPassword(ResetPasswordRequestDto request)
     {
+        _logger.LogInformation("Password reset attempt | UserId: {UserId}", request.UserId);
+
         var user = await _userManager.FindByIdAsync(request.UserId);
 
         if(user == null)
+        {
+            _logger.LogWarning("Password reset failed — user not found | UserId: {UserId}", request.UserId);
             return NotFound(ApiResponse.ErrorResponse(ErrorCodes.UserNotFound, StatusCodes.Status404NotFound));
+        }
 
         var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
 
         if (!result.Succeeded)
+        {
+            _logger.LogWarning("Password reset failed — invalid token | UserId: {UserId} | Error: {Error}", request.UserId, result.Errors.First().Code);
             return BadRequest(ApiResponse.ErrorResponse(result.Errors.First().Code, StatusCodes.Status400BadRequest));
+        }
+
+        _logger.LogInformation("Password reset succeeded | UserId: {UserId} | Email: {Email}", user.Id, user.Email);
 
         return ApiResponse.SuccessResponse("Password reset successfully.", StatusCodes.Status200OK);
     }
@@ -289,10 +337,15 @@ public class AccountController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse>> RegisterDentist(RegisterDentistDto request)
     {
+        _logger.LogInformation("Dentist registration attempt | Email: {Email} | CreatedByAdmin: {AdminId}", request.Email, CurrentUser.Id);
+
         var user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user != null)
+        {
+            _logger.LogWarning("Dentist registration failed — email already exists | Email: {Email}", request.Email);
             return BadRequest(ApiResponse.ErrorResponse(ErrorCodes.EmailAlreadyExists, StatusCodes.Status400BadRequest));
+        }
 
         var dentist = new Dentist
         {
@@ -311,9 +364,14 @@ public class AccountController : BaseApiController
         var result = await _userManager.CreateAsync(dentist, request.Password);
 
         if (!result.Succeeded)
+        {
+            _logger.LogWarning("Dentist registration failed — identity error | Email: {Email} | Error: {Error}", request.Email, result.Errors.First().Code);
             return BadRequest(ApiResponse.ErrorResponse(result.Errors.First().Code, StatusCodes.Status400BadRequest));
+        }
 
         await _userManager.AddToRoleAsync(dentist, RoleNames.Dentist);
+
+        _logger.LogInformation("Dentist account created successfully | UserId: {UserId} | Email: {Email} | CreatedByAdmin: {AdminId}", dentist.Id, dentist.Email, CurrentUser.Id);
 
         return ApiResponse.SuccessResponse("Dentist account created successfully.");
     }
@@ -340,6 +398,8 @@ public class AccountController : BaseApiController
     [SwaggerOperation(Summary = "Register receptionist", Description = "Creates a new receptionist account.")]
     public async Task<ActionResult<ApiResponse>> RegisterReceptionist(RegisterPatientRequestDto input)
     {
+        _logger.LogInformation("Receptionist registration attempt | Email: {Email} | CreatedByAdmin: {AdminId}", input.Email, CurrentUser.Id);
+
         if (User.Identity != null && User.Identity.IsAuthenticated)
             return ApiResponse.ErrorResponse("You are already logged in.", StatusCodes.Status400BadRequest);
 
@@ -350,6 +410,7 @@ public class AccountController : BaseApiController
 
             if (existingUser != null)
             {
+                _logger.LogWarning("Receptionist registration failed — email already exists | Email: {Email}", input.Email);
                 throw new BaseException(
                     StatusCodes.Status400BadRequest,
                     "Email already exists.");
@@ -364,12 +425,16 @@ public class AccountController : BaseApiController
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, RoleNames.Receptionist);
+                _logger.LogInformation("Receptionist account created successfully | UserId: {UserId} | Email: {Email} | CreatedByAdmin: {AdminId}", user.Id, user.Email, CurrentUser.Id);
                 return Ok(ApiResponse.SuccessResponse($"User '{user.UserName}' has been created."));
             }
             else
+            {
+                _logger.LogWarning("Receptionist registration failed — identity error | Email: {Email} | Errors: {Errors}", input.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
                 throw new BaseException(StatusCodes.Status500InternalServerError,
                     string.Format("Error: {0}", string.Join(" ",
                         result.Errors.Select(e => e.Description))));
+            }
         }
         else
         {
@@ -405,27 +470,41 @@ public class AccountController : BaseApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse>> Login(LoginRequestDto request)
     {
+        _logger.LogInformation("Login attempt | Email: {Email}", request.Email);
+
         if(CurrentUser.IsAuthenticated)
+        {
+            _logger.LogWarning("Login rejected — user is already authenticated | Email: {Email}", request.Email);
             return BadRequest(ApiResponse.ErrorResponse(ErrorCodes.UserAlreadyLoggedIn, StatusCodes.Status400BadRequest));
+        }
 
         var user = await _userManager.FindByNameAsync(request.Email!);
 
         if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password!))
+        {
+            _logger.LogWarning("Login failed — invalid credentials | Email: {Email}", request.Email);
             return StatusCode(
                 StatusCodes.Status401Unauthorized,
                 ApiResponse.ErrorResponse(ErrorCodes.InvalidCredentials, StatusCodes.Status401Unauthorized)
             );
+        }
 
         var userRoles = await _userManager.GetRolesAsync(user);
 
         if (!userRoles.Any())
+        {
+            _logger.LogWarning("Login failed — user has no roles assigned | UserId: {UserId} | Email: {Email}", user.Id, user.Email);
             return StatusCode(
                 StatusCodes.Status500InternalServerError,
                 ApiResponse.ErrorResponse(ErrorCodes.UnhandledException, StatusCodes.Status500InternalServerError)
             );
+        }
 
         if (!user.EmailConfirmed)
+        {
+            _logger.LogWarning("Login failed — email not confirmed | UserId: {UserId} | Email: {Email}", user.Id, user.Email);
             return ApiResponse.SuccessResponse(new { UserId = user.Id, user.Email, RequireEmailVerification = true }, "Email not confirmed.");
+        }
 
         var role = userRoles.First();
 
@@ -438,6 +517,8 @@ public class AccountController : BaseApiController
             Token = accessToken.Token,
             Expiration = accessToken.ExpirationDate
         };
+
+        _logger.LogInformation("User authenticated successfully | UserId: {UserId} | Email: {Email} | Role: {Role}", user.Id, user.Email, role);
 
         return ApiResponse.SuccessResponse(loginResponse, "Login successful.");
     }

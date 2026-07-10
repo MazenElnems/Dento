@@ -1,225 +1,977 @@
-@import '../dentist/dentist-dashboard.css';
-@import '../receptionist/receptionist-dashboard.css';
-
-.admin-portal-container {
-    width: 100%;
+/* ── Layout Wrapper ── */
+.admin-panel-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: #f8fafc;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #1e293b;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Analytics Stats Grid */
-.analytics-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 25px;
-    margin-bottom: 40px;
+/* ── Main Workspace ── */
+
+/* ── Main Workspace ── */
+.admin-main-content {
+  box-sizing: border-box;
 }
 
-.stat-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 24px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.01);
+.tab-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 
-.stat-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.75rem;
-    flex-shrink: 0;
+.tab-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.stat-data {
-    display: flex;
-    flex-direction: column;
+.tab-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
 }
 
-.stat-label {
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #64748b;
-    margin-bottom: 6px;
-    letter-spacing: 0.05em;
+.tab-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 4px 0 0 0;
 }
 
-.stat-data h3 {
-    margin: 0;
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: #0f172a;
+.tab-date-indicator {
+  font-size: 0.85rem;
+  color: #64748b;
+  background: #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
 }
 
-/* Color Themes for Stats Card */
-.stat-card.blue .stat-icon {
-    background: rgba(59, 130, 246, 0.1);
-    color: #3b82f6;
-}
-.stat-card.green .stat-icon {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-}
-.stat-card.red .stat-icon {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-}
-.stat-card.purple .stat-icon {
-    background: rgba(139, 92, 246, 0.1);
-    color: #8b5cf6;
+/* ── Metrics Cards Grid ── */
+.stats-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
 }
 
-/* Revenue Estimates Grid */
-.analytics-stats-subgrid {
-    display: grid;
+.stats-grid-container.select-four {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.metric-card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.metric-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.pat-color { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.den-color { background: rgba(14, 165, 233, 0.1); color: #0ea5e9; }
+.app-color { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+.comp-color { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.canc-color { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.rev-color { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+.metric-card-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 4px 0 0 0;
+  color: #0f172a;
+}
+
+.metric-change-label {
+  font-size: 0.75rem;
+  margin-top: 4px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.pos-change {
+  color: #10b981;
+}
+
+/* ── Custom Charting CSS ── */
+.dashboard-row-two {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+}
+
+.chart-container-card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chart-container-card.block {
+  display: block;
+}
+
+.chart-container-card h4 {
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+.custom-bar-chart {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 200px;
+  padding-top: 24px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.custom-bar-chart.tall {
+  height: 300px;
+}
+
+.chart-bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 60px;
+}
+
+.bar-fill-wrap {
+  height: 150px;
+  width: 32px;
+  background: #f1f5f9;
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.custom-bar-chart.tall .bar-fill-wrap {
+  height: 240px;
+  width: 48px;
+}
+
+.bar-fill-body {
+  width: 100%;
+  background: #3b82f6;
+  border-radius: 8px 8px 0 0;
+  transition: height 0.5s ease-out;
+  position: relative;
+  cursor: pointer;
+}
+
+.bar-fill-body:hover {
+  background: #2563eb;
+}
+
+.bar-val-hint {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.bar-fill-body:hover .bar-val-hint {
+  opacity: 1;
+}
+
+.bar-label-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* ── Metrics List Panel ── */
+.metrics-list-card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.metrics-list-card h4 {
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+.util-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.util-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.progress-bar-bg {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 50px;
+}
+
+.progress-bar-fill.green-fill { background: #10b981; }
+.progress-bar-fill.blue-fill { background: #3b82f6; }
+.progress-bar-fill.orange-fill { background: #f59e0b; }
+
+.util-subtext {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.quick-status-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.quick-status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+
+.dot-ind {
+  width: 8px;
+  height: 8px;
+  border-radius: 50px;
+}
+
+.active-dot { background: #10b981; }
+.rev-dot { background: #f59e0b; }
+
+/* ── Inner Tabs User CRUD ── */
+.inner-tabs-row {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 2px;
+}
+
+.inner-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.inner-tab-btn:hover {
+  color: #0f172a;
+}
+
+.inner-tab-btn.active {
+  color: #3b82f6;
+}
+
+.inner-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: #3b82f6;
+  border-radius: 50px;
+}
+
+/* ── Dento Admin Tables ── */
+.table-container {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  padding: 12px 0;
+}
+
+.table-container h4 {
+  padding: 12px 24px;
+  margin: 0;
+}
+
+.dento-admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.dento-admin-table th {
+  background: #f8fafc;
+  padding: 16px 24px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.dento-admin-table td {
+  padding: 16px 24px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+.dento-admin-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.font-bold {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.status-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 50px;
+}
+
+.status-active {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.status-inactive {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-action-edit {
+  background: #f1f5f9;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-action-edit:hover {
+  background: #e2e8f0;
+}
+
+.btn-action-status {
+  background: transparent;
+  border: 1.5px solid #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-action-status:hover {
+  background: #f1f5f9;
+}
+
+.revenue-val {
+  color: #10b981;
+}
+
+/* ── Split Layout: Dentist Schedules ── */
+.schedules-grid-split {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+}
+
+.dentist-shift-config-list {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.dentist-shift-config-list h4 { margin: 0 0 20px 0; }
+
+.shift-cards-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dentist-shift-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.dentist-shift-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dentist-shift-card-header h5 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.btn-config-shift {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-config-shift:hover {
+  background: #f1f5f9;
+}
+
+.dentist-shift-specialty {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 2px 0 12px 0;
+}
+
+.dentist-shift-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  color: #475569;
+}
+
+/* Leaves Management */
+.leaves-management-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.leave-requests-card,
+.vacations-list-card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.leave-requests-card h4,
+.vacations-list-card h4 { margin: 0 0 16px 0; }
+
+.leave-requests-list,
+.vacations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.empty-list-info {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.leave-request-item {
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.leave-request-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.leave-request-head h6 {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.leave-status-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.badge-pending { background: #fef3c7; color: #d97706; }
+.badge-approved { background: #d1fae5; color: #059669; }
+.badge-rejected { background: #fee2e2; color: #dc2626; }
+
+.leave-reason {
+  font-size: 0.8rem;
+  color: #475569;
+  margin: 8px 0;
+  font-style: italic;
+}
+
+.leave-dates {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0 0 12px 0;
+}
+
+.leave-action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-approve-leave {
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-reject-leave {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.vacation-log-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.vacation-log-info h6 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.vacation-dates {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+.btn-delete-vacation {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* ── Calendar Visualizer Grid ── */
+.calendar-visualizer-card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.calendar-visualizer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calendar-visualizer-header h4 { margin: 0; }
+
+.calendar-view-toggles {
+  display: flex;
+  gap: 4px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.cal-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cal-toggle-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.calendar-grid-month {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.calendar-day-slot {
+  height: 90px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+.weekend-day {
+  background: #f1f5f9;
+}
+
+.day-number {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.calendar-event-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-green { background: #d1fae5; color: #065f46; }
+.event-blue { background: #dbeafe; color: #1e40af; }
+.event-red { background: #fee2e2; color: #991b1b; }
+
+/* ── Reports Dashboard ── */
+.reports-container-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.report-metric-box {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.report-metric-box h5 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+
+.stat-row-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.9rem;
+}
+
+.stat-row-item:last-child {
+  border-bottom: none;
+}
+
+.text-red {
+  color: #ef4444;
+}
+
+/* ── Modal Dialogs ── */
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-modal-card {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 550px;
+  max-width: 90%;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalScale 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.admin-modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-modal-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.btn-close-modal {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+}
+
+.admin-modal-body {
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.modal-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group-item label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-group-item input,
+.form-group-item select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.9rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form-group-item input:focus,
+.form-group-item select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.admin-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-cancel-modal {
+  background: #f1f5f9;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+}
+
+.btn-save-modal {
+  background: #3b82f6;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-save-modal:hover {
+  background: #2563eb;
+}
+
+/* Schedule Configuration Form inner elements */
+.days-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.checkbox-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.checkbox-pill input {
+  margin: 0;
+}
+
+.form-group-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Utilities */
+.mt-4 { margin-top: 16px; }
+
+.btn-primary-admin {
+  background: #3b82f6;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.btn-primary-admin:hover {
+  background: #2563eb;
+}
+
+/* ── Animation helper ── */
+.animate-fade {
+  animation: fadeIn 0.3s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Responsive adjustments ── */
+@media (max-width: 1200px) {
+  .schedules-grid-split {
     grid-template-columns: 1fr;
-    gap: 10px;
+  }
 }
-
-.sub-stat-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 10px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.82rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.01);
-}
-
-.sub-stat-card span {
-    color: #64748b;
-    font-weight: 600;
-}
-
-.sub-stat-card strong {
-    color: #0f172a;
-    font-size: 0.95rem;
-}
-
-/* Chart Panel and CSS Chart */
-.chart-panel {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.01);
-}
-
-.chart-panel h4 {
-    margin: 0 0 25px 0;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #0f172a;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.chart-panel h4 i {
-    color: #2563eb;
-}
-
-.css-chart-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    height: 220px;
-    align-items: flex-end;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 10px;
-}
-
-.chart-bar-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
-    justify-content: flex-end;
-}
-
-.bar-fill {
-    width: 50%;
-    border-radius: 6px 6px 0 0;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding-top: 8px;
-    box-sizing: border-box;
-    transition: height 0.6s ease;
-    position: relative;
-    cursor: pointer;
-}
-
-.blue-bar {
-    background: linear-gradient(to top, #2563eb, #3b82f6);
-}
-
-.blue-bar:hover {
-    background: #1d4ed8;
-}
-
-.bar-value {
-    color: #ffffff;
-    font-size: 0.75rem;
-    font-weight: 700;
-}
-
-.bar-label {
-    font-size: 0.8rem;
-    color: #64748b;
-    margin-top: 12px;
-    font-weight: 700;
-}
-
-/* User Role Badges */
-.role-badge {
-    font-size: 0.72rem;
-    font-weight: 800;
-    padding: 3px 8px;
-    border-radius: 4px;
-}
-
-.role-badge.admin {
-    background: #fef3c7;
-    color: #d97706;
-}
-
-.role-badge.dentist {
-    background: #e0f2fe;
-    color: #0369a1;
-}
-
-.role-badge.receptionist {
-    background: #f3e8ff;
-    color: #7e22ce;
-}
-
-/* Checkbox Row Grid for Schedule */
-.checkbox-row-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    background: #f8fafc;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    padding: 14px;
-}
-
-.check-box-item {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #334155;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* Reuse standard table, forms and modals from dentist */

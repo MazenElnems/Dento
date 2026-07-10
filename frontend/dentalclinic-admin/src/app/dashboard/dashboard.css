@@ -35,7 +35,7 @@
 }
 
 .sidebar-logo {
-    height: 32px;
+    height: 58px;
     width: auto;
     filter: brightness(0) invert(1);
 }
@@ -58,7 +58,7 @@
     background: #1e293b;
     padding: 16px;
     border-radius: 12px;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
 }
 
 .user-avatar {

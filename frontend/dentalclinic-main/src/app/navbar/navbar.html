@@ -1,42 +1,35 @@
-<nav class="navbar">
+<nav class="dento-navbar">
 
     <!-- Logo -->
-    <a class="nav-logo" routerLink="/">
-      <img src="assets/images/logo-highquality-removebg-preview.png" alt="Dento Logo" class="nav-logo-img" />
+    <a class="dento-nav-logo" routerLink="/">
+      <img src="assets/images/logo-highquality-removebg-preview.png" alt="Dento Logo" class="dento-nav-logo-img" />
     </a>
 
     <!-- Links -->
-    <ul class="nav-links">
+    <ul class="dento-nav-links">
         <li *ngFor="let link of links" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: link.path === '/' }">
             <a [routerLink]="link.path">{{ link.label }}</a>
         </li>
     </ul>
 
     <!-- Right Side -->
-    <div class="nav-right">
+    <div class="dento-nav-right">
         <!-- Auth Links -->
         @if (authService.currentUser()) {
-            <span class="nav-user-welcome">مرحباً، {{ authService.currentUser()?.name }}</span>
-            <button class="nav-dashboard-btn" routerLink="/dashboard">Dashboard</button>
-            <button class="nav-logout-btn" (click)="logout()">Sign Out</button>
+            <span class="dento-nav-user-welcome">مرحباً، {{ authService.currentUser()?.name }}</span>
+            <button class="dento-nav-dashboard-btn" routerLink="/dashboard">Dashboard</button>
+            <button class="dento-nav-logout-btn" (click)="logout()">Sign Out</button>
         } @else {
-            <a class="nav-signin-link" routerLink="/login">Sign In</a>
-            <button class="nav-signup-btn" routerLink="/signup">Create Account</button>
+            <a class="dento-nav-signin-link" routerLink="/login">Sign In</a>
+            <button class="dento-nav-signup-btn" routerLink="/signup">Create Account</button>
         }
         
-        <div class="nav-auth-divider"></div>
-
-        <!-- Language Button -->
-        <button class="lang-btn">
-  <i class="bi bi-globe"></i>
-  english
-  <i class="bi bi-chevron-down"></i>
-</button>
+        <div class="dento-nav-auth-divider"></div>
 
         <button class="book-btn" routerLink="/book">
-  <i class="bi bi-calendar"></i>
-  BOOK APPOINTMENT
-</button>
+          <i class="bi bi-calendar"></i>
+          BOOK APPOINTMENT
+        </button>
 
     </div>
 </nav>

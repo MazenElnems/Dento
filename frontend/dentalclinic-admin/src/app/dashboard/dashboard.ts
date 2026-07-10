@@ -22,6 +22,9 @@ export class Dashboard {
   authService = inject(AuthService);
   router = inject(Router);
 
+  // Active sub-tab state shared with roles (like admin)
+  activeSubTab = 'dashboard';
+
   constructor() {
     const user = this.authService.currentUser();
     if (!user) {

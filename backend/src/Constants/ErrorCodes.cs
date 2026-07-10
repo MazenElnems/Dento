@@ -23,4 +23,15 @@ public static class ErrorCodes
     public const string SlotIsNotFound = "SLOT_IS_NOT_FOUND";
     public const string SlotIsNotAvailable = "SLOT_IS_NOT_AVAILABLE";
     public const string SlotAppointmentConflict = "SLOT_APPOINTMENT_CONFLICT";
+
+    public const string ResourceNotFound = "RESOURCE_NOT_FOUND";
+
+    // Payment
+    public const string PaymentConflict = "PAYMENT_CONFLICT";
+    public const string PaymentGatewayError = "PAYMENT_GATEWAY_ERROR";
+    public const string PaymentNotFound = "PAYMENT_NOT_FOUND";
+    public const string PaymentAlreadyProcessed = "PAYMENT_ALREADY_PROCESSED";
+    public const string PaymentWebhookInvalid = "PAYMENT_WEBHOOK_INVALID";
+    public const string PaymentVerificationFailed = "PAYMENT_VERIFICATION_FAILED";
+    public const string AppointmentPaymentFailed = "APPOINTMENT_PAYMENT_FAILED";
 }

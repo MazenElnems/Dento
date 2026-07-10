@@ -31,7 +31,9 @@ public class AppointmentsController : BaseApiController
     [Authorize(Roles = RoleNames.Patient)]
     public async Task<ActionResult<ApiResponse>> Book(BookAppointmentRequestDto request)
     {
-        var slot = await _context.Slots.FirstOrDefaultAsync(s => s.Id == request.SlotId);
+        var slot = await _context.Slots
+            .Include(s => s.DentistAvailability)
+            .FirstOrDefaultAsync(s => s.Id == request.SlotId);
 
         if (slot == null)
             return NotFound(ApiResponse.ErrorResponse(ErrorCodes.SlotIsNotFound, StatusCodes.Status404NotFound));
@@ -40,9 +42,7 @@ public class AppointmentsController : BaseApiController
             return Conflict(ApiResponse.ErrorResponse(ErrorCodes.SlotIsNotAvailable, StatusCodes.Status409Conflict));
 
         slot.Status = SlotStatus.Locked;
-        slot.LockedUntil = DateTime.UtcNow.AddMinutes(3);
-
-        BackgroundJob.Schedule(() => _releaseLockedSlotJob.ExecuteAsync(slot.Id), DateTime.UtcNow.AddMinutes(3));
+        slot.LockedUntil = DateTime.UtcNow.AddMinutes(20);
 
         var appointment = new Appointment
         {
@@ -50,14 +50,24 @@ public class AppointmentsController : BaseApiController
             SlotId = slot.Id,
             Status = AppointmentStatus.Pending,
             CreatedAt = DateTime.UtcNow,
+            DentistId = slot.DentistAvailability!.DentistId
         };
+
+        BackgroundJob.Schedule(() => _releaseLockedSlotJob.ExecuteAsync(appointment.Id), DateTime.UtcNow.AddMinutes(20));
 
         _context.Appointments.Add(appointment);
 
         try
         {
             await _context.SaveChangesAsync();
-            return ApiResponse.SuccessResponse("Appointment Booked Successfully");
+            return ApiResponse.SuccessResponse(new
+            {
+                appointment.Id,
+                appointment.Status,
+                SlotId = slot.Id,
+                SlotStatus = slot.Status,
+                slot.LockedUntil
+            } ,"Appointment Booked Successfully");
         }
         catch (DbUpdateConcurrencyException)
         {

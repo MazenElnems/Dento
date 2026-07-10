@@ -5,6 +5,8 @@ public class Dentist : ApplicationUser
     public string Specialty { get; set; } = default!;
     public int YearsOfExperience { get; set; }
     public DentistAvailability DentistAvailability { get; set; } = default!;
+    public decimal? ConsultationFee { get; set; }
+    public List<Appointment> Appointments { get; set; } = [];
 
     public void BuildDefaultSchedule()
     {

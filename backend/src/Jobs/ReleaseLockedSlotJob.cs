@@ -21,17 +21,25 @@ public class ReleaseLockedSlotJob : IReleaseLockedSlotJob
         _logger = logger;
     }
 
-    public async Task ExecuteAsync(string slotId)
+    public async Task ExecuteAsync(string appointmentId)
     {
-        _logger.LogInformation("Attempting to release lock from slot with ID: {SlotId}", slotId);
+        var appointment = await _context.Appointments
+            .Include(x => x.Slot)
+            .FirstOrDefaultAsync(x => x.Id == appointmentId);
 
-        var slot = await _context.Slots.SingleAsync(s => s.Id == slotId);
+        if(appointment == null)
+            return;
+
+        var slot = appointment.Slot;
+
+        _logger.LogInformation("Attempting to release lock from slot with ID: {SlotId}", slot.Id);
 
         if (slot.Status != SlotStatus.Locked)
             return;
 
         slot.Status = SlotStatus.Available;
         slot.LockedUntil = null;
+        appointment.Status = AppointmentStatus.Failed;
 
         try
         {
@@ -49,7 +57,7 @@ public class ReleaseLockedSlotJob : IReleaseLockedSlotJob
                     {
                         _logger.LogWarning(
                             "Concurrency conflict while releasing slot {SlotId}. The slot no longer exists.",
-                            slotId);
+                            slot.Id);
 
                         continue;
                     }
@@ -67,7 +75,7 @@ public class ReleaseLockedSlotJob : IReleaseLockedSlotJob
                             Original Version: {OriginalVersion}
                             Database Version: {DatabaseVersion}
                      """,
-                        slotId,
+                        slot.Id,
                         originalValues["Status"],
                         currentValues["Status"],
                         databaseValues["Status"],

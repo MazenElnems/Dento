@@ -306,6 +306,7 @@ public class AccountController : BaseApiController
             MiddleName = input.MiddleName,
             LastName = input.LastName,
             Specialty = input.Specialty,
+            ConsultationFee = input.ConsultationFee,
             EmailConfirmed = true
         };
 

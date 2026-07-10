@@ -18,4 +18,5 @@ public class RegisterDentistDto
     public required string Password { get; init; }
     [Required]
     public string Specialty { get; init; } = default!;
+    public decimal? ConsultationFee { get; set; }
 }

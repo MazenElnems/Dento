@@ -1,4 +1,4 @@
-﻿using Dento.Data;
+using Dento.Data;
 using Dento.DTOs;
 using Dento.Enums;
 using Dento.Exceptions;
@@ -33,6 +33,9 @@ public class PaymentService : IPaymentService
 
     public async Task<string> CreatePaymentIntent(string appointmentId, string idempotencyKey)
     {
+        _logger.LogInformation("Creating payment intent | AppointmentId: {AppointmentId} | IdempotencyKey: {IdempotencyKey}",
+            appointmentId, idempotencyKey);
+
         var appointment = await _context.Appointments
             .Include(x => x.Dentist)
             .Include(x => x.Patient)
@@ -44,10 +47,18 @@ public class PaymentService : IPaymentService
 
         // Already Payment Check
         if (appointment.Payment != null && appointment.Payment.Status == PaymentStatus.Pending)
+        {
+            _logger.LogWarning("Payment already in-progress | AppointmentId: {AppointmentId} | PaymentId: {PaymentId}",
+                appointmentId, appointment.Payment.Id);
             throw new AppointmentPaymentException("Payment already in-progress");
+        }
 
         if (appointment.Payment != null && appointment.Payment.Status == PaymentStatus.Paid)
+        {
+            _logger.LogWarning("Payment already completed | AppointmentId: {AppointmentId} | PaymentId: {PaymentId}",
+                appointmentId, appointment.Payment.Id);
             throw new AppointmentPaymentException("Payment already Completed");
+        }
 
         var payment = new Payment
         {
@@ -114,6 +125,8 @@ public class PaymentService : IPaymentService
         using var client = _factory.CreateClient();
 
         var url = $"{_paymob.BaseUrl}/{_paymob.CreatePaymentIntentPath}";
+
+        _logger.LogInformation("Calling Paymob API | PaymentId: {PaymentId} | Url: {Url}", payment.Id, url);
 
         HttpResponseMessage response;
         try
@@ -212,6 +225,10 @@ public class PaymentService : IPaymentService
         });
 
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Payment intent created successfully | PaymentId: {PaymentId} | IntentionId: {IntentionId} | Amount: {Amount} | Currency: {Currency} | AppointmentId: {AppointmentId}",
+            payment.Id, payment.IntentionId, payment.Amount, payment.Currency, appointmentId);
 
         return payment.ClientSecret;
     }

@@ -16,6 +16,6 @@ public class SlotEntityTypeConfiguration : IEntityTypeConfiguration<Slot>
             .HasOne(s => s.DentistAvailability)
             .WithMany(a => a.Slots)
             .HasForeignKey(x => x.DentistAvailabilityId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

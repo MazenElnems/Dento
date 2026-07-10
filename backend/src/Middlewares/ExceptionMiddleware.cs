@@ -2,33 +2,56 @@
 using Dento.Controllers.Common;
 using Dento.Exceptions;
 
-namespace Dento.Middlewares
+namespace Dento.Middlewares;
+
+
+public class ExceptionMiddleware(RequestDelegate next)
 {
-    public class ExceptionMiddleware(RequestDelegate next)
+    public async Task InvokeAsync(HttpContext context)
     {
-        public async Task InvokeAsync(HttpContext context)
+        try
         {
-            try
+            await next(context);
+        }
+        catch (Exception ex)
+        {
+            var response = ex switch
             {
-                await next(context);
-            }
-            catch (Exception ex)
-            {
-                var baseException = ex as BaseException ??
-                    new BaseException(
-                        StatusCodes.Status500InternalServerError,
-                        ex.Message);
+                ResourceNotFoundException e => ApiResponse.ErrorResponse(
+                    errorCode: ErrorCodes.ResourceNotFound,
+                    statusCode: e.StatusCode,
+                    message: e.Message),
 
-                context.Response.StatusCode = baseException.StatusCode;
-                context.Response.ContentType = "application/json";
+                ConflictPaymentException e => ApiResponse.ErrorResponse(
+                    errorCode: ErrorCodes.PaymentConflict,
+                    statusCode: e.StatusCode,
+                    message: e.Message),
 
-                var response = ApiResponse.ErrorResponse(
+                AppointmentPaymentException e => ApiResponse.ErrorResponse(
+                    errorCode: ErrorCodes.AppointmentPaymentFailed,
+                    statusCode: e.StatusCode,
+                    message: e.Message),
+
+                PaymentGatewayException e => ApiResponse.ErrorResponse(
+                    errorCode: ErrorCodes.PaymentGatewayError,
+                    statusCode: e.StatusCode,
+                    message: e.Message),
+
+                BaseException e => ApiResponse.ErrorResponse(
                     errorCode: ErrorCodes.UnhandledException,
-                    statusCode: baseException.StatusCode,
-                    message: "Request failed");
+                    statusCode: e.StatusCode,
+                    message: e.Message),
 
-                await context.Response.WriteAsJsonAsync(response);
-            }
+                _ => ApiResponse.ErrorResponse(
+                    errorCode: ErrorCodes.UnhandledException,
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    message: "An unexpected error occurred.")
+            };
+
+            context.Response.StatusCode = response.StatusCode;
+            context.Response.ContentType = "application/json";
+
+            await context.Response.WriteAsJsonAsync(response);
         }
     }
 }

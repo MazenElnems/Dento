@@ -109,6 +109,9 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int>("AppointmentType")
+                        .HasColumnType("int");
+
                     b.Property<string>("CancelationReason")
                         .HasColumnType("nvarchar(max)");
 
@@ -121,8 +124,15 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DentistId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("PatientId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PaymentId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("SlotId")
@@ -134,7 +144,11 @@ namespace AngDepiApi_DentalClinic.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DentistId");
+
                     b.HasIndex("PatientId");
+
+                    b.HasIndex("PaymentId");
 
                     b.HasIndex("SlotId");
 
@@ -230,6 +244,87 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("EmailVerificationCodes");
+                });
+
+            modelBuilder.Entity("Dento.Models.Payment", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ClientSecret")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FauilerReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<long?>("IntentionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PayerEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PayerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("TransactionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("Dento.Models.PaymentEvent", b =>
+                {
+                    b.Property<string>("EventId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RawPayload")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("EventId");
+
+                    b.HasIndex("PaymentId");
+
+                    b.ToTable("PaymentEventLogs");
                 });
 
             modelBuilder.Entity("Dento.Models.Slot", b =>
@@ -413,6 +508,9 @@ namespace AngDepiApi_DentalClinic.Migrations
                 {
                     b.HasBaseType("Dento.Models.ApplicationUser");
 
+                    b.Property<decimal?>("ConsultationFee")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Specialty")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -445,11 +543,21 @@ namespace AngDepiApi_DentalClinic.Migrations
 
             modelBuilder.Entity("Dento.Models.Appointment", b =>
                 {
+                    b.HasOne("Dento.Models.Dentist", "Dentist")
+                        .WithMany("Appointments")
+                        .HasForeignKey("DentistId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Dento.Models.Patient", "Patient")
                         .WithMany("Appointments")
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("Dento.Models.Payment", "Payment")
+                        .WithMany()
+                        .HasForeignKey("PaymentId");
 
                     b.HasOne("Dento.Models.Slot", "Slot")
                         .WithMany()
@@ -457,7 +565,11 @@ namespace AngDepiApi_DentalClinic.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Dentist");
+
                     b.Navigation("Patient");
+
+                    b.Navigation("Payment");
 
                     b.Navigation("Slot");
                 });
@@ -484,12 +596,23 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Dento.Models.PaymentEvent", b =>
+                {
+                    b.HasOne("Dento.Models.Payment", "Payment")
+                        .WithMany("Events")
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+                });
+
             modelBuilder.Entity("Dento.Models.Slot", b =>
                 {
                     b.HasOne("Dento.Models.DentistAvailability", "DentistAvailability")
                         .WithMany("Slots")
                         .HasForeignKey("DentistAvailabilityId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("DentistAvailability");
                 });
@@ -586,8 +709,15 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.Navigation("Slots");
                 });
 
+            modelBuilder.Entity("Dento.Models.Payment", b =>
+                {
+                    b.Navigation("Events");
+                });
+
             modelBuilder.Entity("Dento.Models.Dentist", b =>
                 {
+                    b.Navigation("Appointments");
+
                     b.Navigation("DentistAvailability")
                         .IsRequired();
                 });

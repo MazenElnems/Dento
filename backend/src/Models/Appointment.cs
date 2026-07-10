@@ -11,6 +11,7 @@ public class Appointment
     public string SlotId { get; set; } = default!;
     public Slot Slot { get; set; } = default!;
 
+    public AppointmentType AppointmentType { get; set; }    
     public AppointmentStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? ConfirmedAt { get; set; }
@@ -20,4 +21,12 @@ public class Appointment
     [ForeignKey(nameof(Patient))]
     public string PatientId { get; set; } = default!;
     public Patient Patient { get; set; } = default!;
+
+    [ForeignKey(nameof(Payment))]
+    public string? PaymentId { get; set; } = default!;
+    public Payment? Payment { get; set; } = default!;
+
+    [ForeignKey(nameof(Dentist))]
+    public string DentistId { get; set; } = default!;
+    public Dentist Dentist { get; set; } = default!;
 }

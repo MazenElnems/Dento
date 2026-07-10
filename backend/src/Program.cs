@@ -83,10 +83,14 @@ builder.Services.AddApiVersioning(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<IReleaseLockedSlotJob, ReleaseLockedSlotJob>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymobHmacVarifier, PaymobHmacVarifier>();
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -145,6 +149,8 @@ builder.Services.AddCors(op =>
 builder.Services.Configure<JwtTokenSettings>(builder.Configuration.GetSection("JWTSettings"));
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.Configure<ClientSettings>(builder.Configuration.GetSection("ClientSettings"));
+builder.Services.Configure<PaymobSettings>(builder.Configuration.GetSection("PaymobSettings"));
+builder.Services.Configure<ApplicationOptions>(builder.Configuration.GetSection("ApplicationOptions"));
 
 var app = builder.Build();
 

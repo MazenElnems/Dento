@@ -39,7 +39,7 @@ public class DentistsController : BaseApiController
             .Select(d => new DentistListItemDto
             {
                 Id               = d.Id,
-                FullName         = d.FullName,
+                FullName         = d.FirstName + " " + d.LastName,
                 Specialty        = d.Specialty,
                 ConsultationFee  = d.ConsultationFee,
                 ScheduleId       = d.DentistAvailability.Id,

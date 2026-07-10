@@ -92,9 +92,9 @@ public class SchedulesController : BaseApiController
         schedule.ToHour = request.ToHour;
         schedule.SecondFromHour = request.SecondFromHour;
         schedule.SecondToHour = request.SecondToHour;
-        schedule.SlotLengthInMinutes = schedule.SlotLengthInMinutes;
+        schedule.SlotLengthInMinutes = request.SlotLengthInMinutes;
 
-        schedule.IsActive = schedule.IsActive;
+        schedule.IsActive = request.IsActive;
 
         await _context.SaveChangesAsync();
 

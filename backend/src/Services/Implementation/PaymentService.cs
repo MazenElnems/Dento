@@ -94,8 +94,8 @@ public class PaymentService : IPaymentService
 
         var body = new
         {
-            amount = appointment.Dentist.ConsultationFee, 
-            currency = "egp",
+            amount = appointment.Dentist.ConsultationFee * 100, 
+            currency = "EGP",
             payment_methods = new[] { 5772602 },
 
             items = new[]
@@ -133,7 +133,7 @@ public class PaymentService : IPaymentService
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Token", _paymob.SecretKey);
 
-        request.Content = new StringContent(JsonSerializer.Serialize(body), null, "application/json");
+        request.Content = JsonContent.Create(body);
 
         HttpResponseMessage response;
         try

@@ -33,7 +33,7 @@ public class PaymentsController : BaseApiController
         _logger.LogInformation("Payment intent creation requested | AppointmentId: {AppointmentId} | UserId: {UserId} | IdempotencyKey: {IdempotencyKey}",
             request.AppointmentId, CurrentUser.Id, request.IdempotencyKey);
 
-        var clientSecret = _paymentService.CreatePaymentIntent(request.AppointmentId, request.IdempotencyKey);
+        var clientSecret = await _paymentService.CreatePaymentIntent(request.AppointmentId, request.IdempotencyKey);
 
         _logger.LogInformation("Payment intent created — client secret returned | AppointmentId: {AppointmentId} | UserId: {UserId}",
             request.AppointmentId, CurrentUser.Id);

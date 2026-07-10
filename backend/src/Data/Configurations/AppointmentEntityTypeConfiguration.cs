@@ -12,18 +12,18 @@ public class AppointmentEntityTypeConfiguration : IEntityTypeConfiguration<Appoi
             .HasOne(x => x.Patient)
             .WithMany(x => x.Appointments)
             .HasForeignKey(x => x.PatientId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder
             .HasOne(x => x.Dentist)
             .WithMany(x => x.Appointments)
             .HasForeignKey(x => x.DentistId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder
             .HasOne(x => x.Slot)
             .WithMany()
             .HasForeignKey(x => x.SlotId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -339,6 +339,7 @@ namespace AngDepiApi_DentalClinic.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("DentistAvailabilityId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<TimeOnly>("From")
@@ -549,13 +550,13 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.HasOne("Dento.Models.Dentist", "Dentist")
                         .WithMany("Appointments")
                         .HasForeignKey("DentistId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Dento.Models.Patient", "Patient")
                         .WithMany("Appointments")
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Dento.Models.Payment", "Payment")
@@ -565,7 +566,7 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.HasOne("Dento.Models.Slot", "Slot")
                         .WithMany()
                         .HasForeignKey("SlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Dentist");
@@ -615,7 +616,8 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.HasOne("Dento.Models.DentistAvailability", "DentistAvailability")
                         .WithMany("Slots")
                         .HasForeignKey("DentistAvailabilityId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("DentistAvailability");
                 });

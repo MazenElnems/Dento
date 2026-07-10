@@ -7,8 +7,8 @@ public class Slot
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
-    public DentistAvailability? DentistAvailability { get; set; }
-    public string? DentistAvailabilityId { get; set; }
+    public DentistAvailability DentistAvailability { get; set; } = default!;
+    public string DentistAvailabilityId { get; set; } = default!;
 
     public SlotStatus Status { get; set; } = SlotStatus.Available;
     public DateTime? LockedUntil { get; set; }  

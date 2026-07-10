@@ -8,6 +8,7 @@ using Dento.Services.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace Dento.Services.Implementation;
@@ -124,14 +125,20 @@ public class PaymentService : IPaymentService
 
         using var client = _factory.CreateClient();
 
-        var url = $"{_paymob.BaseUrl}/{_paymob.CreatePaymentIntentPath}";
+        _logger.LogInformation("Calling Paymob API | PaymentId: {PaymentId} | Url: {Url}", payment.Id, _paymob.CreatePaymentIntentPath);
 
-        _logger.LogInformation("Calling Paymob API | PaymentId: {PaymentId} | Url: {Url}", payment.Id, url);
+        client.BaseAddress = new Uri(_paymob.BaseUrl);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, _paymob.CreatePaymentIntentPath);
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("Token", _paymob.SecretKey);
+
+        request.Content = JsonContent.Create(body);
 
         HttpResponseMessage response;
         try
         {
-            response = await client.PostAsJsonAsync(url, body);
+            response = await client.SendAsync(request);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or TimeoutException)
         {

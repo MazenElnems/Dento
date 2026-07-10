@@ -94,9 +94,9 @@ public class PaymentService : IPaymentService
 
         var body = new
         {
-            amount = appointment.Dentist.ConsultationFee, // or appointment.Dentist.ConsultationFee
-            currency = "EGP",
-            payment_methods = new[] { "card" },
+            amount = appointment.Dentist.ConsultationFee, 
+            currency = "egp",
+            payment_methods = new[] { 5772602 },
 
             items = new[]
             {
@@ -125,15 +125,15 @@ public class PaymentService : IPaymentService
 
         using var client = _factory.CreateClient();
 
-        _logger.LogInformation("Calling Paymob API | PaymentId: {PaymentId} | Url: {Url}", payment.Id, _paymob.CreatePaymentIntentPath);
+        var url = $"{_paymob.BaseUrl}/{_paymob.CreatePaymentIntentPath}";
 
-        client.BaseAddress = new Uri(_paymob.BaseUrl);
+        _logger.LogInformation("Calling Paymob API | PaymentId: {PaymentId} | Url: {Url}", payment.Id, url);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, _paymob.CreatePaymentIntentPath);
+        var request = new HttpRequestMessage(HttpMethod.Post, url);
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Token", _paymob.SecretKey);
 
-        request.Content = JsonContent.Create(body);
+        request.Content = new StringContent(JsonSerializer.Serialize(body), null, "application/json");
 
         HttpResponseMessage response;
         try
@@ -165,10 +165,12 @@ public class PaymentService : IPaymentService
 
         if (!response.IsSuccessStatusCode)
         {
+            var errorBody = await response.Content.ReadAsStringAsync();
+
             _logger.LogError(
-                "Failed to create payment intent. Status: {StatusCode} , Content: {@Content}",
+                "Failed to create payment intent. Status: {StatusCode}, Body: {Body}",
                 response.StatusCode,
-                response.Content
+                errorBody
             );
 
             payment.Status = PaymentStatus.Failed;

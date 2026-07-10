@@ -45,7 +45,6 @@ export class Login {
             if (user.role === 'patient') {
               this.router.navigate(['/dashboard']);
             } else {
-              // Non-patients should not be allowed into the main app client portal
               alert('Staff members should log in using the admin portal. You will be redirected.');
               this.authService.logout();
               this.router.navigate(['/login']);
@@ -54,7 +53,6 @@ export class Login {
         } else {
           this.errorMessage = this.mapErrorCode(response.errorCode, response.message);
           
-          // If email is not verified, navigate to verification screen
           if (response.errorCode === 'AUTH_EMAIL_NOT_VERIFIED') {
             const userId = response.data?.userId || response.data || '';
             setTimeout(() => {

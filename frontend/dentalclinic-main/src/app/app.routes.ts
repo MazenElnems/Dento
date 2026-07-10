@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+// Triggering Re-evaluation of Routes
 import { About } from './about/about';
 import { Contact } from './contact/contact';
 import { Gallery } from './gallery/gallery';

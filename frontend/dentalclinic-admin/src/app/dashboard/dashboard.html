@@ -3,37 +3,57 @@
   <!-- Sidebar Panel -->
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <img src="assets/images/logo-highquality-removebg-preview.png" alt="Dento Logo" class="sidebar-logo" />
+      <img src="logo-highquality-removebg-preview.png" alt="Dento Logo" class="sidebar-logo" />
       <span class="sidebar-badge">OS</span>
-    </div>
-
-    <!-- Active User Card -->
-    <div class="sidebar-user-card">
-      <div class="user-avatar">
-        <i class="bi bi-person-workspace"></i>
-      </div>
-      <div class="user-details">
-        <h4>{{ authService.currentUser()?.name }}</h4>
-        <span class="user-role">{{ authService.currentUser()?.role?.toUpperCase() }}</span>
-      </div>
     </div>
 
     <!-- Navigation Menu (Contextual indicator) -->
     <nav class="sidebar-menu">
       <div class="menu-label">Workspace</div>
-      <a class="menu-item active">
-        <i class="bi bi-speedometer2"></i> Dashboard Panel
-      </a>
-      <a class="menu-item disabled">
-        <i class="bi bi-chat-left-text"></i> Messages
-      </a>
-      <a class="menu-item disabled">
-        <i class="bi bi-gear"></i> Settings
-      </a>
+      
+      @if (authService.currentUser()?.role === 'admin') {
+        <a class="menu-item" [class.active]="activeSubTab === 'dashboard'" (click)="activeSubTab = 'dashboard'">
+          <i class="bi bi-grid-1x2"></i> Dashboard
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'users'" (click)="activeSubTab = 'users'">
+          <i class="bi bi-people"></i> Users
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'schedules'" (click)="activeSubTab = 'schedules'">
+          <i class="bi bi-calendar3"></i> Dentists Schedule
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'revenue'" (click)="activeSubTab = 'revenue'">
+          <i class="bi bi-wallet2"></i> Revenue
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'reports'" (click)="activeSubTab = 'reports'">
+          <i class="bi bi-graph-up-arrow"></i> Reports
+        </a>
+      } @else {
+        <a class="menu-item active">
+          <i class="bi bi-speedometer2"></i> Dashboard Panel
+        </a>
+        <a class="menu-item disabled">
+          <i class="bi bi-chat-left-text"></i> Messages
+        </a>
+        <a class="menu-item disabled">
+          <i class="bi bi-gear"></i> Settings
+        </a>
+      }
     </nav>
 
     <!-- Sidebar Footer Actions -->
     <div class="sidebar-footer">
+      
+      <!-- Active User Card (Relocated to bottom) -->
+      <div class="sidebar-user-card">
+        <div class="user-avatar">
+          <i class="bi bi-person-workspace"></i>
+        </div>
+        <div class="user-details">
+          <h4>{{ authService.currentUser()?.name }}</h4>
+          <span class="user-role">{{ authService.currentUser()?.role?.toUpperCase() }}</span>
+        </div>
+      </div>
+
       <button class="btn-logout" (click)="logout()">
         <i class="bi bi-box-arrow-left"></i> Sign Out
       </button>
@@ -51,7 +71,7 @@
           <app-receptionist-dashboard></app-receptionist-dashboard>
         }
         @case ('admin') {
-          <app-admin-dashboard></app-admin-dashboard>
+          <app-admin-dashboard [activeSubTab]="$any(activeSubTab)"></app-admin-dashboard>
         }
       }
     }

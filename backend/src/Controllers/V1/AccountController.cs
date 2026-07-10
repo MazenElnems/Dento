@@ -315,7 +315,7 @@ public class AccountController : BaseApiController
 
         await _userManager.AddToRoleAsync(dentist, RoleNames.Dentist);
 
-        return ApiResponse.SuccessResponse("Doctor account created successfully.");
+        return ApiResponse.SuccessResponse("Dentist account created successfully.");
     }
 
 

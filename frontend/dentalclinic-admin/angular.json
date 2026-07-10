@@ -25,9 +25,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "styles": ["src/styles.css"]
           },
           "configurations": {
             "production": {
@@ -63,7 +61,10 @@
               "buildTarget": "dentalclinic-admin:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "allowedHosts": ["depth-gumball-identity.ngrok-free.dev"]
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test"

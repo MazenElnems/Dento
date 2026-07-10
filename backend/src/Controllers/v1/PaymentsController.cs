@@ -33,10 +33,12 @@ public class PaymentsController : BaseApiController
         _logger.LogInformation("Payment intent creation requested | AppointmentId: {AppointmentId} | UserId: {UserId} | IdempotencyKey: {IdempotencyKey}",
             request.AppointmentId, CurrentUser.Id, request.IdempotencyKey);
 
-        var clientSecret = await _paymentService.CreatePaymentIntent(request.AppointmentId, request.IdempotencyKey);
+        var clientSecret = await _paymentService.CreatePaymentIntent(request.AppointmentId, request.IdempotencyKey, CurrentUser.Id);
 
         _logger.LogInformation("Payment intent created — client secret returned | AppointmentId: {AppointmentId} | UserId: {UserId}",
             request.AppointmentId, CurrentUser.Id);
+
+        Response.Headers.Location = $"{_paymob.BaseUrl}/{_paymob.CheckoutPageUrl}?publicKey={_paymob.PublicKey}&clientSecret={clientSecret}";
 
         return ApiResponse.SuccessResponse(new
         {

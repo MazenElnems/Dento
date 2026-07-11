@@ -148,6 +148,12 @@ public class PaymentService : IPaymentService
 
         _logger.LogInformation("Calling Paymob API | PaymentId: {PaymentId} | Url: {Url}", payment.Id, url);
 
+        _logger.LogInformation(
+            "Paymob URLs | NotificationUrl: {NotificationUrl} | RedirectionUrl: {RedirectionUrl}",
+            body.notification_url,
+            body.redirection_url
+        );
+
         var request = new HttpRequestMessage(HttpMethod.Post, url);
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Token", _paymob.SecretKey);

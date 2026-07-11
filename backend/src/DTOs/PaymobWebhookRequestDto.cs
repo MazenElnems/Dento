@@ -1,6 +1,15 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Dento.DTOs;
+
+public sealed class PaymobWebhookPayload
+{
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = string.Empty;
+
+    [JsonPropertyName("obj")]
+    public PaymobWebhookRequest Obj { get; set; } = default!;
+}
 
 public sealed class PaymobWebhookRequest
 {

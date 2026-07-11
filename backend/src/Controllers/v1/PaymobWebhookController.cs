@@ -27,10 +27,17 @@ public class PaymobWebhookController : BaseApiController
 
     [HttpPost]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> HandleWebhook([FromBody] PaymobWebhookRequest request, [FromQuery] string hmac)
+    public async Task<IActionResult> HandleWebhook([FromBody] PaymobWebhookPayload payload, [FromQuery] string hmac)
     {
+        var request = payload?.Obj;
+        if (request == null)
+        {
+            _logger.LogWarning("Webhook received with null payload or obj");
+            return BadRequest();
+        }
+
         _logger.LogInformation("Paymob webhook received | TransactionId: {TransactionId} | OrderId: {OrderId} | Success: {Success} | AmountCents: {AmountCents}",
-            request.Id, request.Order.Id, request.Success, request.AmountCents);
+            request.Id, request.Order?.Id, request.Success, request.AmountCents);
 
         // Verify HMAC
         var data = string.Concat(
@@ -88,9 +95,9 @@ public class PaymobWebhookController : BaseApiController
             return BadRequest();
         }
 
-        // FIX: serialize the already-deserialized request object for logging
+        // FIX: serialize the already-deserialized payload object for logging
         // (the request body stream has already been consumed by the model binder)
-        var rawPayload = JsonSerializer.Serialize(request);
+        var rawPayload = JsonSerializer.Serialize(payload);
 
         payment.TransactionId = request.Id;
         payment.Status        = request.Success ? PaymentStatus.Paid : PaymentStatus.Failed;

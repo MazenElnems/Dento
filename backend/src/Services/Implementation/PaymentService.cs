@@ -32,51 +32,70 @@ public class PaymentService : IPaymentService
         _logger = logger;
     }
 
-    public async Task<string> CreatePaymentIntent(string appointmentId, string idempotencyKey)
+    public async Task<string> CreatePaymentIntent(string appointmentId, string idempotencyKey, string patientId)
     {
-        _logger.LogInformation("Creating payment intent | AppointmentId: {AppointmentId} | IdempotencyKey: {IdempotencyKey}",
-            appointmentId, idempotencyKey);
+        _logger.LogInformation("Creating payment intent | AppointmentId: {AppointmentId} | IdempotencyKey: {IdempotencyKey} | PatientId: {PatientId}",
+            appointmentId, idempotencyKey, patientId);
 
         var appointment = await _context.Appointments
             .Include(x => x.Dentist)
             .Include(x => x.Patient)
             .Include(x => x.Payment)
+            .Include(x => x.Slot)
             .FirstOrDefaultAsync(x => x.Id == appointmentId);
 
         if (appointment == null)
             throw new ResourceNotFoundException(nameof(Appointment));
+
+        // Ownership check — only the patient who created the appointment can pay
+        if (appointment.PatientId != patientId)
+        {
+            _logger.LogWarning("Unauthorized payment attempt | AppointmentId: {AppointmentId} | RequestingPatientId: {PatientId} | OwnerPatientId: {OwnerId}",
+                appointmentId, patientId, appointment.PatientId);
+            throw new AppointmentPaymentException("You are not authorized to pay for this appointment.");
+        }
+
+        // Slot lock check — verify the 10-minute window hasn't expired
+        if (appointment.Slot.Status != SlotStatus.Locked ||
+            appointment.Slot.LockedUntil == null ||
+            appointment.Slot.LockedUntil <= DateTime.UtcNow)
+        {
+            _logger.LogWarning("Payment intent rejected — slot lock expired | AppointmentId: {AppointmentId} | SlotId: {SlotId} | LockedUntil: {LockedUntil}",
+                appointmentId, appointment.SlotId, appointment.Slot.LockedUntil);
+            throw new SlotLockExpiredException("The slot reservation has expired. Please select a new time slot.");
+        }
 
         // Already Payment Check
         if (appointment.Payment != null && appointment.Payment.Status == PaymentStatus.Pending)
         {
             _logger.LogWarning("Payment already in-progress | AppointmentId: {AppointmentId} | PaymentId: {PaymentId}",
                 appointmentId, appointment.Payment.Id);
-            throw new AppointmentPaymentException("Payment already in-progress");
+            throw new AppointmentPaymentException("Payment already in-progress.");
         }
 
         if (appointment.Payment != null && appointment.Payment.Status == PaymentStatus.Paid)
         {
             _logger.LogWarning("Payment already completed | AppointmentId: {AppointmentId} | PaymentId: {PaymentId}",
                 appointmentId, appointment.Payment.Id);
-            throw new AppointmentPaymentException("Payment already Completed");
+            throw new AppointmentPaymentException("Payment already completed.");
         }
 
         var payment = new Payment
         {
             IdempotencyKey = idempotencyKey,
-            Amount = appointment.Dentist.ConsultationFee ?? 200,
-            Currency = "EGP",
-            PayerEmail = appointment.Patient.Email,
-            PayerName = appointment.Patient.FullName,
-            Status = PaymentStatus.Pending,
-            PaymentMethod = PaymentMethod.Card,
-            CreatedAt = DateTime.UtcNow,
+            Amount         = appointment.Dentist.ConsultationFee ?? 200,
+            Currency       = "EGP",
+            PayerEmail     = appointment.Patient.Email,
+            PayerName      = appointment.Patient.FullName,
+            Status         = PaymentStatus.Pending,
+            PaymentMethod  = PaymentMethod.Card,
+            CreatedAt      = DateTime.UtcNow,
         };
 
         appointment.PaymentId = payment.Id;
         _context.Payments.Add(payment);
 
-        // first Insert Pending Payment Row To ensure Idempotency
+        // First insert the Pending Payment row to ensure idempotency
         try
         {
             await _context.SaveChangesAsync();
@@ -94,33 +113,33 @@ public class PaymentService : IPaymentService
 
         var body = new
         {
-            amount = appointment.Dentist.ConsultationFee * 100, 
-            currency = "EGP",
-            payment_methods = new[] { 5772602 },
+            amount           = appointment.Dentist.ConsultationFee * 100,
+            currency         = "EGP",
+            payment_methods  = new[] { 5772602 },
 
             items = new[]
             {
                 new
                 {
-                    name = "Dental Consultation",
-                    amount = appointment.Dentist.ConsultationFee,
+                    name        = "Dental Consultation",
+                    amount      = appointment.Dentist.ConsultationFee * 100,
                     description = $"Consultation with Dr. {appointment.Dentist.FullName}",
-                    quantity = 1
+                    quantity    = 1
                 }
             },
 
             billing_data = new
             {
-                first_name = appointment.Patient.FirstName,
-                last_name = appointment.Patient.LastName,
-                email = appointment.Patient.Email,
+                first_name   = appointment.Patient.FirstName,
+                last_name    = appointment.Patient.LastName,
+                email        = appointment.Patient.Email,
                 phone_number = appointment.Patient.PhoneNumber
             },
 
             special_reference = idempotencyKey,
 
-            notification_url = $"{_appOptions.ApiBaseUrl}/{_paymob.WebhookEndpointUrl}",
-            redirection_url = $"{_client.Host}/payment/result"
+            notification_url  = $"{_appOptions.ApiBaseUrl}/{_paymob.WebhookEndpointUrl}",
+            redirection_url   = $"{_client.Host}/payment/result"
         };
 
         using var client = _factory.CreateClient();
@@ -128,6 +147,12 @@ public class PaymentService : IPaymentService
         var url = $"{_paymob.BaseUrl}/{_paymob.CreatePaymentIntentPath}";
 
         _logger.LogInformation("Calling Paymob API | PaymentId: {PaymentId} | Url: {Url}", payment.Id, url);
+
+        _logger.LogInformation(
+            "Paymob URLs | NotificationUrl: {NotificationUrl} | RedirectionUrl: {RedirectionUrl}",
+            body.notification_url,
+            body.redirection_url
+        );
 
         var request = new HttpRequestMessage(HttpMethod.Post, url);
 
@@ -144,20 +169,20 @@ public class PaymentService : IPaymentService
         {
             _logger.LogError(ex, "Network failure calling Paymob for payment {PaymentId}", payment.Id);
 
-            payment.Status = PaymentStatus.Failed;
+            payment.Status      = PaymentStatus.Failed;
             payment.FauilerReason = "Network error contacting payment gateway";
-            payment.UpdatedAt = DateTime.UtcNow;
+            payment.UpdatedAt   = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
             throw new PaymentGatewayException(StatusCodes.Status502BadGateway, "Unable to reach payment gateway. Please try again.");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            _logger.LogError(ex, "Unknown Exception was thrown for payment {PaymentId}", payment.Id);
+            _logger.LogError(ex, "Unknown exception thrown for payment {PaymentId}", payment.Id);
 
-            payment.Status = PaymentStatus.Failed;
-            payment.FauilerReason = "Network error contacting payment gateway";
-            payment.UpdatedAt = DateTime.UtcNow;
+            payment.Status      = PaymentStatus.Failed;
+            payment.FauilerReason = "Unknown error contacting payment gateway";
+            payment.UpdatedAt   = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
             throw;
@@ -173,9 +198,9 @@ public class PaymentService : IPaymentService
                 errorBody
             );
 
-            payment.Status = PaymentStatus.Failed;
+            payment.Status      = PaymentStatus.Failed;
             payment.FauilerReason = "Failed to create payment intent";
-            payment.UpdatedAt = DateTime.UtcNow;
+            payment.UpdatedAt   = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
@@ -185,35 +210,33 @@ public class PaymentService : IPaymentService
         var options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+            PropertyNamingPolicy        = JsonNamingPolicy.SnakeCaseLower
         };
 
         var rawContent = await response.Content.ReadAsStringAsync();
 
-        var paymentIntentResponse = new CreatePaymentIntentPaymobResponseDto();
+        CreatePaymentIntentPaymobResponseDto? paymentIntentResponse;
         try
         {
-            paymentIntentResponse = await response.Content
-                .ReadFromJsonAsync<CreatePaymentIntentPaymobResponseDto>(options);
+            paymentIntentResponse = JsonSerializer.Deserialize<CreatePaymentIntentPaymobResponseDto>(rawContent, options);
         }
-        catch(JsonException ex)
+        catch (JsonException ex)
         {
             _logger.LogError(ex, "Failed to parse Paymob response for payment {PaymentId}. Raw: {Raw}", payment.Id, rawContent);
-            
             paymentIntentResponse = null;
         }
 
         if (paymentIntentResponse is null)
         {
-            payment.Status = PaymentStatus.Failed;
+            payment.Status      = PaymentStatus.Failed;
             payment.FauilerReason = "Unable to parse payment gateway response";
-            payment.UpdatedAt = DateTime.UtcNow;
+            payment.UpdatedAt   = DateTime.UtcNow;
 
             payment.Events.Add(new PaymentEvent
             {
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt  = DateTime.UtcNow,
                 RawPayload = rawContent,
-                Type = PaymentEventType.PaymentIntentCreated
+                Type       = PaymentEventType.PaymentIntentCreated
             });
 
             await _context.SaveChangesAsync();
@@ -221,16 +244,16 @@ public class PaymentService : IPaymentService
             throw new PaymentGatewayException(StatusCodes.Status502BadGateway, "Unable to create payment. Please try again.");
         }
 
-        payment.IntentionId = paymentIntentResponse.IntentionOrderId;
+        payment.IntentionId  = paymentIntentResponse.IntentionOrderId;
         payment.ClientSecret = paymentIntentResponse.ClientSecret;
-        payment.Status = PaymentStatus.Intended;
-        payment.UpdatedAt = DateTime.UtcNow;
+        payment.Status       = PaymentStatus.Intended;
+        payment.UpdatedAt    = DateTime.UtcNow;
 
         payment.Events.Add(new PaymentEvent
         {
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt  = DateTime.UtcNow,
             RawPayload = rawContent,
-            Type = PaymentEventType.PaymentIntentCreated
+            Type       = PaymentEventType.PaymentIntentCreated
         });
 
         await _context.SaveChangesAsync();

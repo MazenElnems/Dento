@@ -1,4 +1,4 @@
-﻿namespace Dento.Constants;
+namespace Dento.Constants;
 
 public static class ErrorCodes
 {
@@ -23,6 +23,11 @@ public static class ErrorCodes
     public const string SlotIsNotFound = "SLOT_IS_NOT_FOUND";
     public const string SlotIsNotAvailable = "SLOT_IS_NOT_AVAILABLE";
     public const string SlotAppointmentConflict = "SLOT_APPOINTMENT_CONFLICT";
+    public const string SlotLockExpired = "SLOT_LOCK_EXPIRED";
+
+    // Appointment
+    public const string AppointmentNotFound = "APPOINTMENT_NOT_FOUND";
+    public const string AppointmentNotOwned = "APPOINTMENT_NOT_OWNED";
 
     public const string ResourceNotFound = "RESOURCE_NOT_FOUND";
 

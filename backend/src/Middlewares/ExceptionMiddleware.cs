@@ -39,6 +39,15 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
                 ex.StatusCode,
                 ex.Message);
         }
+        catch (SlotLockExpiredException ex)
+        {
+            await HandleExceptionAsync(
+                context,
+                ex,
+                ErrorCodes.SlotLockExpired,
+                ex.StatusCode,
+                ex.Message);
+        }
         catch (PaymentGatewayException ex)
         {
             await HandleExceptionAsync(

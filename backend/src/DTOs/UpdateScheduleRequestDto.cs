@@ -29,4 +29,5 @@ public class UpdateScheduleRequestDto
 
     [Required, Range(15, 120)]
     public int SlotLengthInMinutes { get; set; }
+    public bool IsActive { get; set; }  
 }

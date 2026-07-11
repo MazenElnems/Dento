@@ -8,5 +8,6 @@ public class PaymobSettings
     public required string ApiKey { get; init; }
     public required string HMAC { get; init; }
     public required string WebhookEndpointUrl { get; init; }
-    public required string CreatePaymentIntentPath { get; init; }   
+    public required string CreatePaymentIntentPath { get; init; }
+    public required string CheckoutPageUrl { get; init; }    
 }

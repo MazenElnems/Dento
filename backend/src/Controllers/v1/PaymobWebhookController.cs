@@ -6,6 +6,7 @@ using Dento.Models;
 using Dento.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Dento.Controllers.v1;
 
@@ -26,12 +27,19 @@ public class PaymobWebhookController : BaseApiController
 
     [HttpPost]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> HandleWebhook([FromBody] PaymobWebhookRequest request, [FromQuery] string hmac)
+    public async Task<IActionResult> HandleWebhook([FromBody] PaymobWebhookPayload payload, [FromQuery] string hmac)
     {
-        _logger.LogInformation("Paymob webhook received | TransactionId: {TransactionId} | OrderId: {OrderId} | Success: {Success} | AmountCents: {AmountCents}",
-            request.Id, request.Order.Id, request.Success, request.AmountCents);
+        var request = payload?.Obj;
+        if (request == null)
+        {
+            _logger.LogWarning("Webhook received with null payload or obj");
+            return BadRequest();
+        }
 
-        // Varify HMAC 
+        _logger.LogInformation("Paymob webhook received | TransactionId: {TransactionId} | OrderId: {OrderId} | Success: {Success} | AmountCents: {AmountCents}",
+            request.Id, request.Order?.Id, request.Success, request.AmountCents);
+
+        // Verify HMAC
         var data = string.Concat(
             request.AmountCents,
             request.CreatedAt,
@@ -64,8 +72,7 @@ public class PaymobWebhookController : BaseApiController
             return Unauthorized("Invalid Hmac");
         }
 
-        // Update the Payment 
-
+        // Look up the payment by IntentionId (= Paymob order ID)
         var payment = await _context.Payments
             .FirstOrDefaultAsync(x => x.IntentionId == request.Order.Id);
 
@@ -76,47 +83,55 @@ public class PaymobWebhookController : BaseApiController
             return NotFound();
         }
 
+        // FIX: look up appointment by PaymentId (was incorrectly using PatientId)
         var appointment = await _context.Appointments
             .Include(x => x.Slot)
-            .FirstOrDefaultAsync(x => x.PatientId == payment.Id);
+            .FirstOrDefaultAsync(x => x.PaymentId == payment.Id);
 
-        if(appointment == null)
+        if (appointment == null)
         {
             _logger.LogWarning("Webhook received but appointment not found | PaymentId: {PaymentId} | OrderId: {OrderId}",
                 payment.Id, request.Order.Id);
             return BadRequest();
         }
-        
-        using var reader = new StreamReader(Request.Body);
-        var rawPayload = await reader.ReadToEndAsync();
+
+        // FIX: serialize the already-deserialized payload object for logging
+        // (the request body stream has already been consumed by the model binder)
+        var rawPayload = JsonSerializer.Serialize(payload);
 
         payment.TransactionId = request.Id;
-        payment.Status = request.Success ? PaymentStatus.Paid : PaymentStatus.Failed;
+        payment.Status        = request.Success ? PaymentStatus.Paid : PaymentStatus.Failed;
+        payment.UpdatedAt     = DateTime.UtcNow;
 
-        // Log Payment Event
+        // Log the payment event
         payment.Events.Add(new PaymentEvent
         {
             RawPayload = rawPayload,
-            Type = request.Success ? PaymentEventType.PaymentSucceeded : PaymentEventType.PaymentFailed,
-            CreatedAt = DateTime.UtcNow
+            Type       = request.Success ? PaymentEventType.PaymentSucceeded : PaymentEventType.PaymentFailed,
+            CreatedAt  = DateTime.UtcNow
         });
-
 
         if (request.Success)
         {
-            appointment.Status = AppointmentStatus.Confirmed;
-            appointment.Slot.Status = SlotStatus.Booked;
-            appointment.ConfirmedAt = DateTime.UtcNow;
+            appointment.Status       = AppointmentStatus.Confirmed;
+            appointment.Slot.Status  = SlotStatus.Booked;
+            appointment.Slot.LockedUntil = null;
+            appointment.ConfirmedAt  = DateTime.UtcNow;
 
-            _logger.LogInformation("Payment confirmed — appointment status updated | PaymentId: {PaymentId} | AppointmentId: {AppointmentId} | TransactionId: {TransactionId}",
+            _logger.LogInformation("Payment confirmed — appointment confirmed and slot booked | PaymentId: {PaymentId} | AppointmentId: {AppointmentId} | TransactionId: {TransactionId}",
                 payment.Id, appointment.Id, request.Id);
         }
         else
         {
-            _logger.LogWarning("Payment failed via webhook | PaymentId: {PaymentId} | TransactionId: {TransactionId} | OrderId: {OrderId}",
-                payment.Id, request.Id, request.Order.Id);
+            // FIX: release the slot immediately on payment failure so another patient can book it
+            appointment.Status       = AppointmentStatus.Failed;
+            appointment.Slot.Status  = SlotStatus.Available;
+            appointment.Slot.LockedUntil = null;
+
+            _logger.LogWarning("Payment failed via webhook — slot released | PaymentId: {PaymentId} | TransactionId: {TransactionId} | OrderId: {OrderId} | AppointmentId: {AppointmentId}",
+                payment.Id, request.Id, request.Order.Id, appointment.Id);
         }
-        
+
         await _context.SaveChangesAsync();
         return Ok();
     }

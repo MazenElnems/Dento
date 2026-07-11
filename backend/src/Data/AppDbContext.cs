@@ -1,4 +1,4 @@
-﻿using Dento.Models;
+using Dento.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +15,10 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<Slot> Slots { get; set; }
     public DbSet<Payment> Payments { get; set; }    
+    public DbSet<MedicalRecord> MedicalRecords { get; set; }
+    public DbSet<VisitMedicalRecord> VisitMedicalRecords { get; set; }
+    public DbSet<Prescription> Prescriptions { get; set; }
+    public DbSet<Procedure> Procedures { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)

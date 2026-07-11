@@ -100,6 +100,7 @@ builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<IReleaseLockedSlotJob, ReleaseLockedSlotJob>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymobHmacVarifier, PaymobHmacVarifier>();
+builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

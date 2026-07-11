@@ -91,7 +91,8 @@ public class AccountController : BaseApiController
             PhoneNumber = request.Phone,
             DateOfBirth = request.BirthDate,
             Email = request.Email,
-            UserName = request.Email
+            UserName = request.Email,
+            MedicalRecord = new MedicalRecord()
         };
         
         var result = await _userManager.CreateAsync(patient, request.Password);
@@ -515,7 +516,8 @@ public class AccountController : BaseApiController
             Email = user.Email!,
             Role = role,
             Token = accessToken.Token,
-            Expiration = accessToken.ExpirationDate
+            Expiration = accessToken.ExpirationDate,
+            Id = user.Id,
         };
 
         _logger.LogInformation("User authenticated successfully | UserId: {UserId} | Email: {Email} | Role: {Role}", user.Id, user.Email, role);

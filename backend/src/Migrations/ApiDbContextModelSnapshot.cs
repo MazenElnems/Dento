@@ -249,6 +249,29 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.ToTable("EmailVerificationCodes");
                 });
 
+            modelBuilder.Entity("Dento.Models.MedicalRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PatientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PatientId")
+                        .IsUnique();
+
+                    b.ToTable("MedicalRecords");
+                });
+
             modelBuilder.Entity("Dento.Models.Payment", b =>
                 {
                     b.Property<string>("Id")
@@ -330,6 +353,56 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.ToTable("PaymentEventLogs");
                 });
 
+            modelBuilder.Entity("Dento.Models.Prescription", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Dosage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MedicationName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VisitMedicalRecordId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VisitMedicalRecordId");
+
+                    b.ToTable("Prescriptions");
+                });
+
+            modelBuilder.Entity("Dento.Models.Procedure", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VisitMedicalRecordId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VisitMedicalRecordId");
+
+                    b.ToTable("Procedures");
+                });
+
             modelBuilder.Entity("Dento.Models.Slot", b =>
                 {
                     b.Property<string>("Id")
@@ -366,6 +439,35 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.HasIndex("DentistAvailabilityId");
 
                     b.ToTable("Slots");
+                });
+
+            modelBuilder.Entity("Dento.Models.VisitMedicalRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AppointmentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Diagnosis")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MedicalRecordId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId")
+                        .IsUnique();
+
+                    b.HasIndex("MedicalRecordId");
+
+                    b.ToTable("VisitMedicalRecords");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -600,6 +702,17 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Dento.Models.MedicalRecord", b =>
+                {
+                    b.HasOne("Dento.Models.Patient", "Patient")
+                        .WithOne("MedicalRecord")
+                        .HasForeignKey("Dento.Models.MedicalRecord", "PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+                });
+
             modelBuilder.Entity("Dento.Models.PaymentEvent", b =>
                 {
                     b.HasOne("Dento.Models.Payment", "Payment")
@@ -611,6 +724,28 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.Navigation("Payment");
                 });
 
+            modelBuilder.Entity("Dento.Models.Prescription", b =>
+                {
+                    b.HasOne("Dento.Models.VisitMedicalRecord", "VisitMedicalRecord")
+                        .WithMany("Prescriptions")
+                        .HasForeignKey("VisitMedicalRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("VisitMedicalRecord");
+                });
+
+            modelBuilder.Entity("Dento.Models.Procedure", b =>
+                {
+                    b.HasOne("Dento.Models.VisitMedicalRecord", "VisitMedicalRecord")
+                        .WithMany("Procedures")
+                        .HasForeignKey("VisitMedicalRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("VisitMedicalRecord");
+                });
+
             modelBuilder.Entity("Dento.Models.Slot", b =>
                 {
                     b.HasOne("Dento.Models.DentistAvailability", "DentistAvailability")
@@ -620,6 +755,25 @@ namespace AngDepiApi_DentalClinic.Migrations
                         .IsRequired();
 
                     b.Navigation("DentistAvailability");
+                });
+
+            modelBuilder.Entity("Dento.Models.VisitMedicalRecord", b =>
+                {
+                    b.HasOne("Dento.Models.Appointment", "Appointment")
+                        .WithOne()
+                        .HasForeignKey("Dento.Models.VisitMedicalRecord", "AppointmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Dento.Models.MedicalRecord", "MedicalRecord")
+                        .WithMany("VisitRecords")
+                        .HasForeignKey("MedicalRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("MedicalRecord");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -714,9 +868,21 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.Navigation("Slots");
                 });
 
+            modelBuilder.Entity("Dento.Models.MedicalRecord", b =>
+                {
+                    b.Navigation("VisitRecords");
+                });
+
             modelBuilder.Entity("Dento.Models.Payment", b =>
                 {
                     b.Navigation("Events");
+                });
+
+            modelBuilder.Entity("Dento.Models.VisitMedicalRecord", b =>
+                {
+                    b.Navigation("Prescriptions");
+
+                    b.Navigation("Procedures");
                 });
 
             modelBuilder.Entity("Dento.Models.Dentist", b =>
@@ -732,6 +898,8 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.Navigation("Appointments");
 
                     b.Navigation("EmailVerificationCodes");
+
+                    b.Navigation("MedicalRecord");
                 });
 #pragma warning restore 612, 618
         }

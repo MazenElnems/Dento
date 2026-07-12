@@ -39,4 +39,8 @@ public static class ErrorCodes
     public const string PaymentWebhookInvalid = "PAYMENT_WEBHOOK_INVALID";
     public const string PaymentVerificationFailed = "PAYMENT_VERIFICATION_FAILED";
     public const string AppointmentPaymentFailed = "APPOINTMENT_PAYMENT_FAILED";
+
+    // Cash Payment
+    public const string PaymentNotCash = "PAYMENT_NOT_CASH";
+    public const string PaymentAlreadyConfirmed = "PAYMENT_ALREADY_CONFIRMED";
 }

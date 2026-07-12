@@ -1,7 +1,8 @@
-﻿namespace Dento.Enums;
+namespace Dento.Enums;
 
 public enum PaymentMethod
 {
     Card,
-    MobileWallet
+    MobileWallet,
+    Cash
 }

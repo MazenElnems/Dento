@@ -30,4 +30,5 @@ public class AppointmentDetailsResponseDto
     public PaymentStatus? PaymentStatus { get; set; }
     public decimal? PaymentAmount { get; set; }
     public string? PaymentCurrency { get; set; }
+    public PaymentMethod? PaymentMethod { get; set; }
 }

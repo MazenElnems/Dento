@@ -1,9 +1,10 @@
-﻿namespace Dento.Enums;
+namespace Dento.Enums;
 
 public enum PaymentEventType
 {
     PaymentIntentCreated,
     PaymentSucceeded,
     PaymentFailed,
-    PaymentRefunded
+    PaymentRefunded,
+    CashPaymentConfirmed
 }

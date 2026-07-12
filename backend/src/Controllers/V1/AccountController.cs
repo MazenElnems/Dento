@@ -92,10 +92,14 @@ public class AccountController : BaseApiController
             DateOfBirth = request.BirthDate,
             Email = request.Email,
             UserName = request.Email,
-            MedicalRecord = new MedicalRecord()
+            MedicalRecord = new MedicalRecord 
+            { 
+                MedicalHistory = new MedicalHistory() 
+            }
         };
         
         var result = await _userManager.CreateAsync(patient, request.Password);
+
 
         if(!result.Succeeded)
         {

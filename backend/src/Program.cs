@@ -99,6 +99,10 @@ builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<IReleaseLockedSlotJob, ReleaseLockedSlotJob>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentStrategy, OnlinePaymentStrategy>();
+builder.Services.AddScoped<IPaymentStrategy, CashPaymentStrategy>();
+builder.Services.AddScoped<PaymentStrategyFactory>();
+
 builder.Services.AddScoped<IPaymobHmacVarifier, PaymobHmacVarifier>();
 builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 

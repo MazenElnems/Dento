@@ -16,6 +16,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Slot> Slots { get; set; }
     public DbSet<Payment> Payments { get; set; }    
     public DbSet<MedicalRecord> MedicalRecords { get; set; }
+    public DbSet<MedicalHistory> MedicalHistories { get; set; }
     public DbSet<VisitMedicalRecord> VisitMedicalRecords { get; set; }
     public DbSet<Prescription> Prescriptions { get; set; }
     public DbSet<Procedure> Procedures { get; set; }

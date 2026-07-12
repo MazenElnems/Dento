@@ -14,4 +14,5 @@ public class MedicalRecord
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<VisitMedicalRecord> VisitRecords { get; set; } = [];
+    public MedicalHistory MedicalHistory { get; set; } = default!;
 }

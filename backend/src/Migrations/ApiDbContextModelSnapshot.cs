@@ -249,6 +249,52 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.ToTable("EmailVerificationCodes");
                 });
 
+            modelBuilder.Entity("Dento.Models.MedicalHistory", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.PrimitiveCollection<string>("Allergies")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("BleedingDisorders")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Diabetes")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HeartConditions")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HighBloodPressure")
+                        .HasColumnType("bit");
+
+                    b.PrimitiveCollection<string>("MedicalConditions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MedicalNotes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MedicalRecordId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("PregnancyStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SmokingStatus")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicalRecordId")
+                        .IsUnique();
+
+                    b.ToTable("MedicalHistories");
+                });
+
             modelBuilder.Entity("Dento.Models.MedicalRecord", b =>
                 {
                     b.Property<string>("Id")
@@ -702,6 +748,17 @@ namespace AngDepiApi_DentalClinic.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Dento.Models.MedicalHistory", b =>
+                {
+                    b.HasOne("Dento.Models.MedicalRecord", "MedicalRecord")
+                        .WithOne("MedicalHistory")
+                        .HasForeignKey("Dento.Models.MedicalHistory", "MedicalRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MedicalRecord");
+                });
+
             modelBuilder.Entity("Dento.Models.MedicalRecord", b =>
                 {
                     b.HasOne("Dento.Models.Patient", "Patient")
@@ -870,6 +927,9 @@ namespace AngDepiApi_DentalClinic.Migrations
 
             modelBuilder.Entity("Dento.Models.MedicalRecord", b =>
                 {
+                    b.Navigation("MedicalHistory")
+                        .IsRequired();
+
                     b.Navigation("VisitRecords");
                 });
 

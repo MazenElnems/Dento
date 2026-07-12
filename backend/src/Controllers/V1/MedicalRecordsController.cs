@@ -55,4 +55,39 @@ public class MedicalRecordsController : BaseApiController
         var visitRecord = await _medicalRecordService.AddVisitRecordAsync(patientId, dto);
         return ApiResponse.SuccessResponse(visitRecord, "Visit record added successfully.");
     }
+
+    /// <summary>
+    /// Updates a visit record (diagnosis, prescriptions, procedures) for a patient.
+    /// </summary>
+    /// <param name="patientId">The ID of the patient.</param>
+    /// <param name="visitRecordId">The ID of the visit record to update.</param>
+    /// <param name="dto">The updated visit record details.</param>
+    /// <returns>The updated visit record.</returns>
+    [HttpPut("{patientId}/visits/{visitRecordId}")]
+    [Authorize(Roles = RoleNames.Dentist)]
+    public async Task<ActionResult<ApiResponse>> UpdateVisitRecord(string patientId, string visitRecordId, UpdateVisitRecordDto dto)
+    {
+        var visitRecord = await _medicalRecordService.UpdateVisitRecordAsync(patientId, visitRecordId, dto);
+        return ApiResponse.SuccessResponse(visitRecord, "Visit record updated successfully.");
+    }
+
+    /// <summary>
+    /// Updates the medical history for a patient.
+    /// </summary>
+    /// <param name="patientId">The ID of the patient.</param>
+    /// <param name="dto">The updated medical history details.</param>
+    /// <returns>The updated medical history.</returns>
+    [HttpPut("{patientId}/history")]
+    [Authorize(Roles = RoleNames.Patient + "," + RoleNames.Dentist)]
+    public async Task<ActionResult<ApiResponse>> UpdateMedicalHistory(string patientId, UpdateMedicalHistoryDto dto)
+    {
+        // For patients, ensure they can only update their own medical history
+        if (User.IsInRole(RoleNames.Patient) && CurrentUser.Id != patientId)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, ApiResponse.ErrorResponse(ErrorCodes.NotOwned, StatusCodes.Status403Forbidden));
+        }
+
+        var history = await _medicalRecordService.UpdateMedicalHistoryAsync(patientId, dto);
+        return ApiResponse.SuccessResponse(history, "Medical history updated successfully.");
+    }
 }

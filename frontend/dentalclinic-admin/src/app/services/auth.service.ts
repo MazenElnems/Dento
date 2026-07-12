@@ -20,7 +20,7 @@ export interface ApiResponse<T = any> {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private http = inject(HttpClient);
@@ -37,7 +37,10 @@ export class AuthService {
         const parts = user.name.split('@')[0];
         const nameParts = parts.split(/[^a-zA-Z]/).filter(Boolean);
         if (nameParts.length > 0) {
-          user.name = nameParts.slice(0, 2).map((p: string) => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+          user.name = nameParts
+            .slice(0, 2)
+            .map((p: string) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join(' ');
           localStorage.setItem('dc_admin_active_user', JSON.stringify(user));
         }
       }
@@ -55,7 +58,7 @@ export class AuthService {
     const token = this.getAuthToken();
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     });
   }
 
@@ -75,22 +78,42 @@ export class AuthService {
     const payload = this.decodeJwt(token);
     if (!payload) return null;
 
-    const id = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || payload['nameid'] || payload['sub'] || 'unknown';
-    const email = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || payload['email'] || 'unknown@clinic.com';
-    
-    const firstName = payload['given_name'] || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'] || '';
-    const lastName = payload['family_name'] || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'] || '';
-    
+    const id =
+      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
+      payload['nameid'] ||
+      payload['sub'] ||
+      'unknown';
+    const email =
+      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
+      payload['email'] ||
+      'unknown@clinic.com';
+
+    const firstName =
+      payload['given_name'] ||
+      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'] ||
+      '';
+    const lastName =
+      payload['family_name'] ||
+      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'] ||
+      '';
+
     let name = 'Staff User';
     if (firstName || lastName) {
       name = `${firstName} ${lastName}`.trim();
     } else {
-      const rawName = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || payload['name'] || payload['unique_name'] || '';
+      const rawName =
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
+        payload['name'] ||
+        payload['unique_name'] ||
+        '';
       if (rawName.includes('@')) {
         const parts = rawName.split('@')[0];
         const nameParts = parts.split(/[^a-zA-Z]/).filter(Boolean);
         if (nameParts.length > 0) {
-          name = nameParts.slice(0, 2).map((p: string) => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+          name = nameParts
+            .slice(0, 2)
+            .map((p: string) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join(' ');
         } else {
           name = parts;
         }
@@ -98,8 +121,11 @@ export class AuthService {
         name = rawName;
       }
     }
-    
-    let rawRole = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload['role'] || 'receptionist';
+
+    let rawRole =
+      payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+      payload['role'] ||
+      'receptionist';
     if (Array.isArray(rawRole)) {
       rawRole = rawRole[0];
     }
@@ -109,29 +135,31 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.baseUrl}/api/v1/Account/login`, { email, password }).pipe(
-      tap(response => {
-        if (response.success && response.data) {
-          let token = '';
-          if (typeof response.data === 'string') {
-            token = response.data;
-          } else if (response.data && response.data.token) {
-            token = response.data.token;
-          } else if (response.data && response.data.jwtToken) {
-            token = response.data.jwtToken;
-          }
+    return this.http
+      .post<ApiResponse>(`${this.baseUrl}/api/v1/Account/login`, { email, password })
+      .pipe(
+        tap((response) => {
+          if (response.success && response.data) {
+            let token = '';
+            if (typeof response.data === 'string') {
+              token = response.data;
+            } else if (response.data && response.data.token) {
+              token = response.data.token;
+            } else if (response.data && response.data.jwtToken) {
+              token = response.data.jwtToken;
+            }
 
-          if (token) {
-            localStorage.setItem('dc_admin_auth_token', token);
-            const user = this.extractUserFromToken(token);
-            if (user) {
-              localStorage.setItem('dc_admin_active_user', JSON.stringify(user));
-              this.currentUser.set(user);
+            if (token) {
+              localStorage.setItem('dc_admin_auth_token', token);
+              const user = this.extractUserFromToken(token);
+              if (user) {
+                localStorage.setItem('dc_admin_active_user', JSON.stringify(user));
+                this.currentUser.set(user);
+              }
             }
           }
-        }
-      })
-    );
+        }),
+      );
   }
 
   registerDentist(details: {
@@ -142,11 +170,9 @@ export class AuthService {
     password: string;
     specialty: string;
   }): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(
-      `${this.baseUrl}/api/v1/Account/register-dentist`,
-      details,
-      { headers: this.getAuthHeaders() }
-    );
+    return this.http.post<ApiResponse>(`${this.baseUrl}/api/v1/Account/register-dentist`, details, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
   registerReceptionist(details: {
@@ -162,7 +188,7 @@ export class AuthService {
     return this.http.post<ApiResponse>(
       `${this.baseUrl}/api/v1/Account/register-receptionist`,
       details,
-      { headers: this.getAuthHeaders() }
+      { headers: this.getAuthHeaders() },
     );
   }
 
@@ -176,5 +202,10 @@ export class AuthService {
     // Return all users cached in local storage for administrative CRUD simulation
     const usersJson = localStorage.getItem('dc_users');
     return usersJson ? JSON.parse(usersJson) : [];
+  }
+
+  getAllDentists(): Observable<any> {
+    console.log(this.getAuthToken());
+    return this.http.get(`${this.baseUrl}/api/v1/Dentists`, { headers: this.getAuthHeaders() });
   }
 }

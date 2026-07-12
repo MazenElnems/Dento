@@ -1,111 +1,200 @@
 <div class="receptionist-portal">
-  
-  <!-- Desk Header Actions -->
-  <div class="desk-header">
-    <div class="header-left">
-      <h3><i class="bi bi-calendar-check-fill"></i> Receptionist Scheduling Desk</h3>
-      <p>Manage daily clinic schedules, book manual walk-ins/phone calls, and manage emergency slots.</p>
+
+  <!-- Top Welcome Bar -->
+  <div class="welcome-bar">
+    <div>
+      <h2>Welcome back, Receptionist <span class="wave">👋</span></h2>
+      <p>Here's what's happening today.</p>
     </div>
-    <div class="header-right">
-      <button class="btn-action-primary" (click)="openBookingModal(false)">
-        <i class="bi bi-telephone-inbound"></i> Book Appointment
-      </button>
-      <button class="btn-action-danger" (click)="openBookingModal(true)">
-        <i class="bi bi-exclamation-triangle"></i> Emergency Slot
-      </button>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="stats-row">
+    <div class="stat-card stat-blue">
+      <div class="stat-icon"><i class="bi bi-calendar-check-fill"></i></div>
+      <div class="stat-info">
+        <span class="stat-label">Today's Appointments</span>
+        <span class="stat-value">{{ appointments.length }}</span>
+        <div class="stat-tags">
+          <span class="tag tag-success">{{ completedCount }} Completed</span>
+          <span class="tag tag-warning">{{ upcomingCount }} Upcoming</span>
+        </div>
+      </div>
     </div>
+
+    <div class="stat-card stat-red">
+      <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+      <div class="stat-info">
+        <span class="stat-label">Emergency Appointments</span>
+        <span class="stat-value">{{ emergencyCount }}</span>
+        <div class="stat-tags">
+          <span class="tag tag-danger">Require Attention</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-green">
+      <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+      <div class="stat-info">
+        <span class="stat-label">Available Dentists</span>
+        <span class="stat-value">{{ dentists.length }}</span>
+        <div class="stat-tags">
+          <span class="tag tag-success">On Duty Now</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions-title">Quick Actions</div>
+  <div class="quick-actions-row">
+    <button class="quick-action" (click)="openBookingModal(false)">
+      <div class="qa-icon qa-blue"><i class="bi bi-calendar-plus"></i></div>
+      <div class="qa-text">
+        <strong>Create Appointment</strong>
+        <span>Book a new appointment</span>
+      </div>
+      <i class="bi bi-chevron-right qa-arrow"></i>
+    </button>
+
+    <button class="quick-action quick-action-danger" (click)="openBookingModal(true)">
+      <div class="qa-icon qa-red"><i class="bi bi-exclamation-triangle"></i></div>
+      <div class="qa-text">
+        <strong>Emergency Appointment</strong>
+        <span>Add emergency appointment</span>
+      </div>
+      <i class="bi bi-chevron-right qa-arrow"></i>
+    </button>
+
+    <!-- NEW -->
+    <button class="quick-action" (click)="viewDailySchedule()">
+      <div class="qa-icon qa-purple"><i class="bi bi-calendar-week"></i></div>
+      <div class="qa-text">
+        <strong>View Daily Schedule</strong>
+        <span>See full schedule</span>
+      </div>
+      <i class="bi bi-chevron-right qa-arrow"></i>
+    </button>
   </div>
 
   <!-- Filters Ribbon -->
-  <div class="filters-ribbon">
-    <div class="filter-group">
-      <label>Filter by Dentist</label>
-      <div class="select-wrapper-sm">
-        <select [(ngModel)]="selectedDentistFilter">
-          <option value="all">All Dentists</option>
-          @for (den of dentists; track den.id) {
-            <option [value]="den.id">{{ den.name }}</option>
-          }
-        </select>
-        <i class="bi bi-chevron-down"></i>
+  <div class="schedule-panel" #scheduleSection>
+
+  <!-- Filters Ribbon -->
+  <div class="schedule-panel">
+    <div class="schedule-panel-header">
+      <h3>Today's Schedule</h3>
+      <div class="filters-ribbon">
+        <div class="filter-group">
+          <i class="bi bi-search filter-search-icon"></i>
+          <input type="text" class="styled-search" placeholder="Search by patient name..." [(ngModel)]="quickSearch">
+        </div>
+
+        <div class="select-wrapper-sm">
+          <select [(ngModel)]="selectedDentistFilter">
+            <option value="all">All Dentists</option>
+            @for (den of dentists; track den.id) {
+              <option [value]="den.id">{{ den.name }}</option>
+            }
+          </select>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+
+        <div class="select-wrapper-sm">
+          <select [(ngModel)]="selectedStatusFilter">
+            <option value="all">All Status</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+
+        <input type="date" [(ngModel)]="selectedDateFilter" class="styled-date-input">
       </div>
     </div>
 
-    <div class="filter-group">
-      <label>Filter by Status</label>
-      <div class="select-wrapper-sm">
-        <select [(ngModel)]="selectedStatusFilter">
-          <option value="all">All Statuses</option>
-          <option value="upcoming">Upcoming</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-        <i class="bi bi-chevron-down"></i>
-      </div>
-    </div>
-
-    <div class="filter-group">
-      <label>Filter by Date</label>
-      <input type="date" [(ngModel)]="selectedDateFilter" class="styled-date-input">
-    </div>
-  </div>
-
-  <!-- Appointments Desk Table -->
-  <div class="schedule-table-wrap">
-    @if (getFilteredAppointments().length === 0) {
-      <div class="empty-portal-state">
-        <i class="bi bi-search"></i>
-        <p>No appointments match the selected filters.</p>
-      </div>
-    } @else {
-      <table class="styled-table">
-        <thead>
-          <tr>
-            <th>Date / Time</th>
-            <th>Patient Name</th>
-            <th>Contact Phone</th>
-            <th>Service Type</th>
-            <th>Dentist Assigned</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (app of getFilteredAppointments(); track app.id) {
-            <tr [class.emergency-row]="app.isEmergency">
-              <td class="time-col">
-                <strong>{{ app.dateStr }} - {{ app.time }}</strong>
-                @if (app.isEmergency) {
-                  <span class="emergency-badge">Emergency</span>
-                }
-              </td>
-              <td class="patient-name">{{ app.patientName }}</td>
-              <td>{{ app.patientPhone }}</td>
-              <td>{{ app.serviceName }}</td>
-              <td>{{ app.dentistName }}</td>
-              <td>
-                <span class="status-badge" [class]="app.status">{{ app.status.toUpperCase() }}</span>
-              </td>
-              <td>
-                @if (app.status === 'upcoming') {
-                  <div class="action-buttons-cell">
-                    <button class="btn-table-action btn-success-sm" (click)="completeAppointment(app.id)">
-                      Complete
-                    </button>
-                    <button class="btn-table-action btn-danger-sm" (click)="cancelAppointment(app.id)">
-                      Cancel
-                    </button>
-                  </div>
-                } @else {
-                  <span class="text-muted">Archived</span>
-                }
-              </td>
+    <!-- Appointments Desk Table -->
+    <div class="schedule-table-wrap">
+      @if (getFilteredAppointments().length === 0) {
+        <div class="empty-portal-state">
+          <i class="bi bi-search"></i>
+          <p>No appointments match the selected filters.</p>
+        </div>
+      } @else {
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Patient</th>
+              <th>Dentist</th>
+              <th>Status</th>
+              <th>Type</th>
+              <th>Phone</th>
+              <th></th>
             </tr>
-          }
-        </tbody>
-      </table>
-    }
+          </thead>
+          <tbody>
+            @for (app of getFilteredAppointments(); track app.id) {
+              <tr [class.emergency-row]="app.isEmergency">
+                <td class="time-col">
+                  <strong>{{ app.dateStr }}</strong>
+                  <span class="time-sub">{{ app.time }}</span>
+                </td>
+                <td class="patient-name">
+                  <div class="patient-avatar">{{ app.patientName.charAt(0) }}</div>
+                  <div>
+                    <strong>{{ app.patientName }}</strong>
+                    <span class="patient-id">#{{ app.id }}</span>
+                  </div>
+                </td>
+                <td class="dentist-col">{{ app.dentistName }}</td>
+                <td>
+                  <span class="status-badge" [class]="app.isEmergency ? 'emergency' : app.status">
+                    @if (app.isEmergency) {
+                      <i class="bi bi-exclamation-circle-fill"></i> Emergency
+                    } @else if (app.status === 'upcoming') {
+                      <i class="bi bi-check-circle-fill"></i> Confirmed
+                    } @else if (app.status === 'completed') {
+                      <i class="bi bi-check-circle-fill"></i> Completed
+                    } @else {
+                      <i class="bi bi-x-circle-fill"></i> Cancelled
+                    }
+                  </span>
+                </td>
+                <td>
+                  <span class="type-badge" [class.type-emergency]="app.isEmergency">
+                    <i class="bi" [class.bi-calendar]="!app.isEmergency" [class.bi-exclamation-triangle-fill]="app.isEmergency"></i>
+                    {{ app.isEmergency ? 'Emergency' : 'Regular' }}
+                  </span>
+                </td>
+                <td class="phone-col">{{ app.patientPhone }}</td>
+                <td>
+                  @if (app.status === 'upcoming') {
+                    <div class="action-buttons-cell">
+                      <button class="btn-table-action btn-success-sm" (click)="completeAppointment(app.id)" title="Complete">
+                        <i class="bi bi-check-lg"></i>
+                      </button>
+                      <button class="btn-table-action btn-danger-sm" (click)="cancelAppointment(app.id)" title="Cancel">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                    </div>
+                  } @else {
+                    <span class="text-muted">Archived</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
   </div>
+
+  <!-- Floating Add Button (opens standard booking modal) -->
+  <button class="fab-add" (click)="openBookingModal(false)" title="Book Appointment">
+    <i class="bi bi-plus-lg"></i>
+  </button>
 
   <!-- Manual Booking Modal (Dual purpose) -->
   @if (showBookingModal) {

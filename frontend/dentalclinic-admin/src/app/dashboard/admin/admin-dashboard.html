@@ -1,8 +1,8 @@
 <div class="admin-panel-container">
-  
+
   <!-- MAIN WORKSPACE -->
   <main class="admin-main-content">
-    
+
     <!-- SUB-TAB 1: MAIN DASHBOARD -->
     @if (activeSubTab === 'dashboard') {
       <div class="tab-view-container animate-fade">
@@ -92,7 +92,7 @@
               </div>
               <p class="util-subtext">Calculated from total dentist booked schedule shifts.</p>
             </div>
-            
+
             <div class="quick-status-row">
               <div class="quick-status-item">
                 <span class="dot-ind active-dot"></span>
@@ -237,7 +237,7 @@
         </div>
 
         <div class="schedules-grid-split">
-          
+
           <!-- LEFT SIDE: DENTIST SHIFT LIST -->
           <div class="dentist-shift-config-list shadow-sm">
             <h4>Dentist Working Hours</h4>
@@ -255,8 +255,8 @@
                     <i class="bi bi-clock"></i> <span>Hours: <strong>{{ dentist.hours || '09:00 - 17:00' }}</strong></span>
                   </div>
                   <div class="dentist-shift-detail-item">
-                    <i class="bi bi-calendar-week"></i> 
-                    <span>Working Days: 
+                    <i class="bi bi-calendar-week"></i>
+                    <span>Working Days:
                       <strong>
                         @if (dentist.workingDays) {
                           {{ dentist.workingDays.length }} Days
@@ -287,7 +287,7 @@
                       </div>
                       <p class="leave-reason">Reason: "{{ req.reason }}"</p>
                       <p class="leave-dates"><i class="bi bi-calendar-range"></i> {{ req.startDate }} to {{ req.endDate }}</p>
-                      
+
                       @if (req.status === 'pending') {
                         <div class="leave-action-buttons">
                           <button class="btn-approve-leave" (click)="approveLeave(req)"><i class="bi bi-check-lg"></i> Approve</button>
@@ -465,10 +465,10 @@
 
         <!-- CAPACITY AND PERFORMANCE REPORT CARDS -->
         <div class="reports-container-grid">
-          
+
           <div class="report-metric-box shadow-sm">
             <h5>Capacity Metrics</h5>
-            
+
             <div class="util-progress-wrap mt-4">
               <div class="util-head">
                 <span>Dentist Utilization Rate</span>
@@ -502,12 +502,12 @@
 
           <div class="report-metric-box shadow-sm">
             <h5>Retention & Cancellations Analysis</h5>
-            
+
             <div class="stat-row-item">
               <span class="stat-name">Total Patients Registered:</span>
               <span class="stat-number font-bold">{{ totalPatientsCount }}</span>
             </div>
-            
+
             <div class="stat-row-item">
               <span class="stat-name">Total Completed Appointments:</span>
               <span class="stat-number font-bold">{{ completedAppointmentsCount }}</span>
@@ -547,7 +547,7 @@
 
       <div class="admin-modal-body">
         <div class="modal-form-grid">
-          
+
           <div class="form-group-item">
             <label>First Name</label>
             <input type="text" [(ngModel)]="userFormFirstName" placeholder="Enter first name" required />
@@ -668,7 +668,7 @@
 
       <div class="admin-modal-body">
         <div class="modal-form-grid">
-          
+
           <div class="form-group-item full-width">
             <label>Select Dentist</label>
             <select [(ngModel)]="vacationDentistEmail">

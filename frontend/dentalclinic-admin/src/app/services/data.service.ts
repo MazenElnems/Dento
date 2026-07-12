@@ -82,6 +82,7 @@ export class DataService {
         { id: 'DC-8003', patientId: 'pat_03', patientName: 'ليلى كريم', patientPhone: '01293847561', serviceId: 'whitening', serviceName: 'Teeth Whitening', price: 150, dateStr: 'Jul 10', time: '01:00 PM', dentistId: 'dentist_01', dentistName: 'د. مازن النمس', status: 'upcoming' },
         { id: 'DC-8004', patientId: 'pat_04', patientName: 'ياسر خالد', patientPhone: '01029384756', serviceId: 'ortho', serviceName: 'Orthodontics', price: 2500, dateStr: 'Jul 06', time: '11:15 AM', dentistId: 'admin_01', dentistName: 'د. هنا بشرى', status: 'cancelled' }
       ];
+
       localStorage.setItem('dc_appointments', JSON.stringify(seedApps));
     }
     if (!localStorage.getItem('dc_dental_records')) {
@@ -199,7 +200,7 @@ export class DataService {
     if (req) {
       req.status = status;
       localStorage.setItem('dc_leave_requests', JSON.stringify(list));
-      
+
       // If approved, automatically add to vacations list
       if (status === 'approved') {
         this.saveVacation({

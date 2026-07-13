@@ -51,8 +51,8 @@
                 <div class="appointment-card">
                   <div class="card-left">
                     <div class="calendar-badge">
-                      <span class="month">{{ app.dateStr.split(' ')[0] }}</span>
-                      <span class="day">{{ app.dateStr.split(' ')[1] }}</span>
+                      <span class="month">{{ getFormattedDate(app.dateStr).month }}</span>
+                      <span class="day">{{ getFormattedDate(app.dateStr).day }}</span>
                     </div>
                     <div class="appointment-info">
                       <h3>{{ app.serviceName }}</h3>

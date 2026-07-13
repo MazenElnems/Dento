@@ -61,6 +61,44 @@ export class AdminDashboard implements OnInit {
   userFormGender: 'Male' | 'Female' = 'Male';
   userFormBirthDate = '';
   userFormSpecialty = '';
+  userFormImageUrl = '';
+
+  dentistAvatars = [
+    { url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200', gender: 'male' },
+    { url: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=200', gender: 'male' },
+    { url: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200', gender: 'male' },
+    { url: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200', gender: 'female' },
+    { url: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?w=200', gender: 'female' },
+    { url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200', gender: 'female' }
+  ];
+
+  selectPresetAvatar(url: string) {
+    this.userFormImageUrl = url;
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 32;
+          canvas.height = 32;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, 32, 32);
+            // Convert to ultra-compressed JPEG (approx 400 bytes) to stay safely under cookie limit
+            const base64 = canvas.toDataURL('image/jpeg', 0.3);
+            this.userFormImageUrl = base64;
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   // Form Fields: Schedule Configuration
   scheduleSat = true;
@@ -192,6 +230,7 @@ export class AdminDashboard implements OnInit {
     this.userFormGender = 'Male';
     this.userFormBirthDate = '';
     this.userFormSpecialty = '';
+    this.userFormImageUrl = '';
 
     this.showUserModal = true;
   }
@@ -211,6 +250,7 @@ export class AdminDashboard implements OnInit {
     this.userFormGender = user.gender || 'Male';
     this.userFormBirthDate = user.birthDate || '';
     this.userFormSpecialty = user.specialty || '';
+    this.userFormImageUrl = user.imageUrl || '';
 
     this.showUserModal = true;
   }
@@ -237,7 +277,8 @@ export class AdminDashboard implements OnInit {
         phone: this.userFormPhone,
         gender: this.userFormGender,
         birthDate: this.userFormBirthDate,
-        specialty: this.userFormSpecialty
+        specialty: this.userFormSpecialty,
+        imageUrl: this.userFormImageUrl
       };
       this.dataService.updateUser(updatedUser);
       alert('User details updated successfully.');
@@ -255,6 +296,7 @@ export class AdminDashboard implements OnInit {
         gender: this.userFormGender,
         birthDate: this.userFormBirthDate,
         specialty: this.userFormSpecialty,
+        imageUrl: this.userFormImageUrl || (this.userFormGender === 'Female' ? 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200' : 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200'),
         status: 'active'
       };
       this.dataService.addUser(newUser);

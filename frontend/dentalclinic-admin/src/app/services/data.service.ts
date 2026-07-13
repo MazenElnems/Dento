@@ -14,6 +14,8 @@ export interface Appointment {
   dentistName: string;
   status: 'upcoming' | 'completed' | 'cancelled';
   isEmergency?: boolean;
+  paymentMethod?: 'Card' | 'Cash';
+  paymentStatus?: 'Paid' | 'Pending';
 }
 
 export interface DentalRecord {
@@ -131,6 +133,15 @@ export class DataService {
     }
   }
 
+  confirmCashPayment(id: string) {
+    const list = this.getAppointments();
+    const app = list.find(a => a.id === id);
+    if (app) {
+      app.paymentStatus = 'Paid';
+      localStorage.setItem('dc_appointments', JSON.stringify(list));
+    }
+  }
+
   getMedicalHistory(userId: string) {
     const list = JSON.parse(localStorage.getItem('dc_medical_histories') || '[]');
     return list.find((m: any) => m.userId === userId) || null;
@@ -221,6 +232,7 @@ export class DataService {
     if (user) {
       user.status = status;
       localStorage.setItem('dc_users', JSON.stringify(users));
+      this.updateSharedCookie(users);
     }
   }
 
@@ -229,6 +241,7 @@ export class DataService {
     const users = JSON.parse(usersJson);
     users.push(user);
     localStorage.setItem('dc_users', JSON.stringify(users));
+    this.updateSharedCookie(users);
   }
 
   updateUser(user: any) {
@@ -238,6 +251,22 @@ export class DataService {
     if (index >= 0) {
       users[index] = user;
       localStorage.setItem('dc_users', JSON.stringify(users));
+      this.updateSharedCookie(users);
+    }
+  }
+
+  private updateSharedCookie(users: any[]) {
+    try {
+      const activeDentists = users.filter((u: any) => (u.role === 'dentist' || u.role === 'admin') && u.status === 'active');
+      const optimized = activeDentists.map(d => ({
+        id: d.id,
+        name: d.name,
+        specialty: d.specialty,
+        imageUrl: d.imageUrl
+      }));
+      document.cookie = "dc_shared_users=" + encodeURIComponent(JSON.stringify(optimized)) + "; path=/; max-age=31536000";
+    } catch (e) {
+      console.error('Error writing optimized shared cookie:', e);
     }
   }
 }

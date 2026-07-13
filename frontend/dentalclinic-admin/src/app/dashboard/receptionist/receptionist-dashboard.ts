@@ -32,6 +32,8 @@ export interface Appointment {
   dentistName: string;
   status: 'upcoming' | 'completed' | 'cancelled';
   isEmergency: boolean;
+  paymentMethod?: 'Card' | 'Cash';
+  paymentStatus?: 'Paid' | 'Pending';
 }
 
 // ==========================================================
@@ -56,22 +58,22 @@ const MOCK_USERS: User[] = [
 ];
 
 const MOCK_APPOINTMENTS: Appointment[] = [
-  { id: 'DC-482913', patientId: 'pat-1001', patientName: 'Mahmoud Reda', patientPhone: '01011122233', serviceId: 'cleaning', serviceName: 'Teeth Cleaning & Hygiene', price: 90, ...relativeDate(0), time: '09:00 AM', dentistId: 'usr-001', dentistName: 'Dr. Amir Hassan', status: 'completed', isEmergency: false },
-  { id: 'DC-482914', patientId: 'pat-1002', patientName: 'Farida Younis', patientPhone: '01022233344', serviceId: 'whitening', serviceName: 'Teeth Whitening', price: 150, ...relativeDate(0), time: '09:45 AM', dentistId: 'usr-002', dentistName: 'Dr. Nourhan El-Sayed', status: 'completed', isEmergency: false },
-  { id: 'DC-482915', patientId: 'pat-1003', patientName: 'Omar Sherif', patientPhone: '01033344455', serviceId: 'canal', serviceName: 'Root Canal Treatment (Emergency)', price: 350, ...relativeDate(0), time: '10:30 AM', dentistId: 'usr-003', dentistName: 'Dr. Karim Mostafa', status: 'upcoming', isEmergency: true },
-  { id: 'DC-482916', patientId: 'pat-1004', patientName: 'Layla Ibrahim', patientPhone: '01044455566', serviceId: 'ortho', serviceName: 'Orthodontics (Braces)', price: 2500, ...relativeDate(0), time: '11:15 AM', dentistId: 'usr-002', dentistName: 'Dr. Nourhan El-Sayed', status: 'upcoming', isEmergency: false },
-  { id: 'DC-482917', patientId: 'pat-1005', patientName: 'Hassan Gaber', patientPhone: '01055566688', serviceId: 'implants', serviceName: 'Dental Implants', price: 1200, ...relativeDate(0), time: '01:00 PM', dentistId: 'usr-004', dentistName: 'Dr. Salma Adel', status: 'upcoming', isEmergency: false },
-  { id: 'DC-482918', patientId: 'pat-1006', patientName: 'Nadia Fouad', patientPhone: '01066677799', serviceId: 'cleaning', serviceName: 'Teeth Cleaning & Hygiene', price: 90, ...relativeDate(0), time: '01:45 PM', dentistId: 'usr-001', dentistName: 'Dr. Amir Hassan', status: 'cancelled', isEmergency: false },
-  { id: 'DC-482919', patientId: 'pat-1007', patientName: 'Ziad Kamal', patientPhone: '01077788800', serviceId: 'canal', serviceName: 'Root Canal Treatment (Emergency)', price: 350, ...relativeDate(0), time: '02:30 PM', dentistId: 'usr-003', dentistName: 'Dr. Karim Mostafa', status: 'upcoming', isEmergency: true },
-  { id: 'DC-482920', patientId: 'pat-1008', patientName: 'Rania Hosny', patientPhone: '01088899911', serviceId: 'whitening', serviceName: 'Teeth Whitening', price: 150, ...relativeDate(0), time: '03:15 PM', dentistId: 'usr-004', dentistName: 'Dr. Salma Adel', status: 'upcoming', isEmergency: false },
-  { id: 'DC-482921', patientId: 'pat-1009', patientName: 'Tarek Aboul-Fotouh', patientPhone: '01099900022', serviceId: 'implants', serviceName: 'Dental Implants', price: 1200, ...relativeDate(1), time: '09:00 AM', dentistId: 'usr-004', dentistName: 'Dr. Salma Adel', status: 'upcoming', isEmergency: false },
-  { id: 'DC-482922', patientId: 'pat-1010', patientName: 'Dina Magdy', patientPhone: '01010011122', serviceId: 'cleaning', serviceName: 'Teeth Cleaning & Hygiene', price: 90, ...relativeDate(1), time: '10:30 AM', dentistId: 'usr-001', dentistName: 'Dr. Amir Hassan', status: 'upcoming', isEmergency: false },
-  { id: 'DC-482923', patientId: 'pat-1011', patientName: 'Sherif Anwar', patientPhone: '01021133445', serviceId: 'ortho', serviceName: 'Orthodontics (Braces)', price: 2500, ...relativeDate(1), time: '11:15 AM', dentistId: 'usr-002', dentistName: 'Dr. Nourhan El-Sayed', status: 'upcoming', isEmergency: false },
-  { id: 'DC-482924', patientId: 'pat-1012', patientName: 'Aya Khalil', patientPhone: '01032244556', serviceId: 'whitening', serviceName: 'Teeth Whitening', price: 150, ...relativeDate(2), time: '01:00 PM', dentistId: 'usr-002', dentistName: 'Dr. Nourhan El-Sayed', status: 'upcoming', isEmergency: false },
-  { id: 'DC-482925', patientId: 'pat-1013', patientName: 'Mostafa Salah', patientPhone: '01043355667', serviceId: 'canal', serviceName: 'Root Canal Treatment', price: 350, ...relativeDate(2), time: '02:30 PM', dentistId: 'usr-003', dentistName: 'Dr. Karim Mostafa', status: 'upcoming', isEmergency: false },
-  { id: 'DC-482910', patientId: 'pat-1014', patientName: 'Heba Nabil', patientPhone: '01054466778', serviceId: 'cleaning', serviceName: 'Teeth Cleaning & Hygiene', price: 90, ...relativeDate(-1), time: '09:45 AM', dentistId: 'usr-001', dentistName: 'Dr. Amir Hassan', status: 'completed', isEmergency: false },
-  { id: 'DC-482911', patientId: 'pat-1015', patientName: 'Waleed Fathy', patientPhone: '01065577889', serviceId: 'implants', serviceName: 'Dental Implants', price: 1200, ...relativeDate(-1), time: '11:15 AM', dentistId: 'usr-004', dentistName: 'Dr. Salma Adel', status: 'completed', isEmergency: false },
-  { id: 'DC-482912', patientId: 'pat-1016', patientName: 'Mariam Sabry', patientPhone: '01076688990', serviceId: 'ortho', serviceName: 'Orthodontics (Braces)', price: 2500, ...relativeDate(-1), time: '01:45 PM', dentistId: 'usr-002', dentistName: 'Dr. Nourhan El-Sayed', status: 'cancelled', isEmergency: false }
+  { id: 'DC-482913', patientId: 'pat-1001', patientName: 'Mahmoud Reda', patientPhone: '01011122233', serviceId: 'cleaning', serviceName: 'Teeth Cleaning & Hygiene', price: 90, ...relativeDate(0), time: '09:00 AM', dentistId: 'usr-001', dentistName: 'Dr. Amir Hassan', status: 'completed', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Paid' },
+  { id: 'DC-482914', patientId: 'pat-1002', patientName: 'Farida Younis', patientPhone: '01022233344', serviceId: 'whitening', serviceName: 'Teeth Whitening', price: 150, ...relativeDate(0), time: '09:45 AM', dentistId: 'usr-002', dentistName: 'Dr. Nourhan El-Sayed', status: 'completed', isEmergency: false, paymentMethod: 'Card', paymentStatus: 'Paid' },
+  { id: 'DC-482915', patientId: 'pat-1003', patientName: 'Omar Sherif', patientPhone: '01033344455', serviceId: 'canal', serviceName: 'Root Canal Treatment (Emergency)', price: 350, ...relativeDate(0), time: '10:30 AM', dentistId: 'usr-003', dentistName: 'Dr. Karim Mostafa', status: 'upcoming', isEmergency: true, paymentMethod: 'Cash', paymentStatus: 'Pending' },
+  { id: 'DC-482916', patientId: 'pat-1004', patientName: 'Layla Ibrahim', patientPhone: '01044455566', serviceId: 'ortho', serviceName: 'Orthodontics (Braces)', price: 2500, ...relativeDate(0), time: '11:15 AM', dentistId: 'usr-002', dentistName: 'Dr. Nourhan El-Sayed', status: 'upcoming', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Pending' },
+  { id: 'DC-482917', patientId: 'pat-1005', patientName: 'Hassan Gaber', patientPhone: '01055566688', serviceId: 'implants', serviceName: 'Dental Implants', price: 1200, ...relativeDate(0), time: '01:00 PM', dentistId: 'usr-004', dentistName: 'Dr. Salma Adel', status: 'upcoming', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Pending' },
+  { id: 'DC-482918', patientId: 'pat-1006', patientName: 'Nadia Fouad', patientPhone: '01066677799', serviceId: 'cleaning', serviceName: 'Teeth Cleaning & Hygiene', price: 90, ...relativeDate(0), time: '01:45 PM', dentistId: 'usr-001', dentistName: 'Dr. Amir Hassan', status: 'cancelled', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Pending' },
+  { id: 'DC-482919', patientId: 'pat-1007', patientName: 'Ziad Kamal', patientPhone: '01077788800', serviceId: 'canal', serviceName: 'Root Canal Treatment (Emergency)', price: 350, ...relativeDate(0), time: '02:30 PM', dentistId: 'usr-003', dentistName: 'Dr. Karim Mostafa', status: 'upcoming', isEmergency: true, paymentMethod: 'Cash', paymentStatus: 'Pending' },
+  { id: 'DC-482920', patientId: 'pat-1008', patientName: 'Rania Hosny', patientPhone: '01088899911', serviceId: 'whitening', serviceName: 'Teeth Whitening', price: 150, ...relativeDate(0), time: '03:15 PM', dentistId: 'usr-004', dentistName: 'Dr. Salma Adel', status: 'upcoming', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Pending' },
+  { id: 'DC-482921', patientId: 'pat-1009', patientName: 'Tarek Aboul-Fotouh', patientPhone: '01099900022', serviceId: 'implants', serviceName: 'Dental Implants', price: 1200, ...relativeDate(1), time: '09:00 AM', dentistId: 'usr-004', dentistName: 'Dr. Salma Adel', status: 'upcoming', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Pending' },
+  { id: 'DC-482922', patientId: 'pat-1010', patientName: 'Dina Magdy', patientPhone: '01010011122', serviceId: 'cleaning', serviceName: 'Teeth Cleaning & Hygiene', price: 90, ...relativeDate(1), time: '10:30 AM', dentistId: 'usr-001', dentistName: 'Dr. Amir Hassan', status: 'upcoming', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Pending' },
+  { id: 'DC-482923', patientId: 'pat-1011', patientName: 'Sherif Anwar', patientPhone: '01021133445', serviceId: 'ortho', serviceName: 'Orthodontics (Braces)', price: 2500, ...relativeDate(1), time: '11:15 AM', dentistId: 'usr-002', dentistName: 'Dr. Nourhan El-Sayed', status: 'upcoming', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Pending' },
+  { id: 'DC-482924', patientId: 'pat-1012', patientName: 'Aya Khalil', patientPhone: '01032244556', serviceId: 'whitening', serviceName: 'Teeth Whitening', price: 150, ...relativeDate(2), time: '01:00 PM', dentistId: 'usr-002', dentistName: 'Dr. Nourhan El-Sayed', status: 'upcoming', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Pending' },
+  { id: 'DC-482925', patientId: 'pat-1013', patientName: 'Mostafa Salah', patientPhone: '01043355667', serviceId: 'canal', serviceName: 'Root Canal Treatment', price: 350, ...relativeDate(2), time: '02:30 PM', dentistId: 'usr-003', dentistName: 'Dr. Karim Mostafa', status: 'upcoming', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Pending' },
+  { id: 'DC-482910', patientId: 'pat-1014', patientName: 'Heba Nabil', patientPhone: '01054466778', serviceId: 'cleaning', serviceName: 'Teeth Cleaning & Hygiene', price: 90, ...relativeDate(-1), time: '09:45 AM', dentistId: 'usr-001', dentistName: 'Dr. Amir Hassan', status: 'completed', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Paid' },
+  { id: 'DC-482911', patientId: 'pat-1015', patientName: 'Waleed Fathy', patientPhone: '01065577889', serviceId: 'implants', serviceName: 'Dental Implants', price: 1200, ...relativeDate(-1), time: '11:15 AM', dentistId: 'usr-004', dentistName: 'Dr. Salma Adel', status: 'completed', isEmergency: false, paymentMethod: 'Cash', paymentStatus: 'Paid' },
+  { id: 'DC-482912', patientId: 'pat-1016', patientName: 'Mariam Sabry', patientPhone: '01076688990', serviceId: 'ortho', serviceName: 'Orthodontics (Braces)', price: 2500, ...relativeDate(-1), time: '01:45 PM', dentistId: 'usr-002', dentistName: 'Dr. Nourhan El-Sayed', status: 'cancelled', isEmergency: false, paymentMethod: 'Card', paymentStatus: 'Paid' }
 ];
 
 // ==========================================================
@@ -102,6 +104,12 @@ class DataService {
   updateAppointmentStatus(appId: string, status: Appointment['status']): void {
     this.appointments = this.appointments.map(a =>
       a.id === appId ? { ...a, status } : a
+    );
+  }
+
+  confirmCashPayment(id: string): void {
+    this.appointments = this.appointments.map(a =>
+      a.id === id ? { ...a, paymentStatus: 'Paid' } : a
     );
   }
 }
@@ -273,7 +281,6 @@ export class ReceptionistDashboard implements OnInit {
     this.dataService.updateAppointmentStatus(appId, 'completed');
     this.loadData();
   }
-
   viewDailySchedule() {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -283,6 +290,11 @@ export class ReceptionistDashboard implements OnInit {
     this.selectedStatusFilter = 'all';
     this.selectedDentistFilter = 'all';
 
-    this.scheduleSection?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    (this as any).scheduleSection?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  confirmCashPayment(appId: string) {
+    this.dataService.confirmCashPayment(appId);
+    this.loadData();
   }
 }

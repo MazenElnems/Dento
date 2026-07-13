@@ -1,9 +1,10 @@
 <div class="booking-container">
+  
   <!-- Progress Header -->
   <div class="booking-progress">
     <div class="step-indicator" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
       <div class="step-num">1</div>
-      <div class="step-label">Service & Slot</div>
+      <div class="step-label">Service & Dentist</div>
     </div>
     <div class="progress-line" [class.completed]="currentStep > 1"></div>
     <div class="step-indicator" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
@@ -11,26 +12,21 @@
       <div class="step-label">Your Info</div>
     </div>
     <div class="progress-line" [class.completed]="currentStep > 2"></div>
-    <div class="step-indicator" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
+    <div class="step-indicator" [class.active]="currentStep === 3">
       <div class="step-num">3</div>
-      <div class="step-label">Payment</div>
-    </div>
-    <div class="progress-line" [class.completed]="currentStep > 3"></div>
-    <div class="step-indicator" [class.active]="currentStep === 4">
-      <div class="step-num">4</div>
-      <div class="step-label">Confirmed</div>
+      <div class="step-label">Payment Redirect</div>
     </div>
   </div>
 
   <!-- Booking Core Card -->
   <div class="booking-card">
 
-    <!-- STEP 1: SERVICE & SLOT -->
-    <div *ngIf="currentStep === 1" class="step-content">
-      <h2 class="step-title">Select Service & Availability</h2>
-      <p class="step-subtitle">Select your clinical procedure and pick an available slot from the next 4 weeks.</p>
+    <!-- STEP 1: SERVICE & DENTIST & SLOTS -->
+    <div *ngIf="currentStep === 1" class="step-content animate-fade">
+      <h2 class="step-title">Select Service & Dentist Schedule</h2>
+      <p class="step-subtitle">Select your clinical procedure, choose your preferred dentist, and pick an available slot.</p>
 
-      <!-- Services Grid -->
+      <!-- 1. Dental Services -->
       <h3 class="section-title">1. Dental Services</h3>
       <div class="services-grid">
         <div *ngFor="let s of services" 
@@ -45,51 +41,74 @@
         </div>
       </div>
 
-      <!-- Date Selection -->
-      <h3 class="section-title">2. Available Dates (Next 4 Weeks)</h3>
-      <div class="dates-slider">
-        <div *ngFor="let day of calendarDays" 
-             class="date-card" 
-             [class.selected]="selectedDay?.dateStr === day.dateStr"
-             (click)="selectDay(day)">
-          <span class="day-name">{{ day.dayName | slice:0:3 }}</span>
-          <span class="day-num">{{ day.dateStr }}</span>
+      <!-- 2. Select Dentist -->
+      <h3 class="section-title">2. Select Your Preferred Dentist</h3>
+      <div class="dentists-select-grid">
+        <div *ngFor="let dentist of dentistsList" 
+             class="dentist-select-card" 
+             [class.selected]="selectedDentist?.id === dentist.id"
+             (click)="selectDentist(dentist)">
+          <div class="dentist-card-avatar">
+            <img [src]="dentist.imageUrl || 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200'" alt="Dentist Image" />
+          </div>
+          <div class="dentist-card-details">
+            <h4>{{ dentist.fullName }}</h4>
+            <span class="dentist-specialty">{{ dentist.specialty }}</span>
+            <span class="dentist-experience"><i class="bi bi-award"></i> {{ dentist.yearsOfExperience }} Years Experience</span>
+            <span class="dentist-fee"><i class="bi bi-cash-coin"></i> Fee: ${{ dentist.consultationFee }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- Time Slots Selection -->
-      <h3 class="section-title" *ngIf="selectedDay">3. Available Slots for {{ selectedDay.dayName }}, {{ selectedDay.dateStr }}</h3>
-      <div class="slots-grid" *ngIf="selectedDay">
-        <button *ngFor="let slot of selectedDay.slots"
-                type="button"
-                class="slot-btn"
-                [class.selected]="selectedTimeSlot === slot.time"
-                [disabled]="!slot.available"
-                (click)="selectTime(slot)">
-          {{ slot.time }}
-        </button>
+      <!-- 3. Available Dates -->
+      <div *ngIf="selectedDentist">
+        <h3 class="section-title">3. Available Dates</h3>
+        <div class="dates-slider">
+          <div *ngFor="let day of calendarDays" 
+               class="date-card" 
+               [class.selected]="selectedDay?.dateStr === day.dateStr"
+               (click)="selectDay(day)">
+            <span class="day-name">{{ day.dayName | slice:0:3 }}</span>
+            <span class="day-num">{{ day.dateStr }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Time Slots Selection -->
+      <div *ngIf="selectedDay">
+        <h3 class="section-title">4. Available Slots for {{ selectedDay.dayName }}, {{ selectedDay.dateStr }}</h3>
+        <div class="slots-grid">
+          <button *ngFor="let slot of selectedDay.slots"
+                  type="button"
+                  class="slot-btn"
+                  [class.selected]="selectedTimeSlot?.id === slot.id"
+                  [disabled]="!slot.available"
+                  (click)="selectTime(slot)">
+            {{ slot.timeStr }}
+          </button>
+        </div>
       </div>
 
       <!-- Footer Buttons -->
       <div class="step-actions">
         <a routerLink="/" class="btn-cancel">Cancel</a>
-        <button type="button" class="btn-next" (click)="goToStep(2)" [disabled]="!selectedService || !selectedTimeSlot">
+        <button type="button" class="btn-next" (click)="goToStep(2)" [disabled]="!selectedService || !selectedDentist || !selectedTimeSlot">
           Continue to Personal Info <i class="bi bi-arrow-right"></i>
         </button>
       </div>
     </div>
 
     <!-- STEP 2: PATIENT INFO -->
-    <div *ngIf="currentStep === 2" class="step-content">
+    <div *ngIf="currentStep === 2" class="step-content animate-fade">
       <h2 class="step-title">Patient Contact Credentials</h2>
-      <p class="step-subtitle">Please fill out your contact details. This will represent your identity in our clinic records.</p>
+      <p class="step-subtitle">Please confirm your contact details to log this appointment in our clinic database.</p>
 
       <div class="form-layout">
         <div class="form-group">
           <label for="pName">Patient Identifier (Full Name)</label>
           <div class="input-wrap">
             <i class="bi bi-person"></i>
-            <input id="pName" type="text" [(ngModel)]="patientName" placeholder="Dr. Mazen / Hana..." />
+            <input id="pName" type="text" [(ngModel)]="patientName" placeholder="Enter Full Name" />
           </div>
         </div>
 
@@ -111,152 +130,114 @@
       </div>
 
       <!-- Summary Panel -->
-      <div class="quick-summary" *ngIf="selectedService">
+      <div class="quick-summary" *ngIf="selectedService && selectedDentist">
         <h4 class="summary-title"><i class="bi bi-journal-bookmark-fill"></i> Booking Snapshot</h4>
         <div class="summary-details">
-          <span><strong>Service:</strong> {{ selectedService.name }}</span>
-          <span><strong>Date/Time:</strong> {{ selectedDay?.dayName }}, {{ selectedDay?.dateStr }} at {{ selectedTimeSlot }}</span>
-          <span><strong>Filing Cost:</strong> ${{ selectedService.price }}</span>
+          <span><strong>Dentist:</strong> {{ selectedDentist.fullName }} ({{ selectedDentist.specialty }})</span>
+          <span><strong>Procedure:</strong> {{ selectedService.name }}</span>
+          <span><strong>Date/Time:</strong> {{ selectedDay?.dayName }}, {{ selectedDay?.dateStr }} at {{ selectedTimeSlot?.timeStr }}</span>
+          <span><strong>Consultation Fee:</strong> ${{ selectedDentist.consultationFee }}</span>
         </div>
       </div>
 
       <!-- Footer Buttons -->
       <div class="step-actions">
         <button type="button" class="btn-back" (click)="goToStep(1)"><i class="bi bi-arrow-left"></i> Back</button>
-        <button type="button" class="btn-next" (click)="goToStep(3)" [disabled]="!patientName || !patientEmail || !patientPhone">
-          Proceed to Payment <i class="bi bi-arrow-right"></i>
+        <button type="button" class="btn-next" (click)="goToStep(3)" [disabled]="!patientName || !patientEmail || !patientPhone || isSubmitting">
+          <span *ngIf="!isSubmitting">Lock Slot & Proceed <i class="bi bi-arrow-right"></i></span>
+          <span *ngIf="isSubmitting"><i class="bi bi-arrow-clockwise spinning"></i> Locking Slot...</span>
         </button>
       </div>
     </div>
 
-    <!-- STEP 3: PAYMENT -->
-    <div *ngIf="currentStep === 3" class="step-content">
-      <h2 class="step-title">Secure Billing Validation</h2>
-      <p class="step-subtitle">To confirm your appointment slot, finalize checkout via our mock payment system.</p>
+    <!-- STEP 3: PAYMENT REDIRECT & LOCK TIMEOUT -->
+    <div *ngIf="currentStep === 3" class="step-content animate-fade">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+        <h2 class="step-title" style="margin: 0;">Select Payment Option</h2>
+        
+        <div class="timer-countdown-badge" *ngIf="paymentMethod === 'card'">
+          <i class="bi bi-clock-history animate-pulse"></i>
+          <span>Time Left: <strong>{{ formattedTimeLeft }}</strong></span>
+        </div>
+      </div>
+
+      <!-- Payment Method Switcher Tabs -->
+      <div class="payment-method-tabs">
+        <div class="payment-tab" [class.active]="paymentMethod === 'card'" (click)="setPaymentMethod('card')">
+          <i class="bi bi-credit-card-2-front-fill"></i>
+          <span>Pay Online (Paymob)</span>
+        </div>
+        <div class="payment-tab" [class.active]="paymentMethod === 'cash'" (click)="setPaymentMethod('cash')">
+          <i class="bi bi-wallet2"></i>
+          <span>Cash in Clinic (كاش)</span>
+        </div>
+      </div>
 
       <div class="payment-grid">
-        <!-- Card Details -->
-        <div class="card-details-form">
-          <div class="form-group">
-            <label for="cName">Cardholder Name</label>
-            <input id="cName" type="text" [(ngModel)]="cardName" placeholder="Full Name on Card" />
-          </div>
-
-          <div class="form-group">
-            <label for="cNumber">Card Number</label>
-            <input id="cNumber" type="text" [(ngModel)]="cardNumber" placeholder="4000 1234 5678 9010" maxlength="19" />
-          </div>
-
-          <div class="form-row-2">
-            <div class="form-group">
-              <label for="cExpiry">Expiry Date</label>
-              <input id="cExpiry" type="text" [(ngModel)]="cardExpiry" placeholder="MM/YY" maxlength="5" />
-            </div>
-            <div class="form-group">
-              <label for="cCvv">CVV Code</label>
-              <input id="cCvv" type="password" [(ngModel)]="cardCvv" placeholder="123" maxlength="4" />
-            </div>
-          </div>
+        
+        <!-- Paymob Launcher panel -->
+        <div class="card-details-form text-center" *ngIf="paymentMethod === 'card'">
+          <h4 class="paymob-title"><i class="bi bi-credit-card-fill"></i> Paymob Unified Payments</h4>
+          <p class="paymob-desc">Clicking below will securely redirect you to Paymob's payment gateway to input card details.</p>
 
           <!-- Payment Error Alert -->
           <div class="payment-alert error" *ngIf="paymentErrorMessage">
             <i class="bi bi-exclamation-triangle-fill"></i> {{ paymentErrorMessage }}
           </div>
 
-          <!-- Checkout Buttons -->
+          <!-- Paymob Launcher Actions -->
           <div class="payment-actions">
-            <button type="button" class="btn-pay-success" (click)="submitPayment(true)" [disabled]="isSubmitting">
-              <span *ngIf="!isSubmitting"><i class="bi bi-credit-card-fill"></i> Pay & Confirm Booking (${{ selectedService?.price }})</span>
-              <span *ngIf="isSubmitting"><i class="bi bi-arrow-clockwise spinning"></i> Authorizing...</span>
+            <button type="button" class="btn-paymob-launch" (click)="payWithPaymob()" [disabled]="isSubmitting">
+              <span *ngIf="!isSubmitting"><i class="bi bi-arrow-right-circle"></i> Redirect to Paymob (${{ selectedDentist?.consultationFee }})</span>
+              <span *ngIf="isSubmitting"><i class="bi bi-arrow-clockwise spinning"></i> Launching Gateway...</span>
             </button>
-            
-            <button type="button" class="btn-pay-fail" (click)="submitPayment(false)" [disabled]="isSubmitting">
-              Simulate Decline
+          </div>
+        </div>
+
+        <!-- Cash in Clinic Info Panel -->
+        <div class="card-details-form text-center" *ngIf="paymentMethod === 'cash'">
+          <h4 class="paymob-title"><i class="bi bi-cash"></i> Pay Cash at clinic desk</h4>
+          <p class="paymob-desc">Your slot remains locked. Simply click confirm below to book, and pay our front-desk staff in cash when you arrive.</p>
+
+          <div class="payment-actions">
+            <button type="button" class="btn-paymob-launch btn-cash-confirm" (click)="confirmCashBooking()" [disabled]="isSubmitting">
+              <span *ngIf="!isSubmitting"><i class="bi bi-check-circle"></i> Confirm Cash Booking & Print Voucher</span>
+              <span *ngIf="isSubmitting"><i class="bi bi-arrow-clockwise spinning"></i> Confirming...</span>
             </button>
           </div>
         </div>
 
         <!-- Receipt Panel -->
-        <div class="receipt-panel">
+        <div class="receipt-panel" *ngIf="selectedService && selectedDentist">
           <h4 class="receipt-title">Appointment Invoice</h4>
           <div class="receipt-items">
             <div class="receipt-row">
-              <span>{{ selectedService?.name }}</span>
-              <span>${{ selectedService?.price }}</span>
+              <span>{{ selectedService.name }}</span>
+              <span>Consultation</span>
             </div>
             <div class="receipt-row">
-              <span>Facility Diagnostic Fee</span>
-              <span>Included</span>
+              <span>Dentist Consultation Fee</span>
+              <span>${{ selectedDentist.consultationFee }}</span>
             </div>
             <div class="receipt-divider"></div>
             <div class="receipt-row total">
               <span>Total Charge</span>
-              <span>${{ selectedService?.price }}</span>
+              <span>${{ selectedDentist.consultationFee }}</span>
             </div>
           </div>
 
           <div class="secure-badge">
             <i class="bi bi-shield-fill-check"></i>
-            <span>Encrypted 256-bit SSL Session</span>
+            <span>Encrypted patient booking Session</span>
           </div>
         </div>
+
       </div>
 
       <!-- Footer Buttons -->
       <div class="step-actions">
-        <button type="button" class="btn-back" (click)="goToStep(2)" [disabled]="isSubmitting"><i class="bi bi-arrow-left"></i> Back</button>
-      </div>
-    </div>
-
-    <!-- STEP 4: CONFIRMED -->
-    <div *ngIf="currentStep === 4" class="step-content text-center">
-      <div class="success-icon-wrap animate-scale">
-        <i class="bi bi-check-circle-fill"></i>
-      </div>
-
-      <h2 class="step-title">Appointment Successfully Synchronized!</h2>
-      <p class="step-subtitle">Your dental reservation has been certified and logged in our clinical grid.</p>
-
-      <!-- Confirmation Voucher -->
-      <div class="voucher-card">
-        <div class="voucher-header">
-          <span class="voucher-badge">CONFIRMED VOUCHER</span>
-          <span class="voucher-id">ID: {{ confirmationId }}</span>
-        </div>
-        
-        <div class="voucher-body">
-          <div class="voucher-detail-grid">
-            <div class="v-group">
-              <span class="v-label">Patient Name</span>
-              <span class="v-value">{{ patientName }}</span>
-            </div>
-            <div class="v-group">
-              <span class="v-label">Assigned Dentist</span>
-              <span class="v-value">{{ assignedDentist }}</span>
-            </div>
-            <div class="v-group">
-              <span class="v-label">Selected Procedure</span>
-              <span class="v-value">{{ selectedService?.name }}</span>
-            </div>
-            <div class="v-group">
-              <span class="v-label">Schedule Slot</span>
-              <span class="v-value">{{ selectedDay?.dayName }}, {{ selectedDay?.dateStr }} at {{ selectedTimeSlot }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="voucher-footer">
-          <div class="barcode">
-            ||||| | ||||| | ||| |||| | ||
-          </div>
-          <span class="barcode-sub">Present this barcode at checkout</span>
-        </div>
-      </div>
-
-      <!-- Next Actions -->
-      <div class="success-actions">
-        <a routerLink="/" class="btn-primary-rect">Return to Homepage</a>
-        <button type="button" class="btn-secondary-rect" onclick="window.print()">Print Voucher</button>
+        <button type="button" class="btn-back" (click)="goToStep(2)" [disabled]="isSubmitting"><i class="bi bi-arrow-left"></i> Change Details</button>
       </div>
     </div>
 

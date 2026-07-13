@@ -11,6 +11,7 @@ import { Signup } from './auth/signup/signup';
 import { Dashboard } from './dashboard/dashboard';
 import { MedicalHistory } from './medical-history/medical-history';
 import { VerifyEmail } from './auth/verify-email/verify-email';
+import { PaymentResult } from './booking/payment-result/payment-result';
 
 export const routes: Routes = [
   { path: '' , redirectTo:"home" , pathMatch:'full' , title:"Home"},
@@ -26,6 +27,7 @@ export const routes: Routes = [
   { path: 'signup', component: Signup, title: 'Sign Up' },
   { path: 'dashboard', component: Dashboard, title: 'Dashboard' },
   { path: 'medical-history', component: MedicalHistory, title: 'Medical History' },
-  { path: 'verify-email', component: VerifyEmail, title: 'Verify Email' }
+  { path: 'verify-email', component: VerifyEmail, title: 'Verify Email' },
+  { path: 'payment/result', component: PaymentResult, title: 'Payment Status' }
 ];
 

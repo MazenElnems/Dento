@@ -1,344 +1,743 @@
-<div class="dentist-portal-container">
-  
-  <!-- Tabs Navigation -->
-  <div class="portal-nav-tabs">
-    <button class="tab-btn" [class.active]="activeTab === 'schedule'" (click)="activeTab = 'schedule'">
-      <i class="bi bi-calendar-range"></i> Today's Schedule
-    </button>
-    <button class="tab-btn" [class.active]="activeTab === 'patients'" (click)="activeTab = 'patients'">
-      <i class="bi bi-people"></i> Patients Records
-    </button>
-  </div>
+<div class="dentist-panel-viewport">
 
-  <!-- Tab 1: Schedule View -->
-  @if (activeTab === 'schedule') {
-    <div class="tab-content animate-fade-in">
-      <div class="page-title">
-        <h3><i class="bi bi-clock-history"></i> My Dental Clinic Schedule</h3>
-        <p>Overview of your assigned patient appointments for the current period.</p>
+  <!-- ========================================== -->
+  <!-- TAB VIEW 1: DASHBOARD                      -->
+  <!-- ========================================== -->
+  @if (activeSubTab === 'dashboard') {
+    <div class="dentist-tab-container animate-fade">
+      
+      <!-- Greeting Banner Row -->
+      <div class="dentist-greeting-row">
+        <div class="greeting-text-wrap">
+          <h2>مرحباً دكتور.</h2>
+          <p>لديك <strong>{{ todayAppointmentsCount }}</strong> مواعيد مجدولة لهذا اليوم. نتمنى لك يوماً سعيداً!</p>
+        </div>
+        <div class="date-badge-card">
+          <i class="bi bi-calendar3"></i>
+          <span>الجمعة، 10 يوليو 2026</span>
+        </div>
       </div>
 
-      @if (appointments.length === 0) {
-        <div class="empty-portal-state">
-          <i class="bi bi-calendar-check"></i>
-          <p>You have no appointments scheduled for today.</p>
+      <!-- STATUS CARDS ROW -->
+      <div class="dentist-stats-cards-grid">
+        <div class="stat-card shadow-sm">
+          <div class="stat-icon-circle bg-blue"><i class="bi bi-calendar2-range"></i></div>
+          <div class="stat-detail">
+            <span>مواعيد اليوم</span>
+            <h3>{{ todayAppointmentsCount }}</h3>
+          </div>
+        </div>
+
+        <div class="stat-card shadow-sm">
+          <div class="stat-icon-circle bg-cyan"><i class="bi bi-clock-history"></i></div>
+          <div class="stat-detail">
+            <span>قادم</span>
+            <h3>{{ upcomingCount }}</h3>
+          </div>
+        </div>
+
+        <div class="stat-card shadow-sm">
+          <div class="stat-icon-circle bg-green"><i class="bi bi-check-circle"></i></div>
+          <div class="stat-detail">
+            <span>مكتمل</span>
+            <h3>{{ completedTodayCount }}</h3>
+          </div>
+        </div>
+
+        <div class="stat-card shadow-sm">
+          <div class="stat-icon-circle bg-orange"><i class="bi bi-arrow-repeat"></i></div>
+          <div class="stat-detail">
+            <span>متابعات معلقة</span>
+            <h3>{{ pendingFollowUpsCount }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN SPLIT WORKSPACE -->
+      <div class="dentist-main-grid-split">
+        
+        <!-- RIGHT COLUMN: SCHEDULE TABLE & RECENT PATIENTS -->
+        <div class="dentist-right-column">
+          
+          <!-- Today's Schedule -->
+          <div class="table-card shadow-sm">
+            <div class="card-header-bar">
+              <h4><i class="bi bi-list-task"></i> جدول مواعيد اليوم</h4>
+              <button class="view-all-link" (click)="activeSubTab = 'schedule'">عرض الكل</button>
+            </div>
+            
+            <div class="table-wrap">
+              @if (appointments.length === 0) {
+                <p class="empty-message-hint">لا توجد مواعيد مجدولة لليوم.</p>
+              } @else {
+                <table class="dentist-portal-table">
+                  <thead>
+                    <tr>
+                      <th>الوقت</th>
+                      <th>اسم المريض</th>
+                      <th>نوع الإجراء</th>
+                      <th>الحالة</th>
+                      <th>إجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (app of appointments; track app.id) {
+                      <tr>
+                        <td class="font-bold text-blue">{{ app.time }}</td>
+                        <td class="font-bold">{{ app.patientName }}</td>
+                        <td>{{ app.serviceName }}</td>
+                        <td>
+                          <span class="status-badge" [class.badge-upcoming]="app.status === 'upcoming'" [class.badge-completed]="app.status === 'completed'" [class.badge-cancelled]="app.status === 'cancelled'">
+                            {{ app.status === 'upcoming' ? 'مؤكد' : app.status === 'completed' ? 'مكتمل' : 'ملغي' }}
+                          </span>
+                        </td>
+                        <td>
+                          <button class="btn-table-action" (click)="selectPatient({ id: app.patientId, name: app.patientName, email: '', role: 'patient' })">
+                            الملف الطبي <i class="bi bi-chevron-left"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              }
+            </div>
+          </div>
+
+          <!-- Recent Patients -->
+          <div class="recent-patients-card mt-4">
+            <h4>المرضى الجدد</h4>
+            <div class="patients-horizontal-list">
+              @for (pat of patients; track pat.id) {
+                <div class="patient-profile-card shadow-sm" (click)="selectPatient(pat)">
+                  <div class="patient-card-avatar"><i class="bi bi-person-fill"></i></div>
+                  <div class="patient-card-info">
+                    <h6>{{ pat.name }}</h6>
+                    <p>آخر زيارة: منذ يومين</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+        </div>
+
+        <!-- LEFT COLUMN: QUICK ACTIONS & STORAGE WIDGET -->
+        <div class="dentist-left-column">
+          
+          <!-- Quick Actions -->
+          <div class="quick-actions-card shadow-sm">
+            <h4><i class="bi bi-lightning-charge-fill"></i> إجراءات سريعة</h4>
+            <div class="actions-grid-buttons">
+              <button class="action-btn-item" (click)="activeSubTab = 'patients'">
+                <div class="action-icon"><i class="bi bi-file-earmark-plus"></i></div>
+                <span>إنشاء سجل طبي</span>
+              </button>
+              <button class="action-btn-item" (click)="activeSubTab = 'files'">
+                <div class="action-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                <span>رفع صور الأشعة</span>
+              </button>
+              <button class="action-btn-item" (click)="activeSubTab = 'patients'">
+                <div class="action-icon"><i class="bi bi-prescription2"></i></div>
+                <span>كتابة وصفة طبية</span>
+              </button>
+              <button class="action-btn-item" (click)="activeSubTab = 'patients'">
+                <div class="action-icon"><i class="bi bi-calendar-plus"></i></div>
+                <span>جدولة متابعة</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Storage Alert -->
+          <div class="storage-alert-card shadow-sm">
+            <h5>مساحة التخزين</h5>
+            <p>تم استهلاك {{ storagePercent }}% من سعة الملفات السريرية للعيادة.</p>
+            <div class="storage-bar-bg">
+              <div class="storage-bar-fill" [style.width]="storagePercent + '%'"></div>
+            </div>
+            <button class="btn-upgrade-plan">ترقية الباقة <i class="bi bi-arrow-up-right"></i></button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- ========================================== -->
+  <!-- TAB VIEW 2: MY SCHEDULE                    -->
+  <!-- ========================================== -->
+  @if (activeSubTab === 'schedule') {
+    <div class="dentist-tab-container animate-fade">
+      <div class="tab-header-row">
+        <h3>جدولي اليومي المجدول</h3>
+        <p class="tab-subtitle-text">عرض زمني للمواعيد والخدمات المحجوزة اليوم.</p>
+      </div>
+
+      <div class="schedule-timeline-list shadow-sm">
+        @if (appointments.length === 0) {
+          <p class="empty-timeline-hint">لا توجد مواعيد اليوم.</p>
+        } @else {
+          @for (app of appointments; track app.id) {
+            <div class="timeline-event-card" [class.timeline-completed]="app.status === 'completed'" [class.timeline-cancelled]="app.status === 'cancelled'">
+              <div class="timeline-time-badge font-bold">{{ app.time }}</div>
+              <div class="timeline-card-body">
+                <div class="timeline-card-header">
+                  <h5>{{ app.patientName }}</h5>
+                  <span class="timeline-status-pill">{{ app.status.toUpperCase() }}</span>
+                </div>
+                <p class="timeline-procedure">الإجراء: <strong>{{ app.serviceName }}</strong></p>
+                <div class="timeline-actions-row">
+                  <button class="btn-timeline-detail" (click)="selectPatient({ id: app.patientId, name: app.patientName, email: '', role: 'patient' })">
+                    عرض السجل الطبي <i class="bi bi-chevron-left"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ========================================== -->
+  <!-- TAB VIEW 3: PATIENTS                       -->
+  <!-- ========================================== -->
+  @if (activeSubTab === 'patients') {
+    <div class="dentist-tab-container animate-fade">
+      
+      @if (!selectedPatient) {
+        <div class="tab-header-row">
+          <h3>المرضى والمستفيدين</h3>
+          <p class="tab-subtitle-text">ابحث واختر المريض لاستعراض ملفه وتعديل سجلاته.</p>
+        </div>
+
+        <div class="patients-explorer-grid">
+          @for (pat of patients; track pat.id) {
+            <div class="patient-grid-item shadow-sm" (click)="selectPatient(pat)">
+              <div class="patient-grid-avatar"><i class="bi bi-person-fill"></i></div>
+              <div class="patient-grid-details">
+                <h5>{{ pat.name }}</h5>
+                <p>Email: {{ pat.email || 'N/A' }}</p>
+                <p>Phone: {{ pat.phone || '01009230193' }}</p>
+              </div>
+              <i class="bi bi-chevron-left arrow-indicator"></i>
+            </div>
+          }
         </div>
       } @else {
-        <div class="schedule-table-wrap">
-          <table class="styled-table">
+        
+        <!-- PATIENT DETAIL WORKSPACE -->
+        <div class="patient-details-view animate-fade">
+          
+          <button class="btn-back-patients" (click)="closePatientDetails()">
+            <i class="bi bi-arrow-right"></i> العودة لقائمة المرضى
+          </button>
+
+          <div class="patient-profile-header-card shadow-sm">
+            <div class="profile-header-main">
+              <div class="profile-header-avatar">{{ selectedPatient.name.charAt(0) }}</div>
+              <div class="profile-header-info">
+                <h3>{{ selectedPatient.name }}</h3>
+                <p>رقم المريض: {{ selectedPatient.id }}</p>
+              </div>
+            </div>
+            <div class="profile-header-actions">
+              <button class="btn-action-primary" (click)="openRecordModal()"><i class="bi bi-file-earmark-plus"></i> إضافة سجل طبي</button>
+              <button class="btn-action-primary" (click)="openPrescriptionModal()"><i class="bi bi-prescription"></i> كتابة وصفة طبية</button>
+              <button class="btn-action-primary" (click)="openFollowUpModal()"><i class="bi bi-calendar-plus"></i> جدولة متابعة</button>
+              <button class="btn-action-primary" (click)="openUploadModal()"><i class="bi bi-cloud-arrow-up"></i> رفع ملف سريري</button>
+            </div>
+          </div>
+
+          <div class="patient-details-grid-layout">
+            
+            <!-- COLUMN 1: MEDICAL HISTORY -->
+            <div class="patient-details-col shadow-sm">
+              <h4><i class="bi bi-heart-pulse"></i> التاريخ الطبي (Medical History)</h4>
+              
+              <div class="medical-details-row">
+                <span class="detail-name">ضغط الدم:</span>
+                <span class="detail-val font-bold">{{ selectedPatientHistory.bloodPressure || 'N/A' }}</span>
+              </div>
+              <div class="medical-details-row">
+                <span class="detail-name">السكري:</span>
+                <span class="detail-val font-bold">{{ selectedPatientHistory.diabetes || 'N/A' }}</span>
+              </div>
+              <div class="medical-details-row">
+                <span class="detail-name">أمراض القلب:</span>
+                <span class="detail-val font-bold">{{ selectedPatientHistory.heartDisease || 'N/A' }}</span>
+              </div>
+              <div class="medical-details-row">
+                <span class="detail-name">الحساسية:</span>
+                <span class="detail-val text-red font-bold">{{ selectedPatientHistory.allergies || 'N/A' }}</span>
+              </div>
+              <div class="medical-details-row">
+                <span class="detail-name">الأدوية الحالية:</span>
+                <span class="detail-val font-bold">{{ selectedPatientHistory.currentMedications || 'N/A' }}</span>
+              </div>
+              <div class="medical-details-row">
+                <span class="detail-name">العمليات السابقة:</span>
+                <span class="detail-val font-bold">{{ selectedPatientHistory.previousSurgeries || 'N/A' }}</span>
+              </div>
+              <div class="medical-details-row">
+                <span class="detail-name">حالة التدخين:</span>
+                <span class="detail-val font-bold">{{ selectedPatientHistory.smokingStatus || 'N/A' }}</span>
+              </div>
+              <div class="medical-details-row vertical">
+                <span class="detail-name">ملاحظات إضافية:</span>
+                <p class="detail-block-notes">{{ selectedPatientHistory.additionalNotes || 'لا توجد ملاحظات.' }}</p>
+              </div>
+            </div>
+
+            <!-- COLUMN 2: RECORDS & PRESCRIPTIONS -->
+            <div class="patient-records-col">
+              
+              <!-- Dental Records -->
+              <div class="record-group-card shadow-sm">
+                <h4>السجلات الطبية السابقة (Dental Records)</h4>
+                
+                @if (selectedPatientRecords.length === 0) {
+                  <p class="empty-records-text">لا توجد سجلات طبية مسجلة.</p>
+                } @else {
+                  @for (rec of selectedPatientRecords; track rec.id) {
+                    <div class="patient-record-log-item">
+                      <div class="record-log-head">
+                        <span class="record-date font-bold">{{ rec.date }}</span>
+                        <span class="record-id">سجل رقم: {{ rec.id }}</span>
+                      </div>
+                      <p>التشخيص: <strong>{{ rec.diagnosis }}</strong></p>
+                      <p>الإجراء المنفذ: <strong>{{ rec.procedurePerformed }}</strong></p>
+                      <p class="log-notes">ملاحظات: "{{ rec.clinicalNotes }}"</p>
+                      <p class="log-notes">خطة العلاج: "{{ rec.treatmentPlan }}"</p>
+                    </div>
+                  }
+                }
+              </div>
+
+              <!-- Prescriptions -->
+              <div class="record-group-card shadow-sm mt-4">
+                <h4>الوصفات والروشتات (Prescriptions)</h4>
+                
+                @if (selectedPatientPrescriptions.length === 0) {
+                  <p class="empty-records-text">لا توجد روشتات مسجلة.</p>
+                } @else {
+                  @for (rx of selectedPatientPrescriptions; track rx.id) {
+                    <div class="prescription-log-item">
+                      <div class="prescription-log-head">
+                        <span class="rx-date font-bold">{{ rx.date }}</span>
+                        <span class="rx-name font-bold text-blue">{{ rx.medicationName }}</span>
+                      </div>
+                      <p>الجرعة: <strong>{{ rx.dosage }}</strong></p>
+                      <p>التكرار: <strong>{{ rx.frequency }}</strong></p>
+                      <p>المدة: <strong>{{ rx.duration }}</strong></p>
+                    </div>
+                  }
+                }
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      }
+
+    </div>
+  }
+
+  <!-- ========================================== -->
+  <!-- TAB VIEW 4: DENTAL RECORDS                 -->
+  <!-- ========================================== -->
+  @if (activeSubTab === 'records') {
+    <div class="dentist-tab-container animate-fade">
+      <div class="tab-header-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <div>
+          <h3>السجلات الطبية المنشأة</h3>
+          <p class="tab-subtitle-text">عرض وتعديل السجلات الطبية وعلاجات الأسنان التي قمت بها.</p>
+        </div>
+        <button class="btn-action-primary" (click)="openRecordModal(true)">
+          <i class="bi bi-plus-circle"></i> إنشاء سجل جديد
+        </button>
+      </div>
+
+      <div class="table-card shadow-sm">
+        <div class="table-wrap">
+          <table class="dentist-portal-table">
             <thead>
               <tr>
-                <th>Time Slot</th>
-                <th>Patient Name</th>
-                <th>Contact</th>
-                <th>Service Type</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>التاريخ</th>
+                <th>اسم المريض</th>
+                <th>التشخيص</th>
+                <th>الإجراء المنفذ</th>
+                <th>خطة العلاج</th>
               </tr>
             </thead>
             <tbody>
-              @for (app of appointments; track app.id) {
-                <tr>
-                  <td class="time-col"><strong>{{ app.time }}</strong></td>
-                  <td class="patient-name">{{ app.patientName }}</td>
-                  <td>{{ app.patientPhone }}</td>
-                  <td>{{ app.serviceName }}</td>
-                  <td>
-                    <span class="status-badge" [class]="app.status">{{ app.status.toUpperCase() }}</span>
-                  </td>
-                  <td>
-                    @if (app.status === 'upcoming') {
-                      <button class="btn-action btn-primary-sm" (click)="selectPatient({id: app.patientId, name: app.patientName, email: '', role: 'patient', phone: app.patientPhone})">
-                        Open File <i class="bi bi-folder-symlink"></i>
-                      </button>
-                    } @else {
-                      <span class="text-muted">No Actions</span>
-                    }
-                  </td>
-                </tr>
+              @for (pat of patients; track pat.id) {
+                @for (rec of dataService.getDentalRecords(pat.id); track rec.id) {
+                  <tr>
+                    <td class="font-bold text-blue">{{ rec.date }}</td>
+                    <td class="font-bold">{{ rec.patientName }}</td>
+                    <td>{{ rec.diagnosis }}</td>
+                    <td>{{ rec.procedurePerformed }}</td>
+                    <td>{{ rec.treatmentPlan }}</td>
+                  </tr>
+                }
               }
             </tbody>
           </table>
         </div>
-      }
+      </div>
     </div>
   }
 
-  <!-- Tab 2: Patient Lookup & Detail Card -->
-  @if (activeTab === 'patients') {
-    <div class="tab-content animate-fade-in">
-      
-      @if (!selectedPatient) {
-        <div class="patient-lookup-screen">
-          <div class="page-title">
-            <h3><i class="bi bi-people-fill"></i> Patient Directory</h3>
-            <p>Select a patient to access their medical file and add clinical records.</p>
-          </div>
-
-          <div class="patients-grid">
-            @for (pat of patients; track pat.id) {
-              <div class="patient-grid-card" (click)="selectPatient(pat)">
-                <div class="patient-avatar-large">
-                  <i class="bi bi-person-fill"></i>
-                </div>
-                <h4>{{ pat.name }}</h4>
-                <p>{{ pat.phone || 'No phone number' }}</p>
-                <button class="btn-view-profile">Open Patient File</button>
-              </div>
-            }
-          </div>
+  <!-- ========================================== -->
+  <!-- TAB VIEW 5: CLINICAL FILES                 -->
+  <!-- ========================================== -->
+  @if (activeSubTab === 'files') {
+    <div class="dentist-tab-container animate-fade">
+      <div class="tab-header-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <div>
+          <h3>الملفات السريرية وأشعة المرضى</h3>
+          <p class="tab-subtitle-text">تصفح صور الأشعة السينية Panoramic والمستندات الطبية المرفوعة.</p>
         </div>
-      } @else {
-        <!-- Patient File Workspace -->
-        <div class="patient-workspace">
-          <div class="workspace-header">
-            <button class="btn-back" (click)="closePatientDetails()">
-              <i class="bi bi-arrow-left"></i> Back to Directory
-            </button>
-            <div class="patient-main-info">
-              <h2>{{ selectedPatient.name }}</h2>
-              <p>Email: {{ selectedPatient.email }} | Mobile: {{ selectedPatient.phone }}</p>
+        <button class="btn-action-primary" (click)="openUploadModal(true)">
+          <i class="bi bi-cloud-arrow-up"></i> رفع ملف جديد
+        </button>
+      </div>
+
+      <div class="clinical-files-grid">
+        @for (file of clinicalFiles; track file.id) {
+          <div class="clinical-file-card shadow-sm">
+            <div class="file-thumbnail-wrap">
+              @if (file.dataUrl.startsWith('data:image/') || file.dataUrl.startsWith('http')) {
+                <img [src]="file.dataUrl" alt="Clinical File" class="file-thumbnail-img" />
+              } @else {
+                <div class="file-thumbnail-placeholder"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+              }
+            </div>
+            <div class="file-card-details">
+              <span class="file-type-badge">{{ file.type }}</span>
+              <h6>{{ file.fileName }}</h6>
+              <p class="file-owner-patient"><i class="bi bi-person"></i> مريض: <strong>{{ file.patientName }}</strong></p>
+              <span class="file-date-created">{{ file.date }}</span>
             </div>
           </div>
-
-          <!-- Actions Row -->
-          <div class="workspace-actions">
-            <button class="btn-action-primary" (click)="openRecordModal()">
-              <i class="bi bi-clipboard-pulse"></i> Add Dental Record
-            </button>
-            <button class="btn-action-primary" (click)="openPrescriptionModal()">
-              <i class="bi bi-capsule"></i> Issue Prescription
-            </button>
-            <button class="btn-action-secondary" (click)="openFollowUpModal()">
-              <i class="bi bi-calendar2-plus"></i> Schedule Follow-Up
-            </button>
-          </div>
-
-          <div class="workspace-grid">
-            
-            <!-- Left Column: Medical History details -->
-            <div class="workspace-left">
-              <div class="detail-card">
-                <h3><i class="bi bi-heart-pulse-fill"></i> Medical History Summary</h3>
-                @if (!selectedPatientHistory) {
-                  <p class="no-history-alert"><i class="bi bi-exclamation-circle"></i> Patient has not completed their medical history questionnaire yet.</p>
-                } @else {
-                  <ul class="history-details-list">
-                    <li><strong>Blood Pressure:</strong> {{ selectedPatientHistory.bloodPressure }}</li>
-                    <li><strong>Diabetes:</strong> {{ selectedPatientHistory.diabetes ? 'Yes' : 'No' }}</li>
-                    <li><strong>Heart Disease:</strong> {{ selectedPatientHistory.heartDisease ? 'Yes' : 'No' }}</li>
-                    <li><strong>Known Allergies:</strong> {{ selectedPatientHistory.allergies || 'None' }}</li>
-                    <li><strong>Daily Medications:</strong> {{ selectedPatientHistory.currentMedications || 'None' }}</li>
-                    <li><strong>Previous Surgeries:</strong> {{ selectedPatientHistory.previousSurgeries || 'None' }}</li>
-                    <li><strong>Smoking Status:</strong> {{ selectedPatientHistory.smokingStatus }}</li>
-                    @if (selectedPatientHistory.additionalNotes) {
-                      <li class="full-width"><strong>Comments:</strong> {{ selectedPatientHistory.additionalNotes }}</li>
-                    }
-                  </ul>
-                  <span class="update-stamp">Updated: {{ selectedPatientHistory.updatedAt }}</span>
-                }
-              </div>
-
-              <!-- Dental Records List -->
-              <div class="detail-card">
-                <h3><i class="bi bi-file-earmark-medical"></i> Clinic Records History</h3>
-                @if (selectedPatientRecords.length === 0) {
-                  <p class="text-muted">No clinical records registered for this patient.</p>
-                } @else {
-                  <div class="records-timeline">
-                    @for (rec of selectedPatientRecords; track rec.id) {
-                      <div class="timeline-item">
-                        <div class="item-meta">
-                          <span class="item-date">{{ rec.date }}</span>
-                          <span class="item-id">#{{ rec.id }}</span>
-                        </div>
-                        <div class="item-body">
-                          <p><strong>Diagnosis:</strong> {{ rec.diagnosis }}</p>
-                          <p><strong>Procedure:</strong> {{ rec.procedurePerformed }}</p>
-                          @if (rec.clinicalNotes) {
-                            <p class="timeline-notes"><strong>Notes:</strong> {{ rec.clinicalNotes }}</p>
-                          }
-                          @if (rec.treatmentPlan) {
-                            <p><strong>Plan:</strong> {{ rec.treatmentPlan }}</p>
-                          }
-                          @if (rec.files && rec.files.length > 0) {
-                            <div class="timeline-attachments">
-                              @for (file of rec.files; track file) {
-                                <a [href]="file" target="_blank" class="attachment-link">
-                                  <i class="bi bi-file-image"></i> View Attachment Image
-                                </a>
-                              }
-                            </div>
-                          }
-                        </div>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-            </div>
-
-            <!-- Right Column: Prescriptions list -->
-            <div class="workspace-right">
-              <div class="detail-card">
-                <h3><i class="bi bi-capsule-pill"></i> Issued Prescriptions</h3>
-                @if (selectedPatientPrescriptions.length === 0) {
-                  <p class="text-muted">No active prescriptions issued.</p>
-                } @else {
-                  <div class="prescriptions-column">
-                    @for (rx of selectedPatientPrescriptions; track rx.id) {
-                      <div class="rx-item">
-                        <div class="rx-meta">
-                          <strong>{{ rx.medicationName }}</strong>
-                          <span class="rx-id">#{{ rx.id }}</span>
-                        </div>
-                        <div class="rx-body">
-                          <p>Dosage: {{ rx.dosage }} | {{ rx.frequency }}</p>
-                          <p>Duration: {{ rx.duration }}</p>
-                          @if (rx.notes) {
-                            <p class="rx-comment">* {{ rx.notes }}</p>
-                          }
-                        </div>
-                        <span class="rx-date">Issued: {{ rx.date }}</span>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-            </div>
-
-          </div>
-        </div>
-      }
-
+        }
+      </div>
     </div>
   }
 
-  <!-- Modal 1: Add Dental Record -->
-  @if (showRecordModal) {
-    <div class="modal-backdrop animate-fade-in">
-      <div class="modal-card animate-zoom-in">
-        <div class="modal-header">
-          <h3>Add Clinic Record - {{ selectedPatient?.name }}</h3>
-          <button class="close-btn" (click)="closeRecordModal()">&times;</button>
+  <!-- ========================================== -->
+  <!-- TAB VIEW 6: PRESCRIPTIONS                  -->
+  <!-- ========================================== -->
+  @if (activeSubTab === 'prescriptions') {
+    <div class="dentist-tab-container animate-fade">
+      <div class="tab-header-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <div>
+          <h3>الوصفات والروشتات الطبية الصادرة</h3>
+          <p class="tab-subtitle-text">قائمة بجميع العلاجات والأدوية الصادرة من قبلك للمرضى.</p>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="diagnosis">Diagnosis</label>
-            <input type="text" id="diagnosis" [(ngModel)]="diagnosis" placeholder="e.g. Tooth decay, Gingivitis" class="styled-input">
-          </div>
-          <div class="form-group">
-            <label for="procedure">Procedure Performed</label>
-            <input type="text" id="procedure" [(ngModel)]="procedurePerformed" placeholder="e.g. Cavity filling, scaling" class="styled-input">
-          </div>
-          <div class="form-group">
-            <label for="clinicalNotes">Clinical Notes</label>
-            <textarea id="clinicalNotes" [(ngModel)]="clinicalNotes" rows="2" placeholder="Tooth status, patient response..." class="styled-textarea"></textarea>
-          </div>
-          <div class="form-group">
-            <label for="treatmentPlan">Treatment Plan</label>
-            <input type="text" id="treatmentPlan" [(ngModel)]="treatmentPlan" placeholder="e.g. Schedule whitening in 2 weeks" class="styled-input">
-          </div>
-          <div class="form-group">
-            <label>Attach X-ray / Clinical File</label>
-            <div class="file-uploader-box">
-              <input type="file" (change)="handleFileUpload($event)" accept="image/*" class="file-input-raw">
-              <div class="uploader-overlay">
-                <i class="bi bi-cloud-upload"></i>
-                <span>{{ uploadedFile ? 'File Attached Successfully!' : 'Click to Upload X-Ray Image' }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-secondary-sm" (click)="closeRecordModal()">Cancel</button>
-          <button class="btn-primary-sm" (click)="submitRecord()">Save Record</button>
+        <button class="btn-action-primary" (click)="openPrescriptionModal(true)">
+          <i class="bi bi-plus-circle"></i> كتابة وصفة جديدة
+        </button>
+      </div>
+
+      <div class="table-card shadow-sm">
+        <div class="table-wrap">
+          <table class="dentist-portal-table">
+            <thead>
+              <tr>
+                <th>التاريخ</th>
+                <th>اسم المريض</th>
+                <th>اسم الدواء</th>
+                <th>الجرعة</th>
+                <th>المدة</th>
+                <th>ملاحظات</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (pat of patients; track pat.id) {
+                @for (rx of dataService.getPrescriptions(pat.id); track rx.id) {
+                  <tr>
+                    <td class="font-bold text-blue">{{ rx.date }}</td>
+                    <td class="font-bold">{{ rx.patientName }}</td>
+                    <td class="font-bold text-green">{{ rx.medicationName }}</td>
+                    <td>{{ rx.dosage }} ({{ rx.frequency }})</td>
+                    <td>{{ rx.duration }}</td>
+                    <td>{{ rx.notes || 'N/A' }}</td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   }
 
-  <!-- Modal 2: Issue Prescription -->
-  @if (showPrescriptionModal) {
-    <div class="modal-backdrop animate-fade-in">
-      <div class="modal-card animate-zoom-in">
-        <div class="modal-header">
-          <h3>Issue Prescription - {{ selectedPatient?.name }}</h3>
-          <button class="close-btn" (click)="closePrescriptionModal()">&times;</button>
+  <!-- ========================================== -->
+  <!-- TAB VIEW 7: FOLLOW-UP VISITS               -->
+  <!-- ========================================== -->
+  @if (activeSubTab === 'followups') {
+    <div class="dentist-tab-container animate-fade">
+      <div class="tab-header-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <div>
+          <h3>زيارات المتابعة المجدولة</h3>
+          <p class="tab-subtitle-text">مواعيد جلسات استكمال العلاج ومتابعات المرضى القادمة.</p>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="medName">Medication Name</label>
-            <input type="text" id="medName" [(ngModel)]="medicationName" placeholder="e.g. Amoxicillin, Ibuprofen" class="styled-input">
-          </div>
-          <div class="grid-2-modal">
-            <div class="form-group">
-              <label for="dosage">Dosage</label>
-              <input type="text" id="dosage" [(ngModel)]="dosage" placeholder="e.g. 500mg, 1 tablet" class="styled-input">
-            </div>
-            <div class="form-group">
-              <label for="duration">Duration</label>
-              <input type="text" id="duration" [(ngModel)]="duration" placeholder="e.g. 7 days" class="styled-input">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="freq">Frequency</label>
-            <div class="select-wrapper">
-              <select id="freq" [(ngModel)]="frequency">
-                <option value="Once daily">Once daily</option>
-                <option value="Twice daily">Twice daily</option>
-                <option value="Three times daily">Three times daily</option>
-                <option value="Four times daily">Four times daily</option>
-                <option value="Every 8 hours">Every 8 hours</option>
-                <option value="As needed (PRN)">As needed (PRN)</option>
-              </select>
-              <i class="bi bi-chevron-down"></i>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="rxNotes">Instructions / Notes</label>
-            <input type="text" id="rxNotes" [(ngModel)]="rxNotes" placeholder="Take after meals" class="styled-input">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-secondary-sm" (click)="closePrescriptionModal()">Cancel</button>
-          <button class="btn-primary-sm" (click)="submitPrescription()">Issue Rx</button>
-        </div>
+        <button class="btn-action-primary" (click)="openFollowUpModal(true)">
+          <i class="bi bi-calendar-plus"></i> جدولة متابعة جديدة
+        </button>
       </div>
-    </div>
-  }
 
-  <!-- Modal 3: Schedule Follow-Up -->
-  @if (showFollowUpModal) {
-    <div class="modal-backdrop animate-fade-in">
-      <div class="modal-card animate-zoom-in">
-        <div class="modal-header">
-          <h3>Schedule Follow-up - {{ selectedPatient?.name }}</h3>
-          <button class="close-btn" (click)="closeFollowUpModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="followDate">Date</label>
-            <input type="date" id="followDate" [(ngModel)]="followUpDate" class="styled-input">
-          </div>
-          <div class="form-group">
-            <label for="followTime">Time Slot</label>
-            <div class="select-wrapper">
-              <select id="followTime" [(ngModel)]="followUpTime">
-                @for (time of availableTimes; track time) {
-                  <option [value]="time">{{ time }}</option>
+      <div class="table-card shadow-sm">
+        <div class="table-wrap">
+          <table class="dentist-portal-table">
+            <thead>
+              <tr>
+                <th>تاريخ الجلسة</th>
+                <th>الوقت</th>
+                <th>اسم المريض</th>
+                <th>نوع الإجراء</th>
+                <th>الحالة</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (app of appointments; track app.id) {
+                @if (app.serviceId === 'follow-up') {
+                  <tr>
+                    <td class="font-bold text-blue">{{ app.dateStr }}</td>
+                    <td class="font-bold">{{ app.time }}</td>
+                    <td class="font-bold">{{ app.patientName }}</td>
+                    <td>جلسة متابعة واستكمال</td>
+                    <td><span class="status-badge badge-upcoming">مؤكدة</span></td>
+                  </tr>
                 }
-              </select>
-              <i class="bi bi-chevron-down"></i>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-secondary-sm" (click)="closeFollowUpModal()">Cancel</button>
-          <button class="btn-primary-sm" (click)="submitFollowUp()">Schedule Slot</button>
+              }
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   }
 
 </div>
+
+<!-- ============================================== -->
+<!-- MODAL: CREATE DENTAL RECORD                    -->
+<!-- ============================================== -->
+@if (showRecordModal) {
+  <div class="dentist-modal-overlay animate-fade">
+    <div class="dentist-modal-card">
+      <div class="dentist-modal-header">
+        <h3>إنشاء سجل طبي للمريض: {{ (!isDirectBooking && selectedPatient) ? selectedPatient.name : 'سجل جديد' }}</h3>
+        <button class="btn-close-modal" (click)="closeRecordModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+      
+      <div class="dentist-modal-body">
+        <div class="modal-form-vertical">
+          @if (isDirectBooking || !selectedPatient) {
+            <div class="form-group-wrap">
+              <label>اختر المريض (Select Patient)</label>
+              <select [(ngModel)]="selectedPatientId" required>
+                <option value="" disabled selected>-- اختر مريضاً من القائمة --</option>
+                @for (pat of patients; track pat.id) {
+                  <option [value]="pat.id">{{ pat.name }}</option>
+                }
+              </select>
+            </div>
+          }
+          <div class="form-group-wrap">
+            <label>التشخيص (Diagnosis)</label>
+            <input type="text" [(ngModel)]="diagnosis" placeholder="أدخل التشخيص الطبي للحالة" required />
+          </div>
+
+          <div class="form-group-wrap">
+            <label>الإجراء المنفذ (Procedure Performed)</label>
+            <input type="text" [(ngModel)]="procedurePerformed" placeholder="أدخل الإجراء (مثل حشو، خلع، تنظيف)" required />
+          </div>
+
+          <div class="form-group-wrap">
+            <label>ملاحظات سريرية (Clinical Notes)</label>
+            <textarea [(ngModel)]="clinicalNotes" placeholder="أدخل الملاحظات وتطورات الحالة الطبية"></textarea>
+          </div>
+
+          <div class="form-group-wrap">
+            <label>خطة العلاج القادمة (Treatment Plan)</label>
+            <textarea [(ngModel)]="treatmentPlan" placeholder="أدخل الإجراءات التالية المتوقعة للمريض"></textarea>
+          </div>
+
+          <div class="form-group-wrap">
+            <label>إرفاق ملف أشعة أو صورة (اختياري)</label>
+            <input type="file" (change)="handleFileUpload($event)" accept="image/*,application/pdf" />
+          </div>
+        </div>
+      </div>
+
+      <div class="dentist-modal-footer">
+        <button class="btn-cancel" (click)="closeRecordModal()">إلغاء</button>
+        <button class="btn-save" (click)="submitRecord()">حفظ السجل الطبي</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ============================================== -->
+<!-- MODAL: CREATE PRESCRIPTION                     -->
+<!-- ============================================== -->
+@if (showPrescriptionModal) {
+  <div class="dentist-modal-overlay animate-fade">
+    <div class="dentist-modal-card">
+      <div class="dentist-modal-header">
+        <h3>كتابة وصفة طبية (روشتة): {{ (!isDirectBooking && selectedPatient) ? selectedPatient.name : 'روشتة جديدة' }}</h3>
+        <button class="btn-close-modal" (click)="closePrescriptionModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="dentist-modal-body">
+        <div class="modal-form-vertical">
+          @if (isDirectBooking || !selectedPatient) {
+            <div class="form-group-wrap">
+              <label>اختر المريض (Select Patient)</label>
+              <select [(ngModel)]="selectedPatientId" required>
+                <option value="" disabled selected>-- اختر مريضاً من القائمة --</option>
+                @for (pat of patients; track pat.id) {
+                  <option [value]="pat.id">{{ pat.name }}</option>
+                }
+              </select>
+            </div>
+          }
+          <div class="form-group-wrap">
+            <label>اسم الدواء (Medication Name)</label>
+            <input type="text" [(ngModel)]="medicationName" placeholder="أدخل اسم الدواء بدقة" required />
+          </div>
+
+          <div class="form-group-wrap">
+            <label>الجرعة (Dosage)</label>
+            <input type="text" [(ngModel)]="dosage" placeholder="مثال: 500 ملغ" required />
+          </div>
+
+          <div class="form-group-wrap">
+            <label>التكرار (Frequency)</label>
+            <input type="text" [(ngModel)]="frequency" placeholder="مثال: 3 مرات يومياً بعد الأكل" required />
+          </div>
+
+          <div class="form-group-wrap">
+            <label>المدة (Duration)</label>
+            <input type="text" [(ngModel)]="duration" placeholder="مثال: 5 أيام" required />
+          </div>
+
+          <div class="form-group-wrap">
+            <label>ملاحظات الاستخدام (Notes)</label>
+            <textarea [(ngModel)]="rxNotes" placeholder="أدخل أي ملاحظات استخدام إضافية للمريض"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="dentist-modal-footer">
+        <button class="btn-cancel" (click)="closePrescriptionModal()">إلغاء</button>
+        <button class="btn-save" (click)="submitPrescription()">حفظ الوصفة وإصدارها</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ============================================== -->
+<!-- MODAL: SCHEDULE FOLLOW-UP VISIT                -->
+<!-- ============================================== -->
+@if (showFollowUpModal) {
+  <div class="dentist-modal-overlay animate-fade">
+    <div class="dentist-modal-card">
+      <div class="dentist-modal-header">
+        <h3>جدولة موعد متابعة للمريض: {{ (!isDirectBooking && selectedPatient) ? selectedPatient.name : 'حجز متابعة' }}</h3>
+        <button class="btn-close-modal" (click)="closeFollowUpModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="dentist-modal-body">
+        <div class="modal-form-vertical">
+          @if (isDirectBooking || !selectedPatient) {
+            <div class="form-group-wrap">
+              <label>اختر المريض (Select Patient)</label>
+              <select [(ngModel)]="selectedPatientId" required>
+                <option value="" disabled selected>-- اختر مريضاً من القائمة --</option>
+                @for (pat of patients; track pat.id) {
+                  <option [value]="pat.id">{{ pat.name }}</option>
+                }
+              </select>
+            </div>
+          }
+          <div class="form-group-wrap">
+            <label>تاريخ الجلسة القادمة (Select Date)</label>
+            <input type="date" [(ngModel)]="followUpDate" required />
+          </div>
+
+          <div class="form-group-wrap">
+            <label>التوقيت المتاح (Select Time)</label>
+            <select [(ngModel)]="followUpTime">
+              @for (time of availableTimes; track time) {
+                <option [value]="time">{{ time }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group-wrap">
+            <label>ملاحظات الجلسة (Follow-up Notes)</label>
+            <textarea [(ngModel)]="followUpNotes" placeholder="أدخل أي تفاصيل أو تجهيزات مطلوبة للمتابعة"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="dentist-modal-footer">
+        <button class="btn-cancel" (click)="closeFollowUpModal()">إلغاء</button>
+        <button class="btn-save" (click)="submitFollowUp()">حجز الموعد وتأكيده</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ============================================== -->
+<!-- MODAL: UPLOAD CLINICAL FILE                    -->
+<!-- ============================================== -->
+@if (showUploadModal) {
+  <div class="dentist-modal-overlay animate-fade">
+    <div class="dentist-modal-card">
+      <div class="dentist-modal-header">
+        <h3>رفع مستند أو أشعة للمريض: {{ (!isDirectBooking && selectedPatient) ? selectedPatient.name : 'ملف جديد' }}</h3>
+        <button class="btn-close-modal" (click)="closeUploadModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="dentist-modal-body">
+        <div class="modal-form-vertical">
+          @if (isDirectBooking || !selectedPatient) {
+            <div class="form-group-wrap">
+              <label>اختر المريض (Select Patient)</label>
+              <select [(ngModel)]="selectedPatientId" required>
+                <option value="" disabled selected>-- اختر مريضاً من القائمة --</option>
+                @for (pat of patients; track pat.id) {
+                  <option [value]="pat.id">{{ pat.name }}</option>
+                }
+              </select>
+            </div>
+          }
+          <div class="form-group-wrap">
+            <label>اختر الملف (صورة أشعة Panoramic أو ملف PDF)</label>
+            <input type="file" (change)="handleFileUpload($event)" accept="image/*,application/pdf" required />
+          </div>
+          
+          @if (uploadedFileName) {
+            <div class="uploaded-file-feedback">
+              <i class="bi bi-file-earmark-check-fill text-green"></i>
+              <span>تم اختيار: <strong>{{ uploadedFileName }}</strong></span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="dentist-modal-footer">
+        <button class="btn-cancel" (click)="closeUploadModal()">إلغاء</button>
+        <button class="btn-save" (click)="saveClinicalFile()">إتمام الرفع والربط</button>
+      </div>
+    </div>
+  </div>
+}

@@ -53,6 +53,28 @@ export class PatientDashboard implements OnInit {
     return this.appointments.filter(a => a.status === 'completed' || a.status === 'cancelled');
   }
 
+  getFormattedDate(dateStr: string): { month: string; day: string } {
+    if (!dateStr) return { month: '', day: '' };
+    
+    if (dateStr.includes('-')) {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthIndex = parseInt(parts[1], 10) - 1;
+        const monthName = months[monthIndex] || 'Jul';
+        const dayVal = parseInt(parts[2], 10).toString();
+        return { month: monthName, day: dayVal };
+      }
+    }
+    
+    const parts = dateStr.split(' ');
+    if (parts.length >= 2) {
+      return { month: parts[0], day: parts[1] };
+    }
+    
+    return { month: 'Date', day: dateStr };
+  }
+
   cancelAppointment(appId: string) {
     const confirmCancel = confirm('Are you sure you want to cancel this appointment?');
     if (!confirmCancel) return;

@@ -27,6 +27,28 @@
         <a class="menu-item" [class.active]="activeSubTab === 'reports'" (click)="activeSubTab = 'reports'">
           <i class="bi bi-graph-up-arrow"></i> Reports
         </a>
+      } @else if (authService.currentUser()?.role === 'dentist') {
+        <a class="menu-item" [class.active]="activeSubTab === 'dashboard'" (click)="activeSubTab = 'dashboard'">
+          <i class="bi bi-grid-1x2"></i> لوحة التحكم
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'schedule'" (click)="activeSubTab = 'schedule'">
+          <i class="bi bi-calendar-event"></i> جدولي اليومي
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'patients'" (click)="activeSubTab = 'patients'">
+          <i class="bi bi-people"></i> المرضى
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'records'" (click)="activeSubTab = 'records'">
+          <i class="bi bi-file-earmark-medical"></i> السجلات الطبية
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'files'" (click)="activeSubTab = 'files'">
+          <i class="bi bi-folder2-open"></i> الملفات السريرية
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'prescriptions'" (click)="activeSubTab = 'prescriptions'">
+          <i class="bi bi-prescription"></i> الوصفات الطبية
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'followups'" (click)="activeSubTab = 'followups'">
+          <i class="bi bi-calendar-check"></i> زيارات المتابعة
+        </a>
       } @else {
         <a class="menu-item active">
           <i class="bi bi-speedometer2"></i> Dashboard Panel
@@ -65,7 +87,7 @@
     @if (authService.currentUser()) {
       @switch (authService.currentUser()?.role) {
         @case ('dentist') {
-          <app-dentist-dashboard></app-dentist-dashboard>
+          <app-dentist-dashboard [activeSubTab]="$any(activeSubTab)"></app-dentist-dashboard>
         }
         @case ('receptionist') {
           <app-receptionist-dashboard></app-receptionist-dashboard>

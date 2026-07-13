@@ -113,7 +113,6 @@
         <input type="date" [(ngModel)]="selectedDateFilter" class="styled-date-input">
       </div>
     </div>
-
     <!-- Appointments Desk Table -->
     <div class="schedule-table-wrap">
       @if (getFilteredAppointments().length === 0) {
@@ -125,63 +124,58 @@
         <table class="styled-table">
           <thead>
             <tr>
-              <th>Time</th>
-              <th>Patient</th>
-              <th>Dentist</th>
+              <th>Date / Time</th>
+              <th>Patient Name</th>
+              <th>Contact Phone</th>
+              <th>Service Type</th>
+              <th>Dentist Assigned</th>
+              <th>Payment</th>
               <th>Status</th>
-              <th>Type</th>
-              <th>Phone</th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             @for (app of getFilteredAppointments(); track app.id) {
               <tr [class.emergency-row]="app.isEmergency">
                 <td class="time-col">
-                  <strong>{{ app.dateStr }}</strong>
-                  <span class="time-sub">{{ app.time }}</span>
-                </td>
-                <td class="patient-name">
-                  <div class="patient-avatar">{{ app.patientName.charAt(0) }}</div>
-                  <div>
-                    <strong>{{ app.patientName }}</strong>
-                    <span class="patient-id">#{{ app.id }}</span>
-                  </div>
-                </td>
-                <td class="dentist-col">{{ app.dentistName }}</td>
-                <td>
-                  <span class="status-badge" [class]="app.isEmergency ? 'emergency' : app.status">
-                    @if (app.isEmergency) {
-                      <i class="bi bi-exclamation-circle-fill"></i> Emergency
-                    } @else if (app.status === 'upcoming') {
-                      <i class="bi bi-check-circle-fill"></i> Confirmed
-                    } @else if (app.status === 'completed') {
-                      <i class="bi bi-check-circle-fill"></i> Completed
-                    } @else {
-                      <i class="bi bi-x-circle-fill"></i> Cancelled
-                    }
-                  </span>
-                </td>
-                <td>
-                  <span class="type-badge" [class.type-emergency]="app.isEmergency">
-                    <i class="bi" [class.bi-calendar]="!app.isEmergency" [class.bi-exclamation-triangle-fill]="app.isEmergency"></i>
-                    {{ app.isEmergency ? 'Emergency' : 'Regular' }}
-                  </span>
-                </td>
-                <td class="phone-col">{{ app.patientPhone }}</td>
-                <td>
-                  @if (app.status === 'upcoming') {
-                    <div class="action-buttons-cell">
-                      <button class="btn-table-action btn-success-sm" (click)="completeAppointment(app.id)" title="Complete">
-                        <i class="bi bi-check-lg"></i>
-                      </button>
-                      <button class="btn-table-action btn-danger-sm" (click)="cancelAppointment(app.id)" title="Cancel">
-                        <i class="bi bi-x-lg"></i>
-                      </button>
-                    </div>
-                  } @else {
-                    <span class="text-muted">Archived</span>
+                  <strong>{{ app.dateStr }} - {{ app.time }}</strong>
+                  @if (app.isEmergency) {
+                    <span class="emergency-badge">Emergency</span>
                   }
+                </td>
+                <td class="patient-name">{{ app.patientName }}</td>
+                <td>{{ app.patientPhone }}</td>
+                <td>{{ app.serviceName }}</td>
+                <td>{{ app.dentistName }}</td>
+                <td>
+                  <span class="payment-method-badge" [class.cash]="app.paymentMethod === 'Cash'" [class.card]="app.paymentMethod === 'Card'">
+                    {{ app.paymentMethod || 'Cash' }}
+                  </span>
+                  <span class="payment-status-badge" [class.paid]="app.paymentStatus === 'Paid'" [class.pending]="app.paymentStatus === 'Pending'">
+                    ({{ app.paymentStatus || 'Pending' }})
+                  </span>
+                </td>
+                <td>
+                  <span class="status-badge" [class]="app.status">{{ app.status.toUpperCase() }}</span>
+                </td>
+                <td>
+                  <div class="action-buttons-cell">
+                    @if ((app.paymentMethod === 'Cash' || !app.paymentMethod) && app.paymentStatus !== 'Paid' && app.status !== 'cancelled') {
+                      <button class="btn-table-action btn-warning-sm" (click)="confirmCashPayment(app.id)">
+                        <i class="bi bi-cash-coin"></i> Confirm Cash
+                      </button>
+                    }
+                    @if (app.status === 'upcoming') {
+                      <button class="btn-table-action btn-success-sm" (click)="completeAppointment(app.id)">
+                        Complete
+                      </button>
+                      <button class="btn-table-action btn-danger-sm" (click)="cancelAppointment(app.id)">
+                        Cancel
+                      </button>
+                    } @else if (app.paymentStatus === 'Paid') {
+                      <span class="text-muted">Archived</span>
+                    }
+                  </div>
                 </td>
               </tr>
             }
@@ -189,7 +183,6 @@
         </table>
       }
     </div>
-  </div>
 
   <!-- Floating Add Button (opens standard booking modal) -->
   <button class="fab-add" (click)="openBookingModal(false)" title="Book Appointment">

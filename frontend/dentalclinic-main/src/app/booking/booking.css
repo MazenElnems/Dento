@@ -743,3 +743,248 @@
     flex: 0 0 calc(50% - 16px);
   }
 }
+
+/* ── New API Booking & Paymob Styles ── */
+.dentists-select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.dentist-select-card {
+  background: #ffffff;
+  border: 1px solid #e8eaf0;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dentist-select-card:hover {
+  border-color: #0d1117;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.dentist-select-card.selected {
+  border-color: #0d1117;
+  background: rgba(13, 17, 23, 0.02);
+  box-shadow: 0 4px 12px rgba(13, 17, 23, 0.1);
+}
+
+.dentist-card-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid #e2e8f0;
+}
+
+.dentist-card-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dentist-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dentist-card-details h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0d1117;
+}
+
+.dentist-specialty {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+  align-self: flex-start;
+}
+
+.dentist-experience, .dentist-fee {
+  font-size: 0.75rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Lock Timer */
+.lock-timer-banner {
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  max-width: 500px;
+  margin: 0 auto 20px auto;
+}
+
+.lock-icon {
+  font-size: 2.2rem;
+  color: #ef4444;
+}
+
+.timer-digits-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.timer-label {
+  font-size: 0.8rem;
+  color: #ef4444;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.timer-countdown {
+  font-size: 1.8rem;
+  color: #ef4444;
+  font-family: 'Syne', sans-serif;
+  line-height: 1;
+}
+
+/* Paymob Button */
+.paymob-title {
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.paymob-desc {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin-bottom: 24px;
+}
+
+.btn-paymob-launch {
+  width: 100%;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 50px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-paymob-launch:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-paymob-launch:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+}
+
+/* Animations */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Timer Countdown Badge */
+.timer-countdown-badge {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Payment Method Switcher Tabs */
+.payment-method-tabs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.payment-tab {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #e8eaf0;
+  border-radius: 16px;
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.payment-tab:hover {
+  border-color: #0d1117;
+  color: #0d1117;
+}
+
+.payment-tab.active {
+  background: #0d1117;
+  border-color: #0d1117;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(13, 17, 23, 0.15);
+}
+
+.payment-tab i {
+  font-size: 1.25rem;
+}
+
+.btn-cash-confirm {
+  background: #10b981;
+}
+
+.btn-cash-confirm:hover {
+  background: #059669;
+}
+
+

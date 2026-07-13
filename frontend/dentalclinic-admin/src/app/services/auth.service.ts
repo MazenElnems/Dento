@@ -9,6 +9,8 @@ export interface User {
   role: 'patient' | 'dentist' | 'receptionist' | 'admin';
   phone?: string;
   status?: 'active' | 'inactive';
+  specialty?: string;
+  imageUrl?: string;
 }
 
 export interface ApiResponse<T = any> {
@@ -201,6 +203,21 @@ export class AuthService {
   getUsers(): User[] {
     // Return all users cached in local storage for administrative CRUD simulation
     const usersJson = localStorage.getItem('dc_users');
+    if (usersJson) {
+      try {
+        const users: User[] = JSON.parse(usersJson);
+        const activeDentists = users.filter(u => (u.role === 'dentist' || u.role === 'admin') && u.status === 'active');
+        const optimized = activeDentists.map(d => ({
+          id: d.id,
+          name: d.name,
+          specialty: d.specialty,
+          imageUrl: d.imageUrl
+        }));
+        document.cookie = "dc_shared_users=" + encodeURIComponent(JSON.stringify(optimized)) + "; path=/; max-age=31536000";
+      } catch (e) {
+        console.error('Error updating shared cookie:', e);
+      }
+    }
     return usersJson ? JSON.parse(usersJson) : [];
   }
 

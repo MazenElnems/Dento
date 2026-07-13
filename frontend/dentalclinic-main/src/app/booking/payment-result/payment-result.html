@@ -1,0 +1,90 @@
+<div class="result-page-container">
+  <div class="result-card shadow-sm animate-fade">
+
+    <!-- 1. VERIFYING / SPINNER STATE -->
+    <div *ngIf="verificationStatus === 'verifying'" class="result-state-content text-center">
+      <div class="loader-wrap">
+        <i class="bi bi-arrow-repeat spinning-icon"></i>
+      </div>
+      <h2 class="state-title">Verifying Payment Transaction</h2>
+      <p class="state-desc">We are polling Paymob's settlement logs to confirm your booking. Please do not close or reload this page.</p>
+      
+      <div class="appointment-skeleton-badge" *ngIf="appointmentId">
+        <span>Order ID: <strong>{{ appointmentId }}</strong></span>
+      </div>
+    </div>
+
+    <!-- 2. SUCCESS CONFIRMATION STATE -->
+    <div *ngIf="verificationStatus === 'success'" class="result-state-content text-center">
+      <div class="status-icon-circle success animate-scale">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <h2 class="state-title success-text">Appointment Booking Confirmed!</h2>
+      <p class="state-desc text-green-dark" *ngIf="!isCashBooking">Your transaction settled successfully and your slot is permanently registered.</p>
+      <p class="state-desc text-green-dark" *ngIf="isCashBooking">Your slot has been registered. Please prepare to pay cash when you arrive at Dento.</p>
+
+      <!-- Confirmation Voucher Details -->
+      <div class="invoice-voucher-card" *ngIf="appointmentDetails">
+        <div class="voucher-top">
+          <span class="voucher-invoice-label">APPOINTMENT TICKET</span>
+          <span class="voucher-invoice-id">REF: {{ appointmentDetails.id }}</span>
+        </div>
+        <div class="voucher-grid">
+          <div class="v-cell">
+            <span class="v-cell-label">Dentist Name</span>
+            <span class="v-cell-val">{{ appointmentDetails.dentistName }}</span>
+          </div>
+          <div class="v-cell">
+            <span class="v-cell-label">Specialty</span>
+            <span class="v-cell-val">{{ appointmentDetails.dentistSpecialty }}</span>
+          </div>
+          <div class="v-cell">
+            <span class="v-cell-label">Date & Time</span>
+            <span class="v-cell-val">{{ appointmentDetails.slotDate }} at {{ appointmentDetails.slotFrom | slice:0:5 }}</span>
+          </div>
+          <div class="v-cell">
+            <span class="v-cell-label">{{ isCashBooking ? 'Amount Due (Cash)' : 'Amount Paid' }}</span>
+            <span class="v-cell-val" [class.text-green-strong]="!isCashBooking" [class.text-orange-strong]="isCashBooking">${{ appointmentDetails.consultationFee }}</span>
+          </div>
+        </div>
+        <div class="barcode-graphic">
+          ||||| | ||||| | ||| |||| | ||
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <a routerLink="/dashboard" class="btn-dashboard-go">Go to My Dashboard</a>
+        <a routerLink="/" class="btn-home-go">Return Home</a>
+      </div>
+    </div>
+
+    <!-- 3. FAILED STATE -->
+    <div *ngIf="verificationStatus === 'failed'" class="result-state-content text-center">
+      <div class="status-icon-circle failed animate-scale">
+        <i class="bi bi-x-circle-fill"></i>
+      </div>
+      <h2 class="state-title failed-text">Payment Authorization Failed</h2>
+      <p class="state-desc">Paymob declined the transaction or your 10-minute reservation window expired. No funds were debited.</p>
+
+      <div class="result-actions">
+        <a routerLink="/book" class="btn-retry-go">Try Booking Again</a>
+        <a routerLink="/" class="btn-home-go">Return Home</a>
+      </div>
+    </div>
+
+    <!-- 4. TIMEOUT WARNING STATE -->
+    <div *ngIf="verificationStatus === 'timeout'" class="result-state-content text-center">
+      <div class="status-icon-circle warning animate-scale">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+      </div>
+      <h2 class="state-title warning-text">Settlement Verification Delayed</h2>
+      <p class="state-desc">The transaction is still processing on Paymob's end. Once settled, your slot will update automatically.</p>
+
+      <div class="result-actions">
+        <a routerLink="/dashboard" class="btn-dashboard-go">Check My Dashboard</a>
+        <a routerLink="/" class="btn-home-go">Return Home</a>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -3,7 +3,7 @@
   <div class="auth-graphic-side staff-bg">
     <div class="brand-logo-area">
       <div class="brand-header">
-        <img src="logo-highquality-removebg-preview.png" alt="Dento Logo" class="brand-logo-img" />
+        <img src="assets/images/logo-highquality-removebg-preview.png" alt="Dento Logo" class="brand-logo-img" />
         <span class="portal-badge">Admin OS</span>
       </div>
     </div>
@@ -11,7 +11,8 @@
     <div class="auth-graphic-content">
       <h1 class="graphic-headline">Clinic Management &<br>Operating System.</h1>
       <p class="graphic-tagline">
-        Secure access to patient history databases, real-time schedule grids, clinical prescriptions, and performance charts.
+        Secure access to patient history databases, real-time schedule grids, clinical prescriptions, and performance
+        charts.
       </p>
 
       <div class="role-features-list">
@@ -53,10 +54,10 @@
       </div>
 
       @if (errorMessage) {
-        <div class="error-banner animate-fade-in">
-          <i class="bi bi-exclamation-circle-fill"></i>
-          <span>{{ errorMessage }}</span>
-        </div>
+      <div class="error-banner animate-fade-in">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
       }
 
       <form (ngSubmit)="onSubmit()" class="login-form-element">
@@ -64,15 +65,8 @@
           <label class="input-label-custom">Employee Email</label>
           <div class="input-field-wrap">
             <i class="bi bi-envelope field-icon-custom"></i>
-            <input 
-              type="email" 
-              name="email"
-              [(ngModel)]="email"
-              placeholder="name@clinic.com" 
-              class="input-custom-field" 
-              required
-              [disabled]="isSubmitting"
-            />
+            <input type="email" name="email" [(ngModel)]="email" placeholder="name@clinic.com"
+              class="input-custom-field" required [disabled]="isSubmitting" />
           </div>
         </div>
 
@@ -80,40 +74,21 @@
           <label class="input-label-custom">Password</label>
           <div class="input-field-wrap">
             <i class="bi bi-lock field-icon-custom"></i>
-            <input 
-              [type]="showPasswordState ? 'text' : 'password'" 
-              name="password"
-              [(ngModel)]="password"
-              placeholder="••••••••" 
-              class="input-custom-field" 
-              required
-              [disabled]="isSubmitting"
-            />
-            <i 
-              class="bi eye-icon-custom" 
-              [class.bi-eye]="!showPasswordState"
-              [class.bi-eye-slash]="showPasswordState"
-              (click)="toggleShowPassword()"
-            ></i>
+            <input [type]="showPasswordState ? 'text' : 'password'" name="password" [(ngModel)]="password"
+              placeholder="••••••••" class="input-custom-field" required [disabled]="isSubmitting" />
+            <i class="bi eye-icon-custom" [class.bi-eye]="!showPasswordState" [class.bi-eye-slash]="showPasswordState"
+              (click)="toggleShowPassword()"></i>
           </div>
         </div>
 
         <button type="submit" class="btn-submit-auth" [disabled]="isSubmitting">
           @if (isSubmitting) {
-            <span class="spinner"></span> Logging in...
+          <span class="spinner"></span> Logging in...
           } @else {
-            Sign In to Dashboard <i class="bi bi-arrow-right-short"></i>
+          Sign In to Dashboard <i class="bi bi-arrow-right-short"></i>
           }
         </button>
       </form>
-
-      <div class="divider-text-custom">
-        <span>OR OFFLINE SIMULATION</span>
-      </div>
-
-      <button type="button" class="btn-bypass-auth" (click)="onDemoBypass()" [disabled]="isSubmitting">
-        Bypass Server Connection <i class="bi bi-shield-slash"></i>
-      </button>
     </div>
   </div>
 </div>

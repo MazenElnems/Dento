@@ -1,219 +1,282 @@
 <div class="receptionist-portal">
 
-  <!-- Top Welcome Bar -->
-  <div class="welcome-bar">
-    <div>
-      <h2>Welcome back, Receptionist <span class="wave">👋</span></h2>
-      <p>Here's what's happening today.</p>
-    </div>
-  </div>
-
-  <!-- Stat Cards -->
-  <div class="stats-row">
-    <div class="stat-card stat-blue">
-      <div class="stat-icon"><i class="bi bi-calendar-check-fill"></i></div>
-      <div class="stat-info">
-        <span class="stat-label">Today's Appointments</span>
-        <span class="stat-value">{{ appointments.length }}</span>
-        <div class="stat-tags">
-          <span class="tag tag-success">{{ completedCount }} Completed</span>
-          <span class="tag tag-warning">{{ upcomingCount }} Upcoming</span>
-        </div>
+  <!-- Metrics Cards (Top Panel) -->
+  <div class="metrics-row">
+    <div class="metric-card card-blue" (click)="switchSubTab('schedule')">
+      <div class="metric-icon"><i class="bi bi-calendar-check-fill"></i></div>
+      <div class="metric-details">
+        <span class="metric-label">Today's Appointments</span>
+        <h2 class="metric-value">{{ todayAppointmentsCount }}</h2>
       </div>
     </div>
-
-    <div class="stat-card stat-red">
-      <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
-      <div class="stat-info">
-        <span class="stat-label">Emergency Appointments</span>
-        <span class="stat-value">{{ emergencyCount }}</span>
-        <div class="stat-tags">
-          <span class="tag tag-danger">Require Attention</span>
-        </div>
+    <div class="metric-card card-red" (click)="switchSubTab('emergency')">
+      <div class="metric-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+      <div class="metric-details">
+        <span class="metric-label">Emergency Cases</span>
+        <h2 class="metric-value">{{ emergencyCount }}</h2>
       </div>
     </div>
-
-    <div class="stat-card stat-green">
-      <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
-      <div class="stat-info">
-        <span class="stat-label">Available Dentists</span>
-        <span class="stat-value">{{ dentists.length }}</span>
-        <div class="stat-tags">
-          <span class="tag tag-success">On Duty Now</span>
-        </div>
+    <div class="metric-card card-green">
+      <div class="metric-icon"><i class="bi bi-people-fill"></i></div>
+      <div class="metric-details">
+        <span class="metric-label">Available Dentists</span>
+        <h2 class="metric-value">{{ availableDentistsCount }}</h2>
       </div>
     </div>
   </div>
 
-  <!-- Quick Actions -->
-  <div class="quick-actions-title">Quick Actions</div>
-  <div class="quick-actions-row">
-    <button class="quick-action" (click)="openBookingModal(false)">
-      <div class="qa-icon qa-blue"><i class="bi bi-calendar-plus"></i></div>
-      <div class="qa-text">
-        <strong>Create Appointment</strong>
-        <span>Book a new appointment</span>
-      </div>
-      <i class="bi bi-chevron-right qa-arrow"></i>
-    </button>
+  <!-- Tab views -->
+  <div class="tab-viewport">
 
-    <button class="quick-action quick-action-danger" (click)="openBookingModal(true)">
-      <div class="qa-icon qa-red"><i class="bi bi-exclamation-triangle"></i></div>
-      <div class="qa-text">
-        <strong>Emergency Appointment</strong>
-        <span>Add emergency appointment</span>
-      </div>
-      <i class="bi bi-chevron-right qa-arrow"></i>
-    </button>
-
-    <!-- NEW -->
-    <button class="quick-action" (click)="viewDailySchedule()">
-      <div class="qa-icon qa-purple"><i class="bi bi-calendar-week"></i></div>
-      <div class="qa-text">
-        <strong>View Daily Schedule</strong>
-        <span>See full schedule</span>
-      </div>
-      <i class="bi bi-chevron-right qa-arrow"></i>
-    </button>
-  </div>
-
-  <!-- Filters Ribbon -->
-  <div class="schedule-panel" #scheduleSection>
-
-  <!-- Filters Ribbon -->
-  <div class="schedule-panel">
-    <div class="schedule-panel-header">
-      <h3>Today's Schedule</h3>
-      <div class="filters-ribbon">
-        <div class="filter-group">
-          <i class="bi bi-search filter-search-icon"></i>
-          <input type="text" class="styled-search" placeholder="Search by patient name..." [(ngModel)]="quickSearch">
+    <!-- SUBTAB 1: DASHBOARD (Home Page View) -->
+    <div *ngIf="activeSubTab === 'dashboard'" class="dashboard-columns animate-fade">
+      
+      <!-- COLUMN 1: Create Appointment Form -->
+      <div class="column-card">
+        <div class="card-header-icon blue-theme">
+          <i class="bi bi-calendar-plus-fill"></i>
+          <h3>Create Appointment</h3>
         </div>
-
-        <div class="select-wrapper-sm">
-          <select [(ngModel)]="selectedDentistFilter">
-            <option value="all">All Dentists</option>
-            @for (den of dentists; track den.id) {
-              <option [value]="den.id">{{ den.name }}</option>
-            }
-          </select>
-          <i class="bi bi-chevron-down"></i>
-        </div>
-
-        <div class="select-wrapper-sm">
-          <select [(ngModel)]="selectedStatusFilter">
-            <option value="all">All Status</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-          <i class="bi bi-chevron-down"></i>
-        </div>
-
-        <input type="date" [(ngModel)]="selectedDateFilter" class="styled-date-input">
-      </div>
-    </div>
-    <!-- Appointments Desk Table -->
-    <div class="schedule-table-wrap">
-      @if (getFilteredAppointments().length === 0) {
-        <div class="empty-portal-state">
-          <i class="bi bi-search"></i>
-          <p>No appointments match the selected filters.</p>
-        </div>
-      } @else {
-        <table class="styled-table">
-          <thead>
-            <tr>
-              <th>Date / Time</th>
-              <th>Patient Name</th>
-              <th>Contact Phone</th>
-              <th>Service Type</th>
-              <th>Dentist Assigned</th>
-              <th>Payment</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (app of getFilteredAppointments(); track app.id) {
-              <tr [class.emergency-row]="app.isEmergency">
-                <td class="time-col">
-                  <strong>{{ app.dateStr }} - {{ app.time }}</strong>
-                  @if (app.isEmergency) {
-                    <span class="emergency-badge">Emergency</span>
-                  }
-                </td>
-                <td class="patient-name">{{ app.patientName }}</td>
-                <td>{{ app.patientPhone }}</td>
-                <td>{{ app.serviceName }}</td>
-                <td>{{ app.dentistName }}</td>
-                <td>
-                  <span class="payment-method-badge" [class.cash]="app.paymentMethod === 'Cash'" [class.card]="app.paymentMethod === 'Card'">
-                    {{ app.paymentMethod || 'Cash' }}
-                  </span>
-                  <span class="payment-status-badge" [class.paid]="app.paymentStatus === 'Paid'" [class.pending]="app.paymentStatus === 'Pending'">
-                    ({{ app.paymentStatus || 'Pending' }})
-                  </span>
-                </td>
-                <td>
-                  <span class="status-badge" [class]="app.status">{{ app.status.toUpperCase() }}</span>
-                </td>
-                <td>
-                  <div class="action-buttons-cell">
-                    @if ((app.paymentMethod === 'Cash' || !app.paymentMethod) && app.paymentStatus !== 'Paid' && app.status !== 'cancelled') {
-                      <button class="btn-table-action btn-warning-sm" (click)="confirmCashPayment(app.id)">
-                        <i class="bi bi-cash-coin"></i> Confirm Cash
-                      </button>
-                    }
-                    @if (app.status === 'upcoming') {
-                      <button class="btn-table-action btn-success-sm" (click)="completeAppointment(app.id)">
-                        Complete
-                      </button>
-                      <button class="btn-table-action btn-danger-sm" (click)="cancelAppointment(app.id)">
-                        Cancel
-                      </button>
-                    } @else if (app.paymentStatus === 'Paid') {
-                      <span class="text-muted">Archived</span>
-                    }
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
-    </div>
-
-  <!-- Floating Add Button (opens standard booking modal) -->
-  <button class="fab-add" (click)="openBookingModal(false)" title="Book Appointment">
-    <i class="bi bi-plus-lg"></i>
-  </button>
-
-  <!-- Manual Booking Modal (Dual purpose) -->
-  @if (showBookingModal) {
-    <div class="modal-backdrop animate-fade-in">
-      <div class="modal-card animate-zoom-in">
-        <div class="modal-header" [class.emergency-modal-header]="isEmergencyBooking">
-          <h3>
-            <i class="bi" [class.bi-exclamation-triangle]="isEmergencyBooking" [class.bi-calendar-plus]="!isEmergencyBooking"></i>
-            {{ isEmergencyBooking ? 'Emergency Appointment Allocation' : 'Manual Appointment Booking' }}
-          </h3>
-          <button class="close-btn" (click)="closeBookingModal()">&times;</button>
-        </div>
-        <div class="modal-body">
+        
+        <div class="card-form-body">
           <div class="form-group">
-            <label for="pName">Patient Name</label>
-            <input type="text" id="pName" [(ngModel)]="patientName" placeholder="Enter patient name" class="styled-input">
+            <label>Patient Name</label>
+            <input type="text" [(ngModel)]="patientName" placeholder="Enter patient name" class="styled-input">
           </div>
+          
           <div class="form-group">
-            <label for="pPhone">Patient Phone Number</label>
-            <input type="tel" id="pPhone" [(ngModel)]="patientPhone" placeholder="e.g. 01000000000" class="styled-input">
+            <label>Phone Number</label>
+            <input type="tel" [(ngModel)]="patientPhone" placeholder="Enter phone number" class="styled-input">
+          </div>
+
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label>Select Service</label>
+              <div class="select-wrapper">
+                <select [(ngModel)]="bookingService">
+                  @for (s of services; track s.id) {
+                    <option [value]="s.id">{{ s.name }} (${{ s.price }})</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Assign Dentist</label>
+              <div class="select-wrapper">
+                <select [(ngModel)]="bookingDentistId">
+                  @for (d of dentists; track d.id) {
+                    <option [value]="d.id">{{ d.name }}</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" [(ngModel)]="bookingDate" class="styled-input">
+            </div>
+
+            <div class="form-group">
+              <label>Time Slot</label>
+              <div class="select-wrapper">
+                <select [(ngModel)]="bookingTime">
+                  @for (t of availableTimes; track t) {
+                    <option [value]="t">{{ t }}</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-action-primary w-full" (click)="submitNormalBooking()">
+            Save Appointment
+          </button>
+
+          <div class="form-hint-box info-box">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>Supports: Phone Booking, Walk-in Patient, Patient Without Online Account</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMN 2: Emergency Appointment Form -->
+      <div class="column-card">
+        <div class="card-header-icon red-theme">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <h3>Emergency Appointment</h3>
+        </div>
+        
+        <div class="card-form-body">
+          <div class="form-group">
+            <label>Patient Name</label>
+            <input type="text" [(ngModel)]="emergPatientName" placeholder="Enter patient name" class="styled-input">
+          </div>
+          
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" [(ngModel)]="emergPatientPhone" placeholder="Enter phone number" class="styled-input">
+          </div>
+
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label>Select Service</label>
+              <div class="select-wrapper">
+                <select [(ngModel)]="emergService">
+                  @for (s of services; track s.id) {
+                    <option [value]="s.id">{{ s.name }} (${{ s.price }})</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Assign Dentist</label>
+              <div class="select-wrapper">
+                <select [(ngModel)]="emergDentistId">
+                  @for (d of dentists; track d.id) {
+                    <option [value]="d.id">{{ d.name }}</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" [(ngModel)]="emergDate" class="styled-input">
+            </div>
+
+            <div class="form-group">
+              <label>Time Slot</label>
+              <div class="select-wrapper">
+                <select [(ngModel)]="emergTime">
+                  @for (t of availableTimes; track t) {
+                    <option [value]="t">{{ t }}</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="emergency-check-row">
+            <input type="checkbox" checked disabled id="emergCheck">
+            <label for="emergCheck">Mark as Emergency</label>
+          </div>
+
+          <button class="btn-action-danger w-full" (click)="submitEmergencyBooking()">
+            Assign
+          </button>
+
+          <ul class="emerg-rules-list">
+            <li>• Cannot replace an existing appointment</li>
+            <li>• Only available time slots can be selected</li>
+            <li>• Appointment will be marked as Emergency</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- COLUMN 3: Today's Schedule Mini-table -->
+      <div class="column-card">
+        <div class="card-header-icon purple-theme">
+          <i class="bi bi-calendar-week-fill"></i>
+          <h3>Today's Schedule</h3>
+        </div>
+
+        <div class="card-form-body">
+          <!-- Small inline filters -->
+          <div class="mini-filters">
+            <div class="select-wrapper-sm">
+              <select [(ngModel)]="selectedDentistFilter">
+                <option value="all">All Dentists</option>
+                @for (d of dentists; track d.id) {
+                  <option [value]="d.id">{{ d.name }}</option>
+                }
+              </select>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+            
+            <div class="select-wrapper-sm">
+              <select [(ngModel)]="selectedStatusFilter">
+                <option value="all">Statuses</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+          </div>
+
+          <!-- Schedule Mini-Table -->
+          <div class="mini-table-wrap">
+            <table class="styled-table mini">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Patient</th>
+                  <th>Dentist</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (app of getFilteredAppointments() | slice:0:5; track app.id) {
+                  <tr>
+                    <td class="time-col"><strong>{{ app.time }}</strong></td>
+                    <td class="patient-name">{{ app.patientName }}</td>
+                    <td>{{ app.dentistName }}</td>
+                    <td>
+                      <span class="status-badge" [class]="app.status">{{ app.status.toUpperCase() }}</span>
+                    </td>
+                  </tr>
+                }
+                @if (getFilteredAppointments().length === 0) {
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">No appointments found.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <button class="btn-secondary-sm w-full mt-10" (click)="switchSubTab('schedule')">
+            <i class="bi bi-calendar-event"></i> View Full Schedule
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBTAB 2: APPOINTMENTS (Full View) -->
+    <div *ngIf="activeSubTab === 'appointments'" class="full-tab-container animate-fade">
+      <div class="column-card full-card">
+        <div class="card-header-icon blue-theme">
+          <i class="bi bi-calendar-plus-fill"></i>
+          <h3>Manual Appointment Booking</h3>
+        </div>
+        <div class="card-form-body full-form-width">
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label>Patient Name</label>
+              <input type="text" [(ngModel)]="patientName" placeholder="Enter patient name" class="styled-input">
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" [(ngModel)]="patientPhone" placeholder="Enter phone number" class="styled-input">
+            </div>
           </div>
           <div class="grid-2-modal">
             <div class="form-group">
-              <label for="service">Select Service</label>
+              <label>Select Service</label>
               <div class="select-wrapper">
-                <select id="service" [(ngModel)]="bookingService">
+                <select [(ngModel)]="bookingService">
                   @for (s of services; track s.id) {
                     <option [value]="s.id">{{ s.name }} (${{ s.price }})</option>
                   }
@@ -222,9 +285,9 @@
               </div>
             </div>
             <div class="form-group">
-              <label for="bDentist">Assign Dentist</label>
+              <label>Assign Dentist</label>
               <div class="select-wrapper">
-                <select id="bDentist" [(ngModel)]="bookingDentistId">
+                <select [(ngModel)]="bookingDentistId">
                   @for (d of dentists; track d.id) {
                     <option [value]="d.id">{{ d.name }}</option>
                   }
@@ -235,13 +298,13 @@
           </div>
           <div class="grid-2-modal">
             <div class="form-group">
-              <label for="bDate">Appointment Date</label>
-              <input type="date" id="bDate" [(ngModel)]="bookingDate" class="styled-input">
+              <label>Date</label>
+              <input type="date" [(ngModel)]="bookingDate" class="styled-input">
             </div>
             <div class="form-group">
-              <label for="bTime">Time Slot</label>
+              <label>Time Slot</label>
               <div class="select-wrapper">
-                <select id="bTime" [(ngModel)]="bookingTime">
+                <select [(ngModel)]="bookingTime">
                   @for (t of availableTimes; track t) {
                     <option [value]="t">{{ t }}</option>
                   }
@@ -250,15 +313,259 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-secondary-sm" (click)="closeBookingModal()">Cancel</button>
-          <button [class]="isEmergencyBooking ? 'btn-danger-sm' : 'btn-primary-sm'" (click)="submitBooking()">
-            {{ isEmergencyBooking ? 'Confirm Emergency Slot' : 'Confirm Appointment' }}
+          <button class="btn-action-primary" (click)="submitNormalBooking()" style="margin-top: 15px; width: 250px;">
+            Save Appointment
           </button>
         </div>
       </div>
     </div>
-  }
+
+    <!-- SUBTAB 3: EMERGENCY APPOINTMENTS (Full View) -->
+    <div *ngIf="activeSubTab === 'emergency'" class="full-tab-container animate-fade">
+      <div class="column-card full-card">
+        <div class="card-header-icon red-theme">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <h3>Emergency Appointment Allocation</h3>
+        </div>
+        <div class="card-form-body full-form-width">
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label>Patient Name</label>
+              <input type="text" [(ngModel)]="emergPatientName" placeholder="Enter patient name" class="styled-input">
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" [(ngModel)]="emergPatientPhone" placeholder="Enter phone number" class="styled-input">
+            </div>
+          </div>
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label>Select Service</label>
+              <div class="select-wrapper">
+                <select [(ngModel)]="emergService">
+                  @for (s of services; track s.id) {
+                    <option [value]="s.id">{{ s.name }} (${{ s.price }})</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Assign Dentist</label>
+              <div class="select-wrapper">
+                <select [(ngModel)]="emergDentistId">
+                  @for (d of dentists; track d.id) {
+                    <option [value]="d.id">{{ d.name }}</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+          <div class="grid-2-modal">
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" [(ngModel)]="emergDate" class="styled-input">
+            </div>
+            <div class="form-group">
+              <label>Time Slot</label>
+              <div class="select-wrapper">
+                <select [(ngModel)]="emergTime">
+                  @for (t of availableTimes; track t) {
+                    <option [value]="t">{{ t }}</option>
+                  }
+                </select>
+                <i class="bi bi-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+          <div class="emergency-check-row">
+            <input type="checkbox" checked disabled id="emergCheckFull">
+            <label for="emergCheckFull">Mark as Emergency</label>
+          </div>
+          <button class="btn-action-danger" (click)="submitEmergencyBooking()" style="margin-top: 15px; width: 250px;">
+            Assign Emergency Slot
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBTAB 4: DAILY SCHEDULE (Full View) -->
+    <div *ngIf="activeSubTab === 'schedule'" class="full-tab-container animate-fade">
+      
+      <!-- Panel Header & Search Filters -->
+      <div class="schedule-panel">
+        <div class="schedule-panel-header">
+          <h3>Daily Clinic Schedule</h3>
+          <div class="filters-ribbon">
+            <div class="filter-group">
+              <i class="bi bi-search filter-search-icon"></i>
+              <input type="text" class="styled-search" placeholder="Search by patient name..." [(ngModel)]="quickSearch">
+            </div>
+            
+            <div class="select-wrapper-sm">
+              <select [(ngModel)]="selectedDentistFilter">
+                <option value="all">All Dentists</option>
+                @for (den of dentists; track den.id) {
+                  <option [value]="den.id">{{ den.name }}</option>
+                }
+              </select>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+            
+            <div class="select-wrapper-sm">
+              <select [(ngModel)]="selectedStatusFilter">
+                <option value="all">All Statuses</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <i class="bi bi-chevron-down"></i>
+            </div>
+            
+            <input type="date" [(ngModel)]="selectedDateFilter" class="styled-date-input">
+          </div>
+        </div>
+
+        <!-- Full Schedule Table -->
+        <div class="schedule-table-wrap">
+          @if (getFilteredAppointments().length === 0) {
+            <div class="empty-portal-state">
+              <i class="bi bi-search"></i>
+              <p>No appointments match the selected filters.</p>
+            </div>
+          } @else {
+            <table class="styled-table">
+              <thead>
+                <tr>
+                  <th>Date / Time</th>
+                  <th>Patient Name</th>
+                  <th>Contact Phone</th>
+                  <th>Service Type</th>
+                  <th>Dentist Assigned</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (app of getFilteredAppointments(); track app.id) {
+                  <tr [class.emergency-row]="app.isEmergency">
+                    <td class="time-col">
+                      <strong>{{ app.dateStr }} - {{ app.time }}</strong>
+                      @if (app.isEmergency) {
+                        <span class="emergency-badge">Emergency</span>
+                      }
+                    </td>
+                    <td class="patient-name">{{ app.patientName }}</td>
+                    <td>{{ app.patientPhone }}</td>
+                    <td>{{ app.serviceName }}</td>
+                    <td>{{ app.dentistName }}</td>
+                    <td>
+                      <span class="payment-method-badge" [class.cash]="app.paymentMethod === 'Cash'" [class.card]="app.paymentMethod === 'Card'">
+                        {{ app.paymentMethod || 'Cash' }}
+                      </span>
+                      <span class="payment-status-badge" [class.paid]="app.paymentStatus === 'Paid'" [class.pending]="app.paymentStatus === 'Pending'">
+                        ({{ app.paymentStatus || 'Pending' }})
+                      </span>
+                    </td>
+                    <td>
+                      <span class="status-badge" [class]="app.status">{{ app.status.toUpperCase() }}</span>
+                    </td>
+                    <td>
+                      <div class="action-buttons-cell">
+                        @if ((app.paymentMethod === 'Cash' || !app.paymentMethod) && app.paymentStatus !== 'Paid' && app.status !== 'cancelled') {
+                          <button class="btn-table-action btn-warning-sm" (click)="confirmCashPayment(app.id)">
+                            <i class="bi bi-cash-coin"></i> Confirm Cash
+                          </button>
+                        }
+                        @if (app.status === 'upcoming') {
+                          <button class="btn-table-action btn-success-sm" (click)="completeAppointment(app.id)">
+                            Complete
+                          </button>
+                          <button class="btn-table-action btn-danger-sm" (click)="cancelAppointment(app.id)">
+                            Cancel
+                          </button>
+                        } @else if (app.paymentStatus === 'Paid') {
+                          <span class="text-muted">Archived</span>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBTAB 5: PROFILE (Receptionist Profile details) -->
+    <div *ngIf="activeSubTab === 'profile'" class="full-tab-container animate-fade">
+      <div class="column-card full-card">
+        <div class="card-header-icon purple-theme">
+          <i class="bi bi-person-circle"></i>
+          <h3>Receptionist Staff Profile</h3>
+        </div>
+        <div class="card-form-body text-center" style="padding: 40px 20px;">
+          <div style="font-size: 80px; color: var(--primary); margin-bottom: 15px;">
+            <i class="bi bi-person-badge-fill"></i>
+          </div>
+          <h2>{{ authService.currentUser()?.name }}</h2>
+          <p class="text-muted" style="margin-top: 5px;">Role: Clinical Desk Receptionist</p>
+          <div style="max-width: 400px; margin: 30px auto; text-align: left; background: var(--bg-muted); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+            <div style="margin-bottom: 12px;"><strong>User ID:</strong> {{ authService.currentUser()?.id }}</div>
+            <div style="margin-bottom: 12px;"><strong>Email:</strong> {{ authService.currentUser()?.email }}</div>
+            <div style="margin-bottom: 12px;"><strong>Assigned Clinic:</strong> BrightSmile Clinic main desk</div>
+            <div><strong>Status:</strong> Active (On Duty)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Quick Actions Ribbon -->
+  <div *ngIf="activeSubTab === 'dashboard'" class="quick-actions-section">
+    <h4><i class="bi bi-lightning-fill"></i> Quick Actions</h4>
+    <div class="quick-actions-row">
+      
+      <button class="quick-action" (click)="switchSubTab('appointments')">
+        <div class="qa-icon qa-blue"><i class="bi bi-calendar-plus"></i></div>
+        <div class="qa-text">
+          <strong>New Appointment</strong>
+          <span>Create a new manual booking</span>
+        </div>
+        <i class="bi bi-chevron-right qa-arrow"></i>
+      </button>
+
+      <button class="quick-action quick-action-danger" (click)="switchSubTab('emergency')">
+        <div class="qa-icon qa-red"><i class="bi bi-exclamation-triangle"></i></div>
+        <div class="qa-text">
+          <strong>Emergency Case</strong>
+          <span>Allocate emergency slot</span>
+        </div>
+        <i class="bi bi-chevron-right qa-arrow"></i>
+      </button>
+
+      <button class="quick-action" (click)="switchSubTab('schedule')">
+        <div class="qa-icon qa-green"><i class="bi bi-search"></i></div>
+        <div class="qa-text">
+          <strong>View All Appointments</strong>
+          <span>Search & filter daily desk</span>
+        </div>
+        <i class="bi bi-chevron-right qa-arrow"></i>
+      </button>
+
+      <button class="quick-action" (click)="switchSubTab('schedule')">
+        <div class="qa-icon qa-purple"><i class="bi bi-calendar-week"></i></div>
+        <div class="qa-text">
+          <strong>Today's Schedule</strong>
+          <span>See full calendar timeline</span>
+        </div>
+        <i class="bi bi-chevron-right qa-arrow"></i>
+      </button>
+    </div>
+  </div>
 
 </div>

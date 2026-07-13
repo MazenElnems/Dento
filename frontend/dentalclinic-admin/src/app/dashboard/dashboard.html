@@ -49,15 +49,21 @@
         <a class="menu-item" [class.active]="activeSubTab === 'followups'" (click)="activeSubTab = 'followups'">
           <i class="bi bi-calendar-check"></i> زيارات المتابعة
         </a>
-      } @else {
-        <a class="menu-item active">
-          <i class="bi bi-speedometer2"></i> Dashboard Panel
+      } @else if (authService.currentUser()?.role === 'receptionist') {
+        <a class="menu-item" [class.active]="activeSubTab === 'dashboard'" (click)="activeSubTab = 'dashboard'">
+          <i class="bi bi-grid-1x2"></i> Dashboard
         </a>
-        <a class="menu-item disabled">
-          <i class="bi bi-chat-left-text"></i> Messages
+        <a class="menu-item" [class.active]="activeSubTab === 'appointments'" (click)="activeSubTab = 'appointments'">
+          <i class="bi bi-calendar-plus"></i> Appointments
         </a>
-        <a class="menu-item disabled">
-          <i class="bi bi-gear"></i> Settings
+        <a class="menu-item" [class.active]="activeSubTab === 'emergency'" (click)="activeSubTab = 'emergency'">
+          <i class="bi bi-exclamation-circle"></i> Emergency Appointments
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'schedule'" (click)="activeSubTab = 'schedule'">
+          <i class="bi bi-calendar3"></i> Daily Schedule
+        </a>
+        <a class="menu-item" [class.active]="activeSubTab === 'profile'" (click)="activeSubTab = 'profile'">
+          <i class="bi bi-person-circle"></i> Profile
         </a>
       }
     </nav>
@@ -90,7 +96,7 @@
           <app-dentist-dashboard [activeSubTab]="$any(activeSubTab)"></app-dentist-dashboard>
         }
         @case ('receptionist') {
-          <app-receptionist-dashboard></app-receptionist-dashboard>
+          <app-receptionist-dashboard [(activeSubTab)]="activeSubTab"></app-receptionist-dashboard>
         }
         @case ('admin') {
           <app-admin-dashboard [activeSubTab]="$any(activeSubTab)"></app-admin-dashboard>

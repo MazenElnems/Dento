@@ -27,4 +27,13 @@ public class Dentist : ApplicationUser
             DentistId = Id
         };
     }
+
+    public class PatientSpeciality
+    {
+        public string PatientId { get; set; } = default!;
+        public string Specialty { get; set; } = default!;
+
+    }
+
+
 }

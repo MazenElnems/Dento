@@ -187,4 +187,32 @@ public class AppointmentsController : BaseApiController
 
         return ApiResponse.SuccessResponse(response);
     }
+
+
+
+
+    [HttpGet("today")]
+    [Authorize(Roles = RoleNames.Admin + "," + RoleNames.Dentist + "," + RoleNames.Receptionist)]
+    public async Task<ActionResult<ApiResponse>> GetTodayPatients()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        var patients = await _context.Appointments
+            .AsNoTracking()
+            .Where(a => a.Slot.Date == today)
+            .OrderBy(a => a.Slot.From)
+            .Select(a => new TodayPatientDto
+            {
+                AppointmentId = a.Id,
+                PatientId = a.Patient.Id,
+                FullName = a.Patient.FullName,
+                PhoneNumber = a.Patient.PhoneNumber,
+                AppointmentTime = a.Slot.From,
+                AppointmentType = a.AppointmentType,
+                Status = a.Status
+            })
+            .ToListAsync();
+
+        return ApiResponse.SuccessResponse(patients);
+    }
 }

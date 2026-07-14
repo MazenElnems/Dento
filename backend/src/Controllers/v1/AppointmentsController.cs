@@ -187,4 +187,52 @@ public class AppointmentsController : BaseApiController
 
         return ApiResponse.SuccessResponse(response);
     }
+
+    /// <summary>
+    /// Gets a list of appointments for the currently authenticated patient.
+    /// </summary>
+    /// <param name="status">Optional filter for status (e.g. "upcoming" or "completed").</param>
+    [HttpGet("my-appointments")]
+    [Authorize(Roles = RoleNames.Patient)]
+    public async Task<ActionResult<ApiResponse>> GetMyAppointments([FromQuery] string? status)
+    {
+        var query = _context.Appointments
+            .Include(a => a.Slot)
+            .Include(a => a.Dentist)
+            .Include(a => a.Payment)
+            .Where(a => a.PatientId == CurrentUser.Id);
+
+        if (!string.IsNullOrEmpty(status))
+        {
+            if (status.Equals("upcoming", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.Where(a => a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Confirmed);
+            }
+            else if (status.Equals("completed", StringComparison.OrdinalIgnoreCase))
+            {
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                query = query.Where(a => a.Status == AppointmentStatus.Canceled || a.Status == AppointmentStatus.Failed || (a.Status == AppointmentStatus.Confirmed && a.Slot.Date < today));
+            }
+        }
+
+        var appointments = await query
+            .OrderByDescending(a => a.Slot.Date)
+            .ThenByDescending(a => a.Slot.From)
+            .Select(a => new AppointmentListItemDto
+            {
+                Id = a.Id,
+                Status = a.Status,
+                AppointmentType = a.AppointmentType,
+                SlotDate = a.Slot.Date,
+                SlotFrom = a.Slot.From,
+                SlotTo = a.Slot.To,
+                DentistId = a.Dentist.Id,
+                DentistName = a.Dentist.FullName,
+                PaymentId = a.Payment != null ? a.Payment.Id : null,
+                PaymentStatus = a.Payment != null ? a.Payment.Status : null
+            })
+            .ToListAsync();
+
+        return ApiResponse.SuccessResponse(appointments);
+    }
 }
